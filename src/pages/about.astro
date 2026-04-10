@@ -13,10 +13,26 @@ const htmlContent = await marked.parse(contentWithoutFrontmatter);
 
 <PageLayout title="About" description="About Will Pike -- physician and researcher.">
   <div class="max-w-3xl mx-auto px-6 py-12">
-    <h1 class="text-2xl font-bold text-primary dark:text-white mb-8">About</h1>
+    <h1 class="text-2xl font-bold text-primary dark:text-white mb-8">About Me</h1>
     <article
       class="prose prose-sm dark:prose-invert max-w-none prose-headings:text-primary dark:prose-headings:text-white prose-a:text-accent"
       set:html={htmlContent}
     />
+
+    <div class="mt-12 pt-10 border-t border-gray-200 dark:border-gray-700 flex flex-col md:flex-row items-center gap-8">
+      <img
+        src="/family.jpeg"
+        alt="Will and Aleisha with their whippets Bleu and Sammy"
+        class="w-64 md:w-80 rounded-2xl shadow-lg object-cover"
+      />
+      <div>
+        <h2 class="text-lg font-bold text-primary dark:text-white mb-2">The Family</h2>
+        <p class="text-gray-600 dark:text-gray-300 leading-relaxed text-sm">
+          When I'm not buried in manuscripts, I'm at home with my wife Aleisha
+          and our two whippets -- Bleu (left) and Sammy (right). They keep us busy, entertained,
+          and well-exercised.
+        </p>
+      </div>
+    </div>
   </div>
 </PageLayout>
