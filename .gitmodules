@@ -1,3 +1,4 @@
 [submodule "publications"]
 	path = publications
 	url = git@github.com:pike00/Publications.git
+	branch = master
