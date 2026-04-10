@@ -1,43 +1,49 @@
-# Astro Starter Kit: Minimal
+# personal-site
+
+Personal site and academic portfolio built with [Astro](https://astro.build), deployed to [Cloudflare Pages](https://pages.cloudflare.com).
+
+## Stack
+
+- **Astro 5** + TypeScript (strict)
+- **Tailwind CSS** with dark mode
+- **React** for interactive components (publication search via Fuse.js)
+- **Typst** for CV compilation (`.typ` -> PDF)
+- **Publications** sourced from a git submodule with auto-generated citations
+
+## Project Structure
+
+```
+src/
+├── pages/          # Routes: index, about, projects, publications, cv, contact
+├── components/     # Astro + React components
+├── layouts/        # Base and page layouts
+├── content/        # Content collections (cv, projects, publication tags)
+├── lib/            # Utilities (citations, abstracts, types)
+└── styles/         # Global CSS
+scripts/            # Build utilities (Bash + Tsx)
+publications/       # Git submodule
+```
+
+## Development
+
+Requires Node >= 22.12.0 and [Typst](https://typst.app) for CV builds.
 
 ```sh
-npm create astro@latest -- --template minimal
+npm install
+npm run dev          # Start dev server at localhost:4321
+npm run build        # Full pipeline: PDFs -> citations -> CV -> Astro build
+npm run preview      # Preview production build
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+### Build pipeline
 
-## 🚀 Project Structure
+`npm run build` runs these steps in sequence:
 
-Inside of your Astro project, you'll see the following folders and files:
+1. `build:pdfs` -- copy publication PDFs from the submodule
+2. `build:citations` -- generate citation metadata from source files
+3. `build:cv` -- compile CV from Typst template to PDF
+4. `astro build` -- build the static site
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
+## Deployment
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
-
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
-
-Any static assets, like images, can be placed in the `public/` directory.
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+Deployed via GitHub Actions to Cloudflare Pages. Builds trigger on pushes to main and via `repository_dispatch` when the publications submodule is updated upstream.
