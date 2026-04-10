@@ -6,7 +6,11 @@ interface Props {
   publications: SearchablePublication[];
   allTags: string[];
   allYears: string[];
-  initialTag?: string;
+}
+
+function getInitialTag(): string {
+  if (typeof window === "undefined") return "";
+  return new URLSearchParams(window.location.search).get("tag") ?? "";
 }
 
 function highlightAuthor(authors: string): string {
@@ -20,10 +24,9 @@ export default function SearchPublications({
   publications,
   allTags,
   allYears,
-  initialTag,
 }: Props) {
   const [query, setQuery] = useState("");
-  const [selectedTag, setSelectedTag] = useState(initialTag ?? "");
+  const [selectedTag, setSelectedTag] = useState(getInitialTag);
   const [selectedYear, setSelectedYear] = useState("");
   const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
 

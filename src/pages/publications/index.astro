@@ -12,9 +12,6 @@ const allYears = [...new Set(
     .map((p) => p.pubDate?.split("-")[0])
     .filter(Boolean)
 )].sort().reverse();
-
-const url = new URL(Astro.request.url);
-const initialTag = url.searchParams.get("tag") ?? undefined;
 ---
 
 <PageLayout
@@ -32,7 +29,6 @@ const initialTag = url.searchParams.get("tag") ?? undefined;
       publications={searchIndex}
       allTags={allTags}
       allYears={allYears}
-      initialTag={initialTag}
     />
   </div>
 </PageLayout>
