@@ -1,0 +1,33 @@
+---
+interface Props {
+  tag: string;
+  href?: string;
+  size?: "sm" | "md";
+}
+
+const { tag, href, size = "md" } = Astro.props;
+const sizeClasses = size === "sm"
+  ? "text-xs px-2.5 py-0.5"
+  : "text-sm px-4 py-2";
+---
+
+{href ? (
+  <a
+    href={href}
+    class:list={[
+      "inline-block rounded-full font-medium bg-purple-50 text-accent-dark dark:bg-purple-950 dark:text-accent hover:bg-purple-100 dark:hover:bg-purple-900 transition-colors",
+      sizeClasses,
+    ]}
+  >
+    {tag}
+  </a>
+) : (
+  <span
+    class:list={[
+      "inline-block rounded-full font-medium bg-purple-50 text-accent-dark dark:bg-purple-950 dark:text-accent",
+      sizeClasses,
+    ]}
+  >
+    {tag}
+  </span>
+)}

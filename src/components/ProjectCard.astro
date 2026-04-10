@@ -1,0 +1,31 @@
+---
+import TopicPill from "./TopicPill.astro";
+
+interface Props {
+  title: string;
+  description: string;
+  url?: string;
+  repo?: string;
+  tags: string[];
+}
+
+const { title, description, url, repo, tags } = Astro.props;
+const href = url || repo;
+---
+
+<div class="bg-white dark:bg-surface-card-dark border border-gray-200 dark:border-gray-700 rounded-lg p-5 hover:shadow-md transition-shadow">
+  <h3 class="text-sm font-semibold text-primary dark:text-gray-100">{title}</h3>
+  <p class="text-xs text-gray-500 dark:text-gray-400 mt-2 leading-relaxed">{description}</p>
+  <div class="flex items-center justify-between mt-4">
+    <div class="flex flex-wrap gap-1.5">
+      {tags.map((tag) => (
+        <TopicPill tag={tag} size="sm" />
+      ))}
+    </div>
+    {href && (
+      <a href={href} target="_blank" rel="noopener noreferrer" class="text-xs text-accent hover:text-accent-dark font-medium">
+        {url ? "Visit" : "GitHub"} &rarr;
+      </a>
+    )}
+  </div>
+</div>
