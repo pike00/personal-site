@@ -1,0 +1,46 @@
+---
+import PageLayout from "../layouts/PageLayout.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+import fs from "node:fs";
+import path from "node:path";
+import matter from "gray-matter";
+
+const projectsDir = path.resolve("src/content/projects");
+const projectFiles = fs.readdirSync(projectsDir).filter((f) => f.endsWith(".md"));
+
+const projects = projectFiles
+  .map((file) => {
+    const content = fs.readFileSync(path.join(projectsDir, file), "utf-8");
+    const { data } = matter(content);
+    return data as {
+      title: string;
+      description: string;
+      url?: string;
+      repo?: string;
+      tags: string[];
+      date: string;
+    };
+  })
+  .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+---
+
+<PageLayout title="Projects" description="Projects and tools by Will Pike.">
+  <div class="max-w-4xl mx-auto px-6 py-12">
+    <h1 class="text-2xl font-bold text-primary dark:text-white mb-2">Projects</h1>
+    <p class="text-sm text-gray-500 dark:text-gray-400 mb-8">
+      Tools, research projects, and open-source work
+    </p>
+
+    <div class="grid gap-4 sm:grid-cols-2">
+      {projects.map((project) => (
+        <ProjectCard
+          title={project.title}
+          description={project.description}
+          url={project.url}
+          repo={project.repo}
+          tags={project.tags}
+        />
+      ))}
+    </div>
+  </div>
+</PageLayout>

@@ -1,0 +1,21 @@
+---
+import PageLayout from "../layouts/PageLayout.astro";
+import fs from "node:fs";
+import path from "node:path";
+import { marked } from "marked";
+
+const aboutPath = path.resolve("src/content/about.md");
+const aboutContent = fs.readFileSync(aboutPath, "utf-8");
+const contentWithoutFrontmatter = aboutContent.replace(/^---[\s\S]*?---\n/, "");
+const htmlContent = await marked.parse(contentWithoutFrontmatter);
+---
+
+<PageLayout title="About" description="About Will Pike -- physician and researcher.">
+  <div class="max-w-3xl mx-auto px-6 py-12">
+    <h1 class="text-2xl font-bold text-primary dark:text-white mb-8">About</h1>
+    <article
+      class="prose prose-sm dark:prose-invert max-w-none prose-headings:text-primary dark:prose-headings:text-white prose-a:text-accent"
+      set:html={htmlContent}
+    />
+  </div>
+</PageLayout>
