@@ -7,9 +7,11 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "astro": "astro"
+    "build": "npm run build:pdfs && npm run build:citations && npm run build:cv && astro build",
+    "build:pdfs": "bash scripts/copy-pdfs.sh",
+    "build:cv": "bash scripts/build-cv.sh",
+    "build:citations": "tsx scripts/generate-citations.ts",
+    "preview": "astro preview"
   },
   "dependencies": {
     "@astrojs/react": "^5.0.3",
