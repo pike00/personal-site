@@ -10,7 +10,10 @@ interface Props {
 }
 
 function highlightAuthor(authors: string): string {
-  return authors.replace(/Pike CW/g, "<strong>Pike CW</strong>");
+  return authors
+    .split(", ")
+    .map((a) => (/\bPike\b/.test(a) && !/\bMorgan\b/.test(a) ? `<strong>${a}</strong>` : a))
+    .join(", ");
 }
 
 export default function SearchPublications({
@@ -123,9 +126,10 @@ export default function SearchPublications({
                     {pub.title}
                   </h3>
                   {pub.authors && (
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1.5">
-                      {pub.authors}
-                    </p>
+                    <p
+                      className="text-xs text-gray-500 dark:text-gray-400 mt-1.5"
+                      dangerouslySetInnerHTML={{ __html: highlightAuthor(pub.authors) }}
+                    />
                   )}
                   {pub.journal && (
                     <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">

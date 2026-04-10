@@ -113,11 +113,11 @@ export function getPublications(): Publication[] {
     }
   }
 
-  // Sort by folder number descending (newest first)
+  // Sort by publication date descending (newest first)
   publications.sort((a, b) => {
-    const numA = parseInt(a.folderName.match(/^(\d+)/)?.[1] ?? "0", 10);
-    const numB = parseInt(b.folderName.match(/^(\d+)/)?.[1] ?? "0", 10);
-    return numB - numA;
+    const dateA = a.pubDate || "0000-00-00";
+    const dateB = b.pubDate || "0000-00-00";
+    return dateB.localeCompare(dateA);
   });
 
   return publications;

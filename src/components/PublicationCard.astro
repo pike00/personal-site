@@ -9,7 +9,7 @@ interface Props {
 const { publication: pub } = Astro.props;
 
 const authorDisplay = pub.authors
-  .map((a) => (/\bPike\b/.test(a) ? `<strong>${a}</strong>` : a))
+  .map((a) => (/\bPike\b/.test(a) && !/\bMorgan\b/.test(a) ? `<strong>${a}</strong>` : a))
   .join(", ");
 
 const year = pub.pubDate ? pub.pubDate.split("-")[0] : "";
