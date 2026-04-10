@@ -18,20 +18,18 @@ const journalLine = [pub.journalAbbrev, year].filter(Boolean).join(", ");
 
 <a href={`/publications/${pub.slug}`} class="block group">
   <div class="bg-white dark:bg-surface-card-dark border border-gray-200 dark:border-gray-700 border-l-[3px] border-l-accent rounded-lg p-5 hover:shadow-md transition-shadow">
-    <div class="flex justify-between items-start gap-3">
-      <div class="flex-1 min-w-0">
-        <h3 class="text-sm font-semibold text-primary dark:text-gray-100 group-hover:text-accent-dark dark:group-hover:text-accent transition-colors leading-snug">
-          {pub.title}
-        </h3>
-        {pub.authors.length > 0 && (
-          <p class="text-xs text-gray-500 dark:text-gray-400 mt-1.5" set:html={authorDisplay} />
-        )}
-        {journalLine && (
-          <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">{journalLine}</p>
-        )}
-      </div>
+    <div class="space-y-2">
+      <h3 class="text-sm font-semibold text-primary dark:text-gray-100 group-hover:text-accent-dark dark:group-hover:text-accent transition-colors leading-snug">
+        {pub.title}
+      </h3>
+      {pub.authors.length > 0 && (
+        <p class="text-xs text-gray-500 dark:text-gray-400" set:html={authorDisplay} />
+      )}
+      {journalLine && (
+        <p class="text-xs text-gray-400 dark:text-gray-500">{journalLine}</p>
+      )}
       {pub.researchArea.length > 0 && (
-        <div class="flex flex-wrap gap-1.5 shrink-0">
+        <div class="flex flex-wrap gap-1.5">
           {pub.researchArea.map((tag) => (
             <TopicPill tag={tag} size="sm" />
           ))}
