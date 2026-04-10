@@ -12,7 +12,7 @@ const recentPubs = publications.slice(0, 3);
 
 const allTags = [...new Set(publications.flatMap((p) => p.researchArea))].sort();
 const firstYear = publications
-  .map((p) => p.pubDate?.split(" ")[0])
+  .map((p) => p.pubDate?.split("-")[0])
   .filter(Boolean)
   .sort()[0] ?? "";
 ---

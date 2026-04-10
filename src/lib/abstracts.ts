@@ -1,10 +1,21 @@
 import fs from "node:fs";
 import path from "node:path";
+import yaml from "yaml";
 import type { Abstract } from "./types";
 
 const SUBMODULE_DIR = path.resolve("publications");
 const ABSTRACTS_DIR = path.resolve("publications/Abstracts");
 const UNPUBLISHED_DIR = path.resolve("publications/Unpublished");
+
+interface AbstractMetadata {
+  title: string;
+  authors?: string[];
+  journal?: string;
+  date_published?: string;
+  doi?: string;
+  abstract_id?: string;
+  pmid?: number;
+}
 
 function slugify(name: string): string {
   return name
@@ -32,24 +43,39 @@ export function getAbstracts(): Abstract[] {
 
     for (const folder of folders) {
       const dirPath = path.join(ABSTRACTS_DIR, folder);
+      const metadataPath = path.join(dirPath, "metadata.yml");
       const pdfPath = findPdf(dirPath);
-      const titleFromFolder = folder.replace(/^\d+\s+/, "");
 
-      const abstractIdPath = path.join(dirPath, "abstract_id.txt");
-      const abstractId = fs.existsSync(abstractIdPath)
-        ? fs.readFileSync(abstractIdPath, "utf-8").trim()
-        : undefined;
-
-      abstracts.push({
-        slug: slugify(folder),
-        title: titleFromFolder,
-        folderName: folder,
-        pdfPath: pdfPath
-          ? path.relative(SUBMODULE_DIR, pdfPath)
-          : undefined,
-        abstractId,
-        unpublished: false,
-      });
+      if (fs.existsSync(metadataPath)) {
+        const raw = fs.readFileSync(metadataPath, "utf-8");
+        const data = yaml.parse(raw) as AbstractMetadata;
+        abstracts.push({
+          slug: slugify(folder),
+          title: data.title,
+          folderName: folder,
+          pdfPath: pdfPath
+            ? path.relative(SUBMODULE_DIR, pdfPath)
+            : undefined,
+          abstractId: data.abstract_id,
+          id: data.pmid ? String(data.pmid) : undefined,
+          authors: data.authors,
+          journal: data.journal,
+          pubDate: data.date_published,
+          doi: data.doi,
+          unpublished: false,
+        });
+      } else {
+        const titleFromFolder = folder.replace(/^\d+\s+/, "");
+        abstracts.push({
+          slug: slugify(folder),
+          title: titleFromFolder,
+          folderName: folder,
+          pdfPath: pdfPath
+            ? path.relative(SUBMODULE_DIR, pdfPath)
+            : undefined,
+          unpublished: false,
+        });
+      }
     }
   }
 

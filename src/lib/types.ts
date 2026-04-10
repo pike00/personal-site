@@ -9,11 +9,8 @@ export interface Publication {
   issue: string;
   pages: string;
   pubDate: string;
-  epubDate: string;
   doi: string;
   pmcId?: string;
-  pii?: string;
-  hasAbstract: boolean;
   pubType: string;
   researchArea: string[];
   pdfPath?: string;

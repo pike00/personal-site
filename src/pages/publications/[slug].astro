@@ -19,10 +19,17 @@ interface Props {
 const { publication: pub } = Astro.props;
 
 const authorDisplay = pub.authors
-  .map((a) => (a === "Pike CW" ? `<strong>${a}</strong>` : a))
+  .map((a) => (/\bPike\b/.test(a) ? `<strong>${a}</strong>` : a))
   .join(", ");
 
-const year = pub.pubDate ? pub.pubDate.split(" ")[0] : "";
+const year = pub.pubDate ? pub.pubDate.split("-")[0] : "";
+const dateDisplay = pub.pubDate
+  ? new Date(pub.pubDate + "T00:00:00").toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })
+  : "";
 ---
 
 <PageLayout
@@ -117,7 +124,7 @@ const year = pub.pubDate ? pub.pubDate.split(" ")[0] : "";
         {pub.pubDate && (
           <>
             <dt class="text-gray-500 dark:text-gray-400">Published</dt>
-            <dd class="text-primary dark:text-gray-200">{pub.pubDate}</dd>
+            <dd class="text-primary dark:text-gray-200">{dateDisplay}</dd>
           </>
         )}
         {pub.id && (

@@ -8,6 +8,7 @@ const aboutPath = path.resolve("src/content/about.md");
 const aboutContent = fs.readFileSync(aboutPath, "utf-8");
 const contentWithoutFrontmatter = aboutContent.replace(/^---[\s\S]*?---\n/, "");
 const htmlContent = await marked.parse(contentWithoutFrontmatter);
+
 ---
 
 <PageLayout title="About" description="About Will Pike -- physician and researcher.">

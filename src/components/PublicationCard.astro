@@ -9,10 +9,10 @@ interface Props {
 const { publication: pub } = Astro.props;
 
 const authorDisplay = pub.authors
-  .map((a) => (a === "Pike CW" ? `<strong>${a}</strong>` : a))
+  .map((a) => (/\bPike\b/.test(a) ? `<strong>${a}</strong>` : a))
   .join(", ");
 
-const year = pub.pubDate ? pub.pubDate.split(" ")[0] : "";
+const year = pub.pubDate ? pub.pubDate.split("-")[0] : "";
 const journalLine = [pub.journalAbbrev, year].filter(Boolean).join(", ");
 ---
 

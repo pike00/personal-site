@@ -1,4 +1,3 @@
-import { XMLParser } from "fast-xml-parser";
 import fs from "node:fs";
 import path from "node:path";
 import yaml from "yaml";
@@ -7,6 +6,21 @@ import type { Publication, SearchablePublication } from "./types";
 const SUBMODULE_DIR = path.resolve("publications");
 const PUBLICATIONS_DIR = path.resolve("publications/Publications");
 const TAGS_FILE = path.resolve("src/content/publication-tags.yaml");
+
+interface PublicationMetadata {
+  title: string;
+  authors: string[];
+  journal: string;
+  date_published: string;
+  doi?: string;
+  pub_type?: string;
+  pmid?: number;
+  pmc?: string;
+  volume?: string;
+  issue?: string;
+  pages?: string;
+  journal_abbrev?: string;
+}
 
 function slugify(folderName: string): string {
   return folderName
@@ -25,53 +39,6 @@ function findPdf(dirPath: string): string | undefined {
       !f.startsWith("20")
   );
   return pdf ? path.join(dirPath, pdf) : undefined;
-}
-
-function parseXml(xmlPath: string): Record<string, string | string[]> {
-  const xmlContent = fs.readFileSync(xmlPath, "utf-8");
-  const parser = new XMLParser({
-    ignoreAttributes: false,
-    attributeNamePrefix: "@_",
-  });
-  const parsed = parser.parse(xmlContent);
-  const docSum = parsed.eSummaryResult.DocSum;
-  const items = docSum.Item;
-
-  const result: Record<string, unknown> = { id: String(docSum.Id) };
-
-  for (const item of Array.isArray(items) ? items : [items]) {
-    const name = item["@_Name"];
-    const type = item["@_Type"];
-
-    if (name === "AuthorList" && type === "List") {
-      const authorItems = item.Item;
-      const authors = Array.isArray(authorItems)
-        ? authorItems.map((a: Record<string, string>) => a["#text"])
-        : authorItems
-          ? [authorItems["#text"]]
-          : [];
-      result.authors = authors;
-    } else if (name === "ArticleIds" && type === "List") {
-      const idItems = Array.isArray(item.Item) ? item.Item : [item.Item];
-      for (const idItem of idItems) {
-        const idName = idItem["@_Name"];
-        if (idName === "pmc" || idName === "pmcid") {
-          result.pmcId = String(idItem["#text"])
-            .replace("pmc-id: ", "")
-            .replace(";", "");
-        }
-        if (idName === "pii") {
-          result.pii = String(idItem["#text"]);
-        }
-      }
-    } else if (type === "List") {
-      // skip other lists
-    } else {
-      result[name] = String(item["#text"] ?? "");
-    }
-  }
-
-  return result as Record<string, string | string[]>;
 }
 
 function loadTags(): Record<string, string[]> {
@@ -97,29 +64,27 @@ export function getPublications(): Publication[] {
 
   for (const folder of folders) {
     const dirPath = path.join(PUBLICATIONS_DIR, folder);
-    const xmlPath = path.join(dirPath, "info.xml");
+    const metadataPath = path.join(dirPath, "metadata.yml");
     const pdfPath = findPdf(dirPath);
     const slug = slugify(folder);
 
-    if (fs.existsSync(xmlPath)) {
-      const data = parseXml(xmlPath);
+    if (fs.existsSync(metadataPath)) {
+      const raw = fs.readFileSync(metadataPath, "utf-8");
+      const data = yaml.parse(raw) as PublicationMetadata;
       publications.push({
-        id: data.id as string,
+        id: data.pmid ? String(data.pmid) : "",
         slug,
-        title: (data.Title as string).replace(/\.$/, ""),
-        authors: data.authors as string[],
-        journal: (data.FullJournalName as string) || (data.Source as string),
-        journalAbbrev: data.Source as string,
-        volume: data.Volume as string,
-        issue: data.Issue as string,
-        pages: data.Pages as string,
-        pubDate: data.PubDate as string,
-        epubDate: data.EPubDate as string,
-        doi: data.DOI as string,
-        pmcId: data.pmcId as string | undefined,
-        pii: data.pii as string | undefined,
-        hasAbstract: data.HasAbstract === "1",
-        pubType: (data.PubType as string) ?? "Journal Article",
+        title: data.title.replace(/\.$/, ""),
+        authors: data.authors,
+        journal: data.journal,
+        journalAbbrev: data.journal_abbrev ?? "",
+        volume: data.volume ?? "",
+        issue: data.issue ?? "",
+        pages: data.pages ?? "",
+        pubDate: data.date_published,
+        doi: data.doi ?? "",
+        pmcId: data.pmc,
+        pubType: data.pub_type ?? "Journal Article",
         researchArea: tags[folder] ?? [],
         pdfPath: pdfPath
           ? path.relative(SUBMODULE_DIR, pdfPath)
@@ -139,9 +104,7 @@ export function getPublications(): Publication[] {
         issue: "",
         pages: "",
         pubDate: "",
-        epubDate: "",
         doi: "",
-        hasAbstract: false,
         pubType: "Journal Article",
         researchArea: tags[folder] ?? [],
         pdfPath: path.relative(SUBMODULE_DIR, pdfPath),
@@ -168,7 +131,7 @@ export function buildSearchIndex(
     title: p.title,
     authors: p.authors.join(", "),
     journal: p.journal,
-    year: p.pubDate ? p.pubDate.split(" ")[0] : "",
+    year: p.pubDate ? p.pubDate.split("-")[0] : "",
     tags: p.researchArea,
   }));
 }

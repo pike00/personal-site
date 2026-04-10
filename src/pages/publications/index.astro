@@ -9,7 +9,7 @@ const searchIndex = buildSearchIndex(publications);
 const allTags = [...new Set(publications.flatMap((p) => p.researchArea))].sort();
 const allYears = [...new Set(
   publications
-    .map((p) => p.pubDate?.split(" ")[0])
+    .map((p) => p.pubDate?.split("-")[0])
     .filter(Boolean)
 )].sort().reverse();
 
