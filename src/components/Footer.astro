@@ -1,9 +1,12 @@
 ---
 const year = new Date().getFullYear();
+const commitHash = import.meta.env.COMMIT_HASH ?? "dev";
+const repoUrl = "https://github.com/pike00/personal-site";
 ---
 
 <footer class="bg-primary dark:bg-gray-950 text-gray-400 mt-auto">
-  <div class="max-w-6xl mx-auto px-6 py-8 flex items-center justify-center">
+  <div class="max-w-6xl mx-auto px-6 py-8 flex items-center justify-between">
     <p class="text-sm">&copy; {year} Will Pike.</p>
+    <a href={`${repoUrl}/commit/${commitHash}`} class="text-sm text-gray-500 hover:text-gray-300 transition-colors font-mono" target="_blank" rel="noopener noreferrer">{commitHash}</a>
   </div>
 </footer>

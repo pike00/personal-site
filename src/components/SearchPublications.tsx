@@ -123,25 +123,23 @@ export default function SearchPublications({
         {filtered.map((pub) => (
           <a key={pub.slug} href={`/publications/${pub.slug}`} className="block group">
             <div className="bg-white dark:bg-[#1e293b] border border-gray-200 dark:border-gray-700 border-l-[3px] border-l-[#a78bfa] rounded-lg p-5 hover:shadow-md transition-shadow">
-              <div className="flex justify-between items-start gap-3">
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-sm font-semibold text-[#1a1a2e] dark:text-gray-100 group-hover:text-[#7c3aed] dark:group-hover:text-[#a78bfa] transition-colors leading-snug">
-                    {pub.title}
-                  </h3>
-                  {pub.authors && (
-                    <p
-                      className="text-xs text-gray-500 dark:text-gray-400 mt-1.5"
-                      dangerouslySetInnerHTML={{ __html: highlightAuthor(pub.authors) }}
-                    />
-                  )}
-                  {pub.journal && (
-                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                      {pub.journal}{pub.year ? `, ${pub.year}` : ""}
-                    </p>
-                  )}
-                </div>
+              <div className="space-y-2">
+                <h3 className="text-sm font-semibold text-[#1a1a2e] dark:text-gray-100 group-hover:text-[#7c3aed] dark:group-hover:text-[#a78bfa] transition-colors leading-snug">
+                  {pub.title}
+                </h3>
+                {pub.authors && (
+                  <p
+                    className="text-xs text-gray-500 dark:text-gray-400"
+                    dangerouslySetInnerHTML={{ __html: highlightAuthor(pub.authors) }}
+                  />
+                )}
+                {pub.journal && (
+                  <p className="text-xs text-gray-400 dark:text-gray-500">
+                    {pub.journal}{pub.year ? `, ${pub.year}` : ""}
+                  </p>
+                )}
                 {pub.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 shrink-0">
+                  <div className="flex flex-wrap gap-1.5">
                     {pub.tags.map((tag) => (
                       <span
                         key={tag}

@@ -1,0 +1,74 @@
+---
+import PageLayout from "../layouts/PageLayout.astro";
+
+const cf = Astro.request.cf;
+
+const geo = [
+  { label: "City", value: cf?.city },
+  { label: "Region", value: cf?.region },
+  { label: "Region Code", value: cf?.regionCode },
+  { label: "Country", value: cf?.country },
+  { label: "Continent", value: cf?.continent },
+  { label: "Postal Code", value: cf?.postalCode },
+  { label: "Metro Code", value: cf?.metroCode },
+  { label: "Latitude", value: cf?.latitude },
+  { label: "Longitude", value: cf?.longitude },
+  { label: "Timezone", value: cf?.timezone },
+  { label: "EU Country", value: cf?.isEUCountry === "1" ? "Yes" : "No" },
+];
+
+const network = [
+  { label: "ASN", value: cf?.asn },
+  { label: "AS Organization", value: cf?.asOrganization },
+  { label: "Colo", value: cf?.colo },
+  { label: "HTTP Protocol", value: cf?.httpProtocol },
+  { label: "TLS Version", value: cf?.tlsVersion },
+  { label: "TLS Cipher", value: cf?.tlsCipher },
+  { label: "Client TCP RTT", value: cf?.clientTcpRtt ? `${cf.clientTcpRtt} ms` : undefined },
+  { label: "Client Accept Encoding", value: cf?.clientAcceptEncoding },
+];
+---
+
+<PageLayout title="whoami" description="Request details via Cloudflare.">
+  <div class="max-w-3xl mx-auto px-6 py-12">
+    <h1 class="text-2xl font-bold text-primary dark:text-white mb-2 font-mono">whoami</h1>
+    <p class="text-sm text-gray-500 dark:text-gray-400 mb-10">Request properties from Cloudflare's edge network.</p>
+
+    {cf ? (
+      <>
+        <section class="mb-10">
+          <h2 class="text-sm font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-4">Geolocation</h2>
+          <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
+            {geo.map(({ label, value }) => (
+              <div class="flex justify-between sm:block">
+                <dt class="text-xs text-gray-500 dark:text-gray-400">{label}</dt>
+                <dd class="text-sm font-mono text-primary dark:text-white">{value ?? "---"}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+
+        <section>
+          <h2 class="text-sm font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-4">Network</h2>
+          <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
+            {network.map(({ label, value }) => (
+              <div class="flex justify-between sm:block">
+                <dt class="text-xs text-gray-500 dark:text-gray-400">{label}</dt>
+                <dd class="text-sm font-mono text-primary dark:text-white">{value ?? "---"}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      </>
+    ) : (
+      <div class="rounded-lg border border-gray-200 dark:border-gray-700 p-6 text-center">
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+          Cloudflare request properties are not available in this environment.
+        </p>
+        <p class="text-xs text-gray-400 dark:text-gray-500 mt-2">
+          This page only works when deployed to Cloudflare.
+        </p>
+      </div>
+    )}
+  </div>
+</PageLayout>
