@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import type { Abstract } from "./types";
 
+const SUBMODULE_DIR = path.resolve("publications");
 const ABSTRACTS_DIR = path.resolve("publications/Abstracts");
 const UNPUBLISHED_DIR = path.resolve("publications/Unpublished");
 
@@ -44,7 +45,7 @@ export function getAbstracts(): Abstract[] {
         title: titleFromFolder,
         folderName: folder,
         pdfPath: pdfPath
-          ? path.relative(path.resolve("."), pdfPath)
+          ? path.relative(SUBMODULE_DIR, pdfPath)
           : undefined,
         abstractId,
         unpublished: false,

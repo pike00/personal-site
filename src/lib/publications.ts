@@ -4,6 +4,7 @@ import path from "node:path";
 import yaml from "yaml";
 import type { Publication, SearchablePublication } from "./types";
 
+const SUBMODULE_DIR = path.resolve("publications");
 const PUBLICATIONS_DIR = path.resolve("publications/Publications");
 const TAGS_FILE = path.resolve("src/content/publication-tags.yaml");
 
@@ -121,7 +122,7 @@ export function getPublications(): Publication[] {
         pubType: (data.PubType as string) ?? "Journal Article",
         researchArea: tags[folder] ?? [],
         pdfPath: pdfPath
-          ? path.relative(path.resolve("."), pdfPath)
+          ? path.relative(SUBMODULE_DIR, pdfPath)
           : undefined,
         folderName: folder,
       });
@@ -143,7 +144,7 @@ export function getPublications(): Publication[] {
         hasAbstract: false,
         pubType: "Journal Article",
         researchArea: tags[folder] ?? [],
-        pdfPath: path.relative(path.resolve("."), pdfPath),
+        pdfPath: path.relative(SUBMODULE_DIR, pdfPath),
         folderName: folder,
       });
     }
