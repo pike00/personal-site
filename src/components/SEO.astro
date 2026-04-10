@@ -1,0 +1,29 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  image?: string;
+  type?: string;
+}
+
+const { title, description, image, type = "website" } = Astro.props;
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
+const siteTitle = "Will Pike";
+const fullTitle = title === siteTitle ? title : `${title} | ${siteTitle}`;
+---
+
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonicalUrl} />
+
+<meta property="og:type" content={type} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonicalUrl} />
+<meta property="og:site_name" content={siteTitle} />
+{image && <meta property="og:image" content={new URL(image, Astro.site)} />}
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />
+{image && <meta name="twitter:image" content={new URL(image, Astro.site)} />}
