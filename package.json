@@ -7,8 +7,7 @@
   },
   "scripts": {
     "dev": "npm run build:pdfs && astro dev",
-    "build": "npm run build:pdfs && npm run build:citations && npm run build:cv && astro build",
-    "build": "npm run build:pdfs && npm run build:citations && npm run build:cv && astro build",
+    "build": "npm run build:pdfs && astro build",
     "build:pdfs": "bash scripts/copy-pdfs.sh",
     "build:cv": "bash scripts/build-cv.sh",
     "build:citations": "tsx scripts/generate-citations.ts",
