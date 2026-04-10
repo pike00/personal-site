@@ -1,0 +1,132 @@
+---
+import PageLayout from "../../layouts/PageLayout.astro";
+import TopicPill from "../../components/TopicPill.astro";
+import { getPublications } from "../../lib/publications";
+import type { Publication } from "../../lib/types";
+
+export function getStaticPaths() {
+  const publications = getPublications();
+  return publications.map((pub) => ({
+    params: { slug: pub.slug },
+    props: { publication: pub },
+  }));
+}
+
+interface Props {
+  publication: Publication;
+}
+
+const { publication: pub } = Astro.props;
+
+const authorDisplay = pub.authors
+  .map((a) => (a === "Pike CW" ? `<strong>${a}</strong>` : a))
+  .join(", ");
+
+const year = pub.pubDate ? pub.pubDate.split(" ")[0] : "";
+---
+
+<PageLayout
+  title={pub.title}
+  description={`${pub.title}. ${pub.journal}${year ? `, ${year}` : ""}`}
+>
+  <div class="max-w-3xl mx-auto px-6 py-12">
+    <nav class="text-sm text-gray-400 dark:text-gray-500 mb-8">
+      <a href="/publications" class="hover:text-accent transition-colors">Publications</a>
+      <span class="mx-2">/</span>
+      <span class="text-gray-600 dark:text-gray-300">{pub.title}</span>
+    </nav>
+
+    <h1 class="text-2xl font-bold text-primary dark:text-white leading-snug mb-4">
+      {pub.title}
+    </h1>
+
+    {pub.authors.length > 0 && (
+      <p class="text-sm text-gray-600 dark:text-gray-300 mb-2" set:html={authorDisplay} />
+    )}
+
+    {pub.journal && (
+      <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
+        <span class="italic">{pub.journal}</span>
+        {pub.volume && `, ${pub.volume}`}
+        {pub.issue && `(${pub.issue})`}
+        {pub.pages && `: ${pub.pages}`}
+        {year && ` (${year})`}
+      </p>
+    )}
+
+    {pub.researchArea.length > 0 && (
+      <div class="flex flex-wrap gap-2 mb-8">
+        {pub.researchArea.map((tag) => (
+          <TopicPill tag={tag} href={`/publications?tag=${encodeURIComponent(tag)}`} size="sm" />
+        ))}
+      </div>
+    )}
+
+    <div class="flex flex-wrap gap-3 mb-8">
+      {pub.doi && (
+        <a
+          href={`https://doi.org/${pub.doi}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-2 px-4 py-2 bg-accent hover:bg-accent-dark text-white rounded-lg text-sm font-medium transition-colors"
+        >
+          DOI: {pub.doi}
+        </a>
+      )}
+      {pub.id && (
+        <a
+          href={`https://pubmed.ncbi.nlm.nih.gov/${pub.id}/`}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-2 px-4 py-2 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:text-accent rounded-lg text-sm transition-colors"
+        >
+          PubMed
+        </a>
+      )}
+      {pub.pmcId && (
+        <a
+          href={`https://www.ncbi.nlm.nih.gov/pmc/articles/${pub.pmcId}/`}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-2 px-4 py-2 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:text-accent rounded-lg text-sm transition-colors"
+        >
+          PMC
+        </a>
+      )}
+      {pub.pdfPath && (
+        <a
+          href={`/${pub.pdfPath}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-2 px-4 py-2 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:text-accent rounded-lg text-sm transition-colors"
+        >
+          PDF
+        </a>
+      )}
+    </div>
+
+    <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+      <h2 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">Details</h2>
+      <dl class="grid grid-cols-2 gap-y-3 text-sm">
+        {pub.pubType && (
+          <>
+            <dt class="text-gray-500 dark:text-gray-400">Type</dt>
+            <dd class="text-primary dark:text-gray-200">{pub.pubType}</dd>
+          </>
+        )}
+        {pub.pubDate && (
+          <>
+            <dt class="text-gray-500 dark:text-gray-400">Published</dt>
+            <dd class="text-primary dark:text-gray-200">{pub.pubDate}</dd>
+          </>
+        )}
+        {pub.id && (
+          <>
+            <dt class="text-gray-500 dark:text-gray-400">PubMed ID</dt>
+            <dd class="text-primary dark:text-gray-200">{pub.id}</dd>
+          </>
+        )}
+      </dl>
+    </div>
+  </div>
+</PageLayout>

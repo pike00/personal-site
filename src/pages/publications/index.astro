@@ -1,0 +1,38 @@
+---
+import PageLayout from "../../layouts/PageLayout.astro";
+import SearchPublications from "../../components/SearchPublications";
+import { getPublications, buildSearchIndex } from "../../lib/publications";
+
+const publications = getPublications();
+const searchIndex = buildSearchIndex(publications);
+
+const allTags = [...new Set(publications.flatMap((p) => p.researchArea))].sort();
+const allYears = [...new Set(
+  publications
+    .map((p) => p.pubDate?.split(" ")[0])
+    .filter(Boolean)
+)].sort().reverse();
+
+const url = new URL(Astro.request.url);
+const initialTag = url.searchParams.get("tag") ?? undefined;
+---
+
+<PageLayout
+  title="Publications"
+  description="Research publications by Will Pike across multiple medical specialties."
+>
+  <div class="max-w-4xl mx-auto px-6 py-12">
+    <h1 class="text-2xl font-bold text-primary dark:text-white mb-2">Publications</h1>
+    <p class="text-sm text-gray-500 dark:text-gray-400 mb-8">
+      {publications.length} peer-reviewed publications
+    </p>
+
+    <SearchPublications
+      client:load
+      publications={searchIndex}
+      allTags={allTags}
+      allYears={allYears}
+      initialTag={initialTag}
+    />
+  </div>
+</PageLayout>
