@@ -8,10 +8,17 @@ OUTPUT="$PROJECT_DIR/public/cv.pdf"
 
 mkdir -p "$(dirname "$OUTPUT")"
 
+TYPST=""
 if command -v typst &> /dev/null; then
-  typst compile "$CV_DIR/template.typ" "$OUTPUT"
+  TYPST="typst"
+elif [ -x "$PROJECT_DIR/node_modules/.bin/typst" ]; then
+  TYPST="$PROJECT_DIR/node_modules/.bin/typst"
+fi
+
+if [ -n "$TYPST" ]; then
+  "$TYPST" compile "$CV_DIR/template.typ" "$OUTPUT"
   echo "CV PDF generated: $OUTPUT"
 else
   echo "Warning: typst not installed, skipping CV PDF generation"
-  echo "Install: brew install typst (macOS) or cargo install typst-cli"
+  echo "Install: npm install --save-dev typst"
 fi
