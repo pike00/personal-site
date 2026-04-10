@@ -4,6 +4,6 @@ import sitemap from "@astrojs/sitemap";
 import react from "@astrojs/react";
 
 export default defineConfig({
-  site: "https://personal-site.pages.dev",
+  site: "https://pikemd.com",
   integrations: [tailwind(), sitemap(), react()],
 });
