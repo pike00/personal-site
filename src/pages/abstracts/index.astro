@@ -1,0 +1,38 @@
+---
+import PageLayout from "../../layouts/PageLayout.astro";
+import AbstractCard from "../../components/AbstractCard.astro";
+import { getAbstracts } from "../../lib/abstracts";
+
+const allAbstracts = getAbstracts();
+const published = allAbstracts.filter((a) => !a.unpublished);
+const unpublished = allAbstracts.filter((a) => a.unpublished);
+---
+
+<PageLayout
+  title="Abstracts & Presentations"
+  description="Conference abstracts, posters, and presentations by Will Pike."
+>
+  <div class="max-w-4xl mx-auto px-6 py-12">
+    <h1 class="text-2xl font-bold text-primary dark:text-white mb-2">Abstracts & Presentations</h1>
+    <p class="text-sm text-gray-500 dark:text-gray-400 mb-8">
+      Conference abstracts, posters, and presentations
+    </p>
+
+    <div class="flex flex-col gap-3">
+      {published.map((abs) => (
+        <AbstractCard abstract={abs} />
+      ))}
+    </div>
+
+    {unpublished.length > 0 && (
+      <>
+        <h2 class="text-lg font-bold text-primary dark:text-white mt-12 mb-4">Unpublished</h2>
+        <div class="flex flex-col gap-3">
+          {unpublished.map((abs) => (
+            <AbstractCard abstract={abs} />
+          ))}
+        </div>
+      </>
+    )}
+  </div>
+</PageLayout>
