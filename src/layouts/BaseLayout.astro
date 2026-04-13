@@ -21,6 +21,12 @@ const { title, description, image, type } = Astro.props;
     <link rel="preconnect" href="https://rsms.me/" />
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
     <SEO title={title} description={description} image={image} type={type} />
+    <script
+      data-goatcounter="https://pikemd.goatcounter.com/count"
+      async
+      src="//gc.zgo.at/count.js"
+      is:inline
+    ></script>
   </head>
   <body class="min-h-screen flex flex-col">
     <slot />
