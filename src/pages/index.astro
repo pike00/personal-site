@@ -25,24 +25,35 @@ const firstYear = publications
   <!-- Hero -->
   <section class="bg-gradient-to-br from-primary to-primary-light text-white relative overflow-hidden">
     <div class="absolute top-[-80px] right-[-40px] w-96 h-96 rounded-full bg-accent/10 blur-3xl"></div>
-    <div class="max-w-6xl mx-auto px-6 py-20 md:py-28 relative z-10">
-      <p class="text-xs uppercase tracking-[3px] text-accent font-semibold mb-4">
-        Physician & Researcher
-      </p>
-      <h1 class="text-4xl md:text-5xl font-extrabold leading-tight tracking-tight mb-4">
-        Building evidence<br />for better patient care.
-      </h1>
-      <p class="text-gray-300 max-w-lg leading-relaxed">
-        Clinician-researcher focused on real-world evidence, health outcomes, and translational
-        research across multiple specialties.
-      </p>
-      <div class="flex gap-3 mt-8">
-        <a href="/cv" class="bg-accent hover:bg-accent-dark text-white px-6 py-3 rounded-lg text-sm font-semibold transition-colors">
-          View CV
-        </a>
-        <a href="/publications" class="bg-accent hover:bg-accent-dark text-white px-6 py-3 rounded-lg text-sm font-semibold transition-colors">
-          View Publications
-        </a>
+    <div class="max-w-6xl mx-auto px-6 py-20 md:py-28 relative z-10 flex flex-col md:flex-row items-center gap-6">
+      <div class="flex-1">
+        <p class="text-xs uppercase tracking-[3px] text-accent font-semibold mb-4">
+          Physician & Researcher
+        </p>
+        <h1 class="text-4xl md:text-5xl font-extrabold leading-tight tracking-tight mb-4">
+          Building evidence<br />for better patient care.
+        </h1>
+        <p class="text-gray-300 max-w-lg leading-relaxed">
+          Clinician-researcher focused on real-world evidence, health outcomes, and translational
+          research across multiple specialties.
+        </p>
+        <div class="flex gap-3 mt-8">
+          <a href="/cv" class="bg-accent hover:bg-accent-dark text-white px-6 py-3 rounded-lg text-sm font-semibold transition-colors">
+            View CV
+          </a>
+          <a href="/publications" class="bg-accent hover:bg-accent-dark text-white px-6 py-3 rounded-lg text-sm font-semibold transition-colors">
+            View Publications
+          </a>
+        </div>
+      </div>
+      <div class="shrink-0">
+        <img
+          src="/headshot.jpg"
+          alt="Will Pike, MD"
+          width="280"
+          height="280"
+          class="w-48 h-56 md:w-60 md:h-72 rounded-full object-cover object-top ring-4 ring-accent/30 shadow-2xl"
+        />
       </div>
     </div>
   </section>
