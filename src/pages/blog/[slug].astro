@@ -5,7 +5,8 @@ import TopicPill from "../../components/TopicPill.astro";
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
-import { marked } from "marked";
+import { Marked } from "marked";
+import markedFootnote from "marked-footnote";
 
 interface PostFrontmatter {
   title: string;
@@ -24,6 +25,7 @@ interface StaticPath {
 }
 
 export async function getStaticPaths(): Promise<StaticPath[]> {
+  const marked = new Marked().use(markedFootnote());
   const blogDir = path.resolve("src/content/blog");
   if (!fs.existsSync(blogDir)) return [];
 
