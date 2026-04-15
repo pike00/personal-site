@@ -1,0 +1,58 @@
+---
+export const prerender = true;
+import PageLayout from "../layouts/PageLayout.astro";
+import PostCard from "../components/PostCard.astro";
+import fs from "node:fs";
+import path from "node:path";
+import matter from "gray-matter";
+
+interface PostEntry {
+  slug: string;
+  title: string;
+  description: string;
+  date: string;
+  tags: string[];
+}
+
+const blogDir = path.resolve("src/content/blog");
+const blogFiles: string[] = fs.existsSync(blogDir)
+  ? fs.readdirSync(blogDir).filter((f: string) => f.endsWith(".md"))
+  : [];
+
+const posts: PostEntry[] = blogFiles
+  .map((file: string): PostEntry => {
+    const slug = file.replace(/\.md$/, "");
+    const raw = fs.readFileSync(path.join(blogDir, file), "utf-8");
+    const { data } = matter(raw);
+    return { slug, ...(data as Omit<PostEntry, "slug">) };
+  })
+  .sort(
+    (a: PostEntry, b: PostEntry) =>
+      new Date(b.date).getTime() - new Date(a.date).getTime(),
+  );
+---
+
+<PageLayout title="Blog" description="Writing on research, tools, and engineering by Will Pike.">
+  <div class="max-w-3xl mx-auto px-6 py-12">
+    <h1 class="text-2xl font-bold text-primary dark:text-white mb-2">Blog</h1>
+    <p class="text-sm text-gray-500 dark:text-gray-400 mb-8">
+      Notes on research, tools, and engineering
+    </p>
+
+    {posts.length === 0 ? (
+      <p class="text-sm text-gray-500 dark:text-gray-400">No posts yet. Check back soon.</p>
+    ) : (
+      <div class="flex flex-col gap-4">
+        {posts.map((post: PostEntry) => (
+          <PostCard
+            slug={post.slug}
+            title={post.title}
+            description={post.description}
+            date={post.date}
+            tags={post.tags}
+          />
+        ))}
+      </div>
+    )}
+  </div>
+</PageLayout>

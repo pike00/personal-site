@@ -20,4 +20,14 @@ const projects = defineCollection({
   }),
 });
 
-export const collections = { cv, projects };
+const blog = defineCollection({
+  type: "content",
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    date: z.string(),
+    tags: z.array(z.string()),
+  }),
+});
+
+export const collections = { cv, projects, blog };

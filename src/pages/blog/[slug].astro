@@ -1,0 +1,91 @@
+---
+export const prerender = true;
+import PageLayout from "../../layouts/PageLayout.astro";
+import TopicPill from "../../components/TopicPill.astro";
+import fs from "node:fs";
+import path from "node:path";
+import matter from "gray-matter";
+import { marked } from "marked";
+
+interface PostFrontmatter {
+  title: string;
+  description: string;
+  date: string;
+  tags: string[];
+}
+
+interface PostData extends PostFrontmatter {
+  bodyHtml: string;
+}
+
+interface StaticPath {
+  params: { slug: string };
+  props: { post: PostData };
+}
+
+export async function getStaticPaths(): Promise<StaticPath[]> {
+  const blogDir = path.resolve("src/content/blog");
+  if (!fs.existsSync(blogDir)) return [];
+
+  const files: string[] = fs
+    .readdirSync(blogDir)
+    .filter((f: string) => f.endsWith(".md"));
+
+  const paths = await Promise.all(
+    files.map(async (file: string): Promise<StaticPath> => {
+      const slug = file.replace(/\.md$/, "");
+      const raw = fs.readFileSync(path.join(blogDir, file), "utf-8");
+      const { data, content } = matter(raw);
+      const bodyHtml = await marked.parse(content);
+      return {
+        params: { slug },
+        props: {
+          post: {
+            ...(data as PostFrontmatter),
+            bodyHtml,
+          },
+        },
+      };
+    }),
+  );
+  return paths;
+}
+
+interface Props {
+  post: PostData;
+}
+
+const { post } = Astro.props;
+
+const dateDisplay = new Date(post.date + "T00:00:00").toLocaleDateString("en-US", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+});
+---
+
+<PageLayout title={post.title} description={post.description}>
+  <div class="max-w-3xl mx-auto px-6 py-12">
+    <nav class="text-sm text-gray-400 dark:text-gray-500 mb-8">
+      <a href="/blog" class="hover:text-accent transition-colors">Blog</a>
+      <span class="mx-2">/</span>
+      <span class="text-gray-600 dark:text-gray-300">{post.title}</span>
+    </nav>
+
+    <h1 class="text-2xl font-bold text-primary dark:text-white mb-3">{post.title}</h1>
+    <p class="text-xs text-gray-400 dark:text-gray-500 mb-4">{dateDisplay}</p>
+
+    {post.tags.length > 0 && (
+      <div class="flex flex-wrap gap-2 mb-8">
+        {post.tags.map((tag: string) => (
+          <TopicPill tag={tag} size="sm" />
+        ))}
+      </div>
+    )}
+
+    <article
+      class="prose prose-sm dark:prose-invert max-w-none prose-headings:text-primary dark:prose-headings:text-white prose-a:text-accent"
+      set:html={post.bodyHtml}
+    />
+  </div>
+</PageLayout>
