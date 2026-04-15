@@ -2,30 +2,36 @@
 export const prerender = true;
 import PageLayout from "../layouts/PageLayout.astro";
 import ProjectCard from "../components/ProjectCard.astro";
-import { flags } from "../lib/flags";
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
 
-if (!flags.projects) return new Response(null, { status: 404, statusText: "Not found" });
+interface ProjectEntry {
+  slug: string;
+  title: string;
+  description: string;
+  url?: string;
+  repo?: string;
+  tags: string[];
+  date: string;
+}
 
 const projectsDir = path.resolve("src/content/projects");
-const projectFiles = fs.readdirSync(projectsDir).filter((f) => f.endsWith(".md"));
+const projectFiles: string[] = fs
+  .readdirSync(projectsDir)
+  .filter((f: string) => f.endsWith(".md"));
 
-const projects = projectFiles
-  .map((file) => {
-    const content = fs.readFileSync(path.join(projectsDir, file), "utf-8");
-    const { data } = matter(content);
-    return data as {
-      title: string;
-      description: string;
-      url?: string;
-      repo?: string;
-      tags: string[];
-      date: string;
-    };
+const projects: ProjectEntry[] = projectFiles
+  .map((file: string): ProjectEntry => {
+    const slug = file.replace(/\.md$/, "");
+    const raw = fs.readFileSync(path.join(projectsDir, file), "utf-8");
+    const { data } = matter(raw);
+    return { slug, ...(data as Omit<ProjectEntry, "slug">) };
   })
-  .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  .sort(
+    (a: ProjectEntry, b: ProjectEntry) =>
+      new Date(b.date).getTime() - new Date(a.date).getTime(),
+  );
 ---
 
 <PageLayout title="Projects" description="Projects and tools by Will Pike.">
@@ -38,6 +44,7 @@ const projects = projectFiles
     <div class="grid gap-4 sm:grid-cols-2">
       {projects.map((project) => (
         <ProjectCard
+          slug={project.slug}
           title={project.title}
           description={project.description}
           url={project.url}

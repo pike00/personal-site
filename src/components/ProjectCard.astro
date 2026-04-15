@@ -2,6 +2,7 @@
 import TopicPill from "./TopicPill.astro";
 
 interface Props {
+  slug: string;
   title: string;
   description: string;
   url?: string;
@@ -9,12 +10,19 @@ interface Props {
   tags: string[];
 }
 
-const { title, description, url, repo, tags } = Astro.props;
-const href = url || repo;
+const { slug, title, description, url, repo, tags } = Astro.props;
+const externalHref = url || repo;
 ---
 
-<div class="bg-white dark:bg-surface-card-dark border border-gray-200 dark:border-gray-700 rounded-lg p-5 hover:shadow-md transition-shadow">
-  <h3 class="text-sm font-semibold text-primary dark:text-gray-100">{title}</h3>
+<div
+  class="project-card cursor-pointer bg-white dark:bg-surface-card-dark border border-gray-200 dark:border-gray-700 rounded-lg p-5 hover:shadow-md transition-shadow group"
+  data-href={`/projects/${slug}`}
+>
+  <h3 class="text-sm font-semibold">
+    <a href={`/projects/${slug}`} class="text-primary dark:text-gray-100 group-hover:text-accent dark:group-hover:text-accent transition-colors">
+      {title}
+    </a>
+  </h3>
   <p class="text-xs text-gray-500 dark:text-gray-400 mt-2 leading-relaxed">{description}</p>
   <div class="flex items-center justify-between mt-4">
     <div class="flex flex-wrap gap-1.5">
@@ -22,10 +30,20 @@ const href = url || repo;
         <TopicPill tag={tag} size="sm" />
       ))}
     </div>
-    {href && (
-      <a href={href} target="_blank" rel="noopener noreferrer" class="text-xs text-accent hover:text-accent-dark font-medium">
+    {externalHref && (
+      <a href={externalHref} target="_blank" rel="noopener noreferrer" class="text-xs text-accent hover:text-accent-dark font-medium">
         {url ? "Visit" : "GitHub"} &rarr;
       </a>
     )}
   </div>
 </div>
+
+<script>
+  document.querySelectorAll<HTMLElement>(".project-card").forEach((card) => {
+    card.addEventListener("click", (e) => {
+      if ((e.target as HTMLElement).closest("a")) return;
+      const href = card.dataset.href;
+      if (href) window.location.href = href;
+    });
+  });
+</script>
