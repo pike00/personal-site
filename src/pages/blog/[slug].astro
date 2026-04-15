@@ -13,6 +13,7 @@ interface PostFrontmatter {
   description: string;
   date: string;
   tags: string[];
+  draft?: boolean;
 }
 
 interface PostData extends PostFrontmatter {
@@ -34,10 +35,11 @@ export async function getStaticPaths(): Promise<StaticPath[]> {
     .filter((f: string) => f.endsWith(".md"));
 
   const paths = await Promise.all(
-    files.map(async (file: string): Promise<StaticPath> => {
+    files.map(async (file: string): Promise<StaticPath | null> => {
       const slug = file.replace(/\.md$/, "");
       const raw = fs.readFileSync(path.join(blogDir, file), "utf-8");
       const { data, content } = matter(raw);
+      if ((data as PostFrontmatter & { draft?: boolean }).draft) return null;
       const bodyHtml = await marked.parse(content);
       return {
         params: { slug },
@@ -50,7 +52,7 @@ export async function getStaticPaths(): Promise<StaticPath[]> {
       };
     }),
   );
-  return paths;
+  return paths.filter((p): p is StaticPath => p !== null);
 }
 
 interface Props {

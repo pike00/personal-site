@@ -12,6 +12,7 @@ interface PostEntry {
   description: string;
   date: string;
   tags: string[];
+  draft?: boolean;
 }
 
 const blogDir = path.resolve("src/content/blog");
@@ -26,6 +27,7 @@ const posts: PostEntry[] = blogFiles
     const { data } = matter(raw);
     return { slug, ...(data as Omit<PostEntry, "slug">) };
   })
+  .filter((post: PostEntry) => !post.draft)
   .sort(
     (a: PostEntry, b: PostEntry) =>
       new Date(b.date).getTime() - new Date(a.date).getTime(),
