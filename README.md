@@ -1,6 +1,6 @@
 # personal-site
 
-Personal site and academic portfolio built with [Astro](https://astro.build), deployed to [Cloudflare Pages](https://pages.cloudflare.com).
+Personal site and academic portfolio built with [Astro](https://astro.build), deployed to [GitHub Pages](https://pages.github.com).
 
 ## Stack
 
@@ -14,10 +14,10 @@ Personal site and academic portfolio built with [Astro](https://astro.build), de
 
 ```
 src/
-├── pages/          # Routes: index, about, projects, publications, cv, contact
+├── pages/          # Routes: index, about, projects, blog, publications, cv, contact
 ├── components/     # Astro + React components
 ├── layouts/        # Base and page layouts
-├── content/        # Content collections (cv, projects, publication tags)
+├── content/        # Content collections (cv, projects, blog, publication tags)
 ├── lib/            # Utilities (citations, abstracts, types)
 └── styles/         # Global CSS
 scripts/            # Build utilities (Bash + Tsx)
@@ -29,11 +29,17 @@ publications/       # Git submodule
 Requires Node >= 22.12.0 and [Typst](https://typst.app) for CV builds.
 
 ```sh
+git clone --recurse-submodules https://github.com/pike00/personal-site.git
+# or, if already cloned without submodules:
+git submodule update --init --recursive
+
 npm install
 npm run dev          # Start dev server at localhost:4321
 npm run build        # Full pipeline: PDFs -> citations -> CV -> Astro build
 npm run preview      # Preview production build
 ```
+
+> **Note:** The `publications/` directory is a git submodule. If you skip submodule init, the Publications page, homepage recent-publications list, and CV publication counts will all render empty on the dev server.
 
 ### Build pipeline
 
@@ -46,4 +52,4 @@ npm run preview      # Preview production build
 
 ## Deployment
 
-Deployed via GitHub Actions to Cloudflare Pages. Builds trigger on pushes to main and via `repository_dispatch` when the publications submodule is updated upstream.
+Deployed via GitHub Actions to GitHub Pages. Builds trigger on pushes to main and via `repository_dispatch` when the publications submodule is updated upstream.
