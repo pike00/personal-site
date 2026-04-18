@@ -10,17 +10,4 @@
   </svg>
 </button>
 
-<script is:inline>
-  (function() {
-    if (window.__darkModeInit) return;
-    window.__darkModeInit = true;
-
-    var toggles = document.querySelectorAll(".dark-mode-toggle");
-    for (var i = 0; i < toggles.length; i++) {
-      toggles[i].addEventListener("click", function() {
-        var isDark = document.documentElement.classList.toggle("dark");
-        localStorage.setItem("theme", isDark ? "dark" : "light");
-      });
-    }
-  })();
-</script>
+<script is:inline src="/scripts/dark-mode-toggle.js" defer></script>
