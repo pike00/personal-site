@@ -1,9 +1,9 @@
 ---
 title: "Teaching a Neural Net to Find Date Stamps on Scanned Photos"
 description: "Fine-tuning YOLO to locate burned-in LED date stamps on 7,500 scanned family photos so EXIF can be rewritten from the film itself."
-date: "2026-04-15"
+date: "2026-04-17"
 tags: ["YOLO", "Computer Vision", "Python", "Machine Learning"]
-draft: true
+draft: false
 ---
 
 
