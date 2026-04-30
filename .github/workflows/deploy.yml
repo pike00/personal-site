@@ -18,7 +18,7 @@ jobs:
       url: https://pikemd.com
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: recursive
 
@@ -32,7 +32,7 @@ jobs:
         run: npm ci
 
       - name: Cache Typst binary
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ${{ runner.tool_cache }}/typst
           key: typst-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('package.json') }}
@@ -50,6 +50,8 @@ jobs:
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
+        env:
+          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
         with:
           apiToken: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
