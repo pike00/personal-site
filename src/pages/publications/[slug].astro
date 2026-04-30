@@ -19,6 +19,10 @@ interface Props {
 
 const { publication: pub } = Astro.props;
 
+const pdfUrl = pub.pdfPath
+  ? "/" + pub.pdfPath.split("/").map(encodeURIComponent).join("/")
+  : undefined;
+
 const authorDisplay = pub.authors
   .map((a) => (/\bPike\b/.test(a) ? `<strong>${a}</strong>` : a))
   .join(", ");
@@ -70,10 +74,10 @@ const dateDisplay = pub.pubDate
       </div>
     )}
 
-    {pub.pdfPath && (
+    {pdfUrl && (
       <div class="mb-8">
         <a
-          href={`/${pub.pdfPath}`}
+          href={pdfUrl}
           target="_blank"
           rel="noopener noreferrer"
           class="inline-flex items-center gap-2 px-4 py-2 bg-accent hover:bg-accent-dark text-white rounded-lg text-sm font-medium transition-colors"
@@ -185,26 +189,26 @@ const dateDisplay = pub.pubDate
       </dl>
     </div>
 
-    {pub.pdfPath && (
+    {pdfUrl && (
       <div class="border-t border-gray-200 dark:border-gray-700 pt-6 mt-8">
         <h2 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">Document Preview</h2>
         <div class="hidden md:block rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden bg-gray-100 dark:bg-gray-800">
           <iframe
-            src={`/${pub.pdfPath}`}
+            src={pdfUrl}
             class="w-full"
             style="height: 80vh; min-height: 600px;"
             title={`PDF preview of ${pub.title}`}
           >
             <p class="p-6 text-sm text-gray-500">
               Your browser does not support embedded PDFs.
-              <a href={`/${pub.pdfPath}`} target="_blank" rel="noopener noreferrer" class="text-accent hover:underline">
+              <a href={pdfUrl} target="_blank" rel="noopener noreferrer" class="text-accent hover:underline">
                 Open the PDF directly.
               </a>
             </p>
           </iframe>
         </div>
         <a
-          href={`/${pub.pdfPath}`}
+          href={pdfUrl}
           target="_blank"
           rel="noopener noreferrer"
           class="md:hidden inline-flex items-center gap-2 text-accent hover:underline text-sm"
