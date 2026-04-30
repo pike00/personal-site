@@ -27,7 +27,7 @@ interface StaticPath {
 
 export async function getStaticPaths(): Promise<StaticPath[]> {
   const marked = new Marked().use(markedFootnote());
-  const blogDir = path.resolve("src/content/blog");
+  const blogDir = path.resolve("blog-posts/posts");
   if (!fs.existsSync(blogDir)) return [];
 
   const files: string[] = fs

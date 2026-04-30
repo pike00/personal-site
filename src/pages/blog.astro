@@ -15,7 +15,7 @@ interface PostEntry {
   draft?: boolean;
 }
 
-const blogDir = path.resolve("src/content/blog");
+const blogDir = path.resolve("blog-posts/posts");
 const blogFiles: string[] = fs.existsSync(blogDir)
   ? fs.readdirSync(blogDir).filter((f: string) => f.endsWith(".md"))
   : [];
