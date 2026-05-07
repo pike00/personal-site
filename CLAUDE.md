@@ -118,6 +118,15 @@ npm run dev          # http://localhost:4321
 
 Dev server does not run `build:cv` or the PDF copy steps eagerly on every reload — restart it after touching `publications/` or the CV `.typ` source.
 
+## Analytics
+
+Two trackers are wired in [src/layouts/BaseLayout.astro](src/layouts/BaseLayout.astro):
+
+- **GoatCounter** — `pikemd.goatcounter.com` (SaaS). Note: blocked by aggressive tracker-blocklists including the household NextDNS profile, so admin and other privacy-tooled visitors won't appear in its counts.
+- **Umami** — self-hosted at `umami.khanpikehome.com` (homelab `apps/umami`). Website ID `e195e031-845c-4950-a08b-bd4a44038ab3`. Default-allow on the same domain as the homelab so blocklists can't selectively filter it.
+
+If you change either tracker, update the CSP in [public/_headers](public/_headers): `script-src` needs the script's origin and `connect-src` needs the API origin (Umami POSTs to `/api/send`).
+
 ## Repo metadata to keep in sync
 
 - README's "GitHub Pages" line and "Astro 5" stack line are both stale. Update if rewriting.
