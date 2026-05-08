@@ -16,7 +16,10 @@
   },
   "dependencies": {
     "@astrojs/react": "^5.0.3",
+    "@astrojs/rss": "^4.0.18",
     "@astrojs/sitemap": "^3.7.2",
+    "@fontsource/inter": "^5.2.8",
+    "@resvg/resvg-js": "^2.6.2",
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.2.4",
     "@types/react": "^19.2.14",
@@ -29,6 +32,7 @@
     "marked-footnote": "^1.4.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
+    "satori": "^0.26.0",
     "tailwindcss": "^4.2.4",
     "yaml": "^2.8.3"
   },

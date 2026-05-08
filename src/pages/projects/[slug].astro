@@ -68,7 +68,7 @@ const dateDisplay = project.date
 const hasBody = project.bodyHtml.trim().length > 0;
 ---
 
-<PageLayout title={project.title} description={project.description}>
+<PageLayout title={project.title} description={project.description} image={`/og/project-${Astro.params.slug}.png`}>
   <div class="max-w-3xl mx-auto px-6 py-12">
     <nav class="text-sm text-gray-400 dark:text-gray-500 mb-8">
       <a href="/projects" class="hover:text-accent transition-colors">Projects</a>

@@ -68,7 +68,7 @@ const dateDisplay = new Date(post.date + "T00:00:00").toLocaleDateString("en-US"
 });
 ---
 
-<PageLayout title={post.title} description={post.description}>
+<PageLayout title={post.title} description={post.description} image={`/og/blog-${Astro.params.slug}.png`}>
   <div class="max-w-3xl mx-auto px-6 py-12">
     <nav class="text-sm text-gray-400 dark:text-gray-500 mb-8">
       <a href="/blog" class="hover:text-accent transition-colors">Blog</a>

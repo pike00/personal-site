@@ -1,5 +1,7 @@
 ---
 export const prerender = true;
+import { Image } from "astro:assets";
+import familyPhoto from "../assets/family.jpeg";
 import PageLayout from "../layouts/PageLayout.astro";
 import fs from "node:fs";
 import path from "node:path";
@@ -21,8 +23,8 @@ const htmlContent = await marked.parse(contentWithoutFrontmatter);
     />
 
     <div class="mt-12 pt-10 border-t border-gray-200 dark:border-gray-700 flex flex-col md:flex-row items-center gap-8">
-      <img
-        src="/family.jpeg"
+      <Image
+        src={familyPhoto}
         alt="Will and Aleisha with their whippets Bleu and Sammy"
         class="w-64 md:w-80 rounded-2xl shadow-lg object-cover"
       />

@@ -1,5 +1,7 @@
 ---
 export const prerender = true;
+import { Image } from "astro:assets";
+import headshot from "../assets/headshot.jpg";
 import PageLayout from "../layouts/PageLayout.astro";
 import StatBlock from "../components/StatBlock.astro";
 import PublicationCard from "../components/PublicationCard.astro";
@@ -47,11 +49,11 @@ const firstYear = publications
         </div>
       </div>
       <div class="shrink-0">
-        <img
-          src="/headshot.jpg"
+        <Image
+          src={headshot}
           alt="Will Pike, MD"
-          width="280"
-          height="280"
+          width={280}
+          height={280}
           class="w-48 h-56 md:w-60 md:h-72 rounded-full object-cover object-top ring-4 ring-accent/30 shadow-2xl"
         />
       </div>
