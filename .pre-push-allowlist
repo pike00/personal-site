@@ -1,0 +1,7 @@
+# Strings that may appear in this repo intentionally and should NOT be flagged
+# by the global pre-push secrets/PII scanner. One entry per line.
+
+# Self-hosted Umami analytics endpoint — referenced from BaseLayout.astro and
+# the CSP allowlist in public/_headers. The hostname is publicly resolvable
+# (DNS-only Cloudflare record) and the script is part of the live deployed site.
+umami.khanpikehome.com
