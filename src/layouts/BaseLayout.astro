@@ -29,13 +29,7 @@ const { title, description, image, type } = Astro.props;
       data-website-id="e195e031-845c-4950-a08b-bd4a44038ab3"
       is:inline
     ></script>
-  </head>
-  <body class="min-h-screen flex flex-col">
-    <slot />
-  </body>
-</html>
-
-<script is:inline>
+    <script is:inline>
   (function() {
     var stored = localStorage.getItem("theme");
     var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -44,3 +38,9 @@ const { title, description, image, type } = Astro.props;
     }
   })();
 </script>
+  </head>
+  <body class="min-h-screen flex flex-col">
+    <slot />
+    <script is:inline src="/scripts/dark-mode-toggle.js" defer></script>
+  </body>
+</html>
