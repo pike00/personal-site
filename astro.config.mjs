@@ -17,5 +17,10 @@ export default defineConfig({
     define: {
       "import.meta.env.COMMIT_HASH": JSON.stringify(commitHash),
     },
+    server: {
+      allowedHosts: process.env.VITE_ALLOWED_HOSTS
+        ? process.env.VITE_ALLOWED_HOSTS.split(",")
+        : undefined,
+    },
   },
 });

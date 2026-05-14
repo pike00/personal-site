@@ -2,6 +2,18 @@
 default:
     @just --list
 
+# Run the Astro dev server bound to the tailnet (reachable from any tailnet
+# device, not LAN/internet). Override port with: just dev 4322
+dev port='4321':
+    #!/usr/bin/env bash
+    set -euo pipefail
+    TS_IP=$(tailscale ip -4)
+    TS_HOST=$(tailscale status --self --json | jq -r '.Self.DNSName' | sed 's/\.$//')
+    echo "→ http://${TS_HOST}:{{port}}/"
+    npm run build:pdfs
+    npm run build:blog-assets
+    VITE_ALLOWED_HOSTS="$TS_HOST" npx astro dev --host="$TS_IP" --port={{port}}
+
 # Update publications submodule to latest and commit the pointer
 update-pubs:
     git -C publications fetch origin
