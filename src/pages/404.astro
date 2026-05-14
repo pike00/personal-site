@@ -1,0 +1,24 @@
+---
+export const prerender = true;
+import PageLayout from "../layouts/PageLayout.astro";
+---
+
+<PageLayout title="404 — Page not found" description="The page you requested does not exist.">
+  <div class="max-w-3xl mx-auto px-6 py-24 text-center">
+    <p class="text-sm uppercase tracking-[3px] text-accent font-semibold mb-4">
+      404
+    </p>
+    <h1 class="text-4xl md:text-5xl font-extrabold text-primary dark:text-white mb-6">
+      Page not found
+    </h1>
+    <p class="text-gray-600 dark:text-gray-400 mb-10">
+      That URL does not exist on this site. It may have been moved, or it may have never existed.
+    </p>
+    <a
+      href="/"
+      class="inline-block px-6 py-3 rounded-lg bg-primary text-white font-semibold hover:bg-primary-light transition-colors"
+    >
+      Back to home
+    </a>
+  </div>
+</PageLayout>
