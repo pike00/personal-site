@@ -7,6 +7,7 @@ import path from "node:path";
 import matter from "gray-matter";
 import { Marked } from "marked";
 import markedFootnote from "marked-footnote";
+import { codeToHtml } from "shiki";
 
 interface PostFrontmatter {
   title: string;
@@ -26,7 +27,32 @@ interface StaticPath {
 }
 
 export async function getStaticPaths(): Promise<StaticPath[]> {
-  const marked = new Marked().use(markedFootnote());
+  // Fresh Marked per post: marked-footnote keeps shared closure state that
+  // races under Promise.all otherwise.
+  const makeMarked = () =>
+    new Marked({
+      async: true,
+      async walkTokens(token) {
+        if (token.type === "code") {
+          (token as { html?: string }).html = await codeToHtml(token.text, {
+            lang: token.lang || "text",
+            theme: "github-dark",
+          });
+        }
+      },
+    })
+      .use({
+        renderer: {
+          code(token) {
+            return (
+              (token as { html?: string }).html ||
+              `<pre><code>${token.text}</code></pre>`
+            );
+          },
+        },
+      })
+      .use(markedFootnote());
+
   const blogDir = path.resolve("blog-posts/posts");
   if (!fs.existsSync(blogDir)) return [];
 
@@ -40,7 +66,7 @@ export async function getStaticPaths(): Promise<StaticPath[]> {
       const raw = fs.readFileSync(path.join(blogDir, file), "utf-8");
       const { data, content } = matter(raw);
       if ((data as PostFrontmatter & { draft?: boolean }).draft) return null;
-      const bodyHtml = await marked.parse(content);
+      const bodyHtml = await makeMarked().parse(content);
       return {
         params: { slug },
         props: {

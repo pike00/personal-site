@@ -8,11 +8,23 @@ Static site for pikemd.com. Astro 6 + React 19 + Tailwind 4. Deploys to **Cloudf
 
 Public GitHub repo: `pike00/personal-site`. Per global rules: **never push without explicit user approval**.
 
+## Publishing a blog post
+
+Use the `publish-post` just recipe — it handles the cross-repo dance end-to-end:
+
+```sh
+just publish-post sops-age-docker-compose
+```
+
+That flips `draft: false` in `blog-posts/posts/<slug>.md`, commits + pushes the blog-posts submodule (`pike00/blog`), then bumps the submodule pointer here and pushes (`pike00/personal-site`). Idempotent: rerunning on an already-published post is a no-op except for the submodule pointer if it lags.
+
+Manual cross-repo dispatch (if you only want to *rebuild* against an already-updated submodule pointer, no commit) is documented under Triggers below — but in normal flow `publish-post` covers it.
+
 ## Deploy
 
 ### How it actually deploys
 
-`git push origin main` → [.github/workflows/deploy.yml](.github/workflows/deploy.yml) runs on GitHub-hosted runner → builds → `wrangler pages deploy dist --project-name=personal-site` → Cloudflare zone-wide cache purge.
+`git push origin main` → [.github/workflows/deploy.yml](.github/workflows/deploy.yml) runs on GitHub-hosted runner → builds → `wrangler pages deploy dist --project-name=personal-site` (via `cloudflare/wrangler-action@v4`) → Cloudflare zone-wide cache purge.
 
 A successful run is ~50–70s. Watch with:
 
@@ -26,10 +38,11 @@ gh run list --workflow=deploy.yml --limit 5      # history
 The workflow listens for:
 
 - `push` to `main` — the normal path.
-- `repository_dispatch` with `event_type: publications-updated` or `blog-updated` — fired from the `publications` / `blog-posts` submodule repos when their upstream content lands, so the site rebuilds without a code change here. Trigger manually with:
+- `repository_dispatch` with `event_type: publications-updated` or `blog-updated` — fired from the `publications` / `blog-posts` submodule repos when their upstream content lands, so the site rebuilds without a code change here. Note: a dispatch rebuilds against the **submodule pointer recorded in this repo**, not the submodule's latest commit. New content needs the pointer bumped here too (which `just publish-post` does). Trigger a no-op rebuild manually with:
   ```sh
   gh api repos/pike00/personal-site/dispatches -f event_type=publications-updated
   ```
+  Triggering blog-updated cross-repo from a workflow needs a token. The `pike00/blog` repo's `.github/workflows/notify-site.yml` does this with `SITE_DEPLOY_TOKEN` — a fine-grained PAT scoped to `pike00/personal-site` with **Contents: read+write**. (Counterintuitive but `repository_dispatch` maps to the Contents permission, not Actions.) If the token errors with "Bad credentials", regenerate it: https://github.com/settings/personal-access-tokens/new.
 
 No `workflow_dispatch` is configured, so `gh workflow run deploy.yml` does not work. To force a no-op deploy, push an empty commit:
 
@@ -82,6 +95,15 @@ npm run build:cv && npm run build
 ```sh
 git submodule update --init --recursive
 ```
+
+### Blog markdown pipeline: shiki + marked-footnote
+
+[src/pages/blog/[slug].astro](src/pages/blog/[slug].astro) renders posts with `marked` + custom `walkTokens` that calls shiki's `codeToHtml` for syntax highlighting (theme: `github-dark`). Two non-obvious things:
+
+- A fresh `Marked` instance is created **per post** inside the `Promise.all`. `marked-footnote` keeps shared closure state (an `e.hasFootnotes` flag) that races and throws `Cannot read properties of undefined (reading 'filter')` when the same instance parses multiple posts concurrently.
+- Syntax highlighting goes through `walkTokens` + a custom `code` renderer, **not** via `marked-shiki` — the plugin conflicts with marked-footnote's tokenizer at `node_modules/marked-footnote/dist/index.js:54`.
+
+If you add another markdown-rendering page (about, projects), repeat the same pattern — don't try to share a Marked instance.
 
 ### CSP allowlist must be re-extracted after Astro upgrades
 
