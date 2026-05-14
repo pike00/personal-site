@@ -27,4 +27,9 @@
   .dark body {
     @apply bg-surface-dark text-gray-200;
   }
+
+  .prose :where(code):not(:where([class~="not-prose"] *))::before,
+  .prose :where(code):not(:where([class~="not-prose"] *))::after {
+    content: "";
+  }
 }
