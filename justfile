@@ -2,10 +2,31 @@
 default:
     @just --list
 
-# Build and deploy to Cloudflare Pages, then purge the CDN cache.
-# Credentials are loaded from .env.sops (sops-encrypted). Create it with:
-#   sops .env.sops   (set CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_ZONE_ID)
+# Bump version, push, and deploy to Cloudflare Pages.
+# Errors on uncommitted changes. Prompts for patch/minor/major.
+# Credentials loaded from sops-encrypted .env.sops — create with: sops .env.sops
+# Required keys: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_ZONE_ID
 deploy:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if ! git diff --quiet || ! git diff --cached --quiet; then
+        echo "error: uncommitted changes — commit or stash before deploying" >&2
+        exit 1
+    fi
+    current=$(jq -r .version package.json)
+    echo "Current version: $current"
+    printf "Bump type [patch/minor/major]: "
+    read -r bump
+    case "$bump" in
+        patch|minor|major) ;;
+        *) echo "error: invalid bump type '$bump'" >&2; exit 1 ;;
+    esac
+    npm version "$bump" --no-git-tag-version
+    new=$(jq -r .version package.json)
+    git add package.json package-lock.json
+    git commit -m "chore: release v${new}"
+    git tag "v${new}"
+    git push && git push --tags
     sops exec-env .env.sops just _deploy
 
 _deploy:
