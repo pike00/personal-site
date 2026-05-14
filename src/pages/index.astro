@@ -1,23 +1,46 @@
 ---
 export const prerender = true;
 import { Image } from "astro:assets";
+import fs from "node:fs";
+import path from "node:path";
+import matter from "gray-matter";
 import headshot from "../assets/headshot.jpg";
 import PageLayout from "../layouts/PageLayout.astro";
 import StatBlock from "../components/StatBlock.astro";
 import PublicationCard from "../components/PublicationCard.astro";
+import PostCard from "../components/PostCard.astro";
 import TopicPill from "../components/TopicPill.astro";
 import { getPublications } from "../lib/publications";
 import { getAbstracts } from "../lib/abstracts";
 
+interface PostEntry {
+  slug: string;
+  title: string;
+  description: string;
+  date: string;
+  tags: string[];
+  draft?: boolean;
+}
+
 const publications = getPublications();
 const abstracts = getAbstracts();
-const recentPubs = publications.slice(0, 3);
+const recentPubs = publications.slice(0, 2);
 
 const allTags = [...new Set(publications.flatMap((p) => p.researchArea))].sort();
-const firstYear = publications
-  .map((p) => p.pubDate?.split("-")[0])
-  .filter(Boolean)
-  .sort()[0] ?? "";
+
+const blogDir = path.resolve("blog-posts/posts");
+const posts: PostEntry[] = (fs.existsSync(blogDir) ? fs.readdirSync(blogDir) : [])
+  .filter((f: string) => f.endsWith(".md"))
+  .map((file: string): PostEntry => {
+    const slug = file.replace(/\.md$/, "");
+    const raw = fs.readFileSync(path.join(blogDir, file), "utf-8");
+    const { data } = matter(raw);
+    return { slug, ...(data as Omit<PostEntry, "slug">) };
+  })
+  .filter((p: PostEntry) => !p.draft)
+  .sort((a: PostEntry, b: PostEntry) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+const recentPosts = posts.slice(0, 3);
 ---
 
 <PageLayout
@@ -40,11 +63,11 @@ const firstYear = publications
           research across multiple specialties.
         </p>
         <div class="flex gap-3 mt-8">
+          <a href="/blog" class="bg-accent hover:bg-accent-dark text-white px-6 py-3 rounded-lg text-sm font-semibold transition-colors">
+            Read Blog
+          </a>
           <a href="/cv" class="bg-accent hover:bg-accent-dark text-white px-6 py-3 rounded-lg text-sm font-semibold transition-colors">
             View CV
-          </a>
-          <a href="/publications" class="bg-accent hover:bg-accent-dark text-white px-6 py-3 rounded-lg text-sm font-semibold transition-colors">
-            View Publications
           </a>
         </div>
       </div>
@@ -63,12 +86,38 @@ const firstYear = publications
   <!-- Stats -->
   <section class="bg-white dark:bg-surface-card-dark border-b border-gray-200 dark:border-gray-800">
     <div class="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 divide-x divide-gray-200 dark:divide-gray-700">
+      <StatBlock value={posts.length} label="Blog Posts" />
       <StatBlock value={publications.length} label="Publications" />
       <StatBlock value={abstracts.length} label="Abstracts" />
       <StatBlock value={allTags.length} label="Research Areas" />
-      <StatBlock value={firstYear} label="First Publication" />
     </div>
   </section>
+
+  {recentPosts.length > 0 && (
+    <!-- Recent Posts -->
+    <section class="max-w-6xl mx-auto px-6 py-12">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-xl font-bold text-primary dark:text-white">Recent Posts</h2>
+          <p class="text-sm text-gray-500 dark:text-gray-400">Notes on research, tools, and engineering</p>
+        </div>
+        <a href="/blog" class="text-sm text-accent font-semibold hover:text-accent-dark transition-colors">
+          View all &rarr;
+        </a>
+      </div>
+      <div class="flex flex-col gap-4">
+        {recentPosts.map((post) => (
+          <PostCard
+            slug={post.slug}
+            title={post.title}
+            description={post.description}
+            date={post.date}
+            tags={post.tags}
+          />
+        ))}
+      </div>
+    </section>
+  )}
 
   <!-- Recent Publications -->
   <section class="max-w-6xl mx-auto px-6 py-12">
