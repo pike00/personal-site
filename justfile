@@ -3,8 +3,12 @@ default:
     @just --list
 
 # Build and deploy to Cloudflare Pages, then purge the CDN cache.
-# Requires CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_ZONE_ID in env.
+# Credentials are loaded from .env.sops (sops-encrypted). Create it with:
+#   sops .env.sops   (set CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_ZONE_ID)
 deploy:
+    sops exec-env .env.sops just _deploy
+
+_deploy:
     #!/usr/bin/env bash
     set -euo pipefail
     npm run build:cv
