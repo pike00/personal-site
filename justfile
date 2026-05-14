@@ -2,6 +2,22 @@
 default:
     @just --list
 
+# Build and deploy to Cloudflare Pages, then purge the CDN cache.
+# Requires CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_ZONE_ID in env.
+deploy:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    npm run build:cv
+    npm run build
+    npx wrangler pages deploy dist --project-name=personal-site
+    echo "→ purging Cloudflare cache..."
+    curl -sf -X POST \
+      "https://api.cloudflare.com/client/v4/zones/${CLOUDFLARE_ZONE_ID}/purge_cache" \
+      -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+      -H "Content-Type: application/json" \
+      --data '{"purge_everything":true}' | jq -r '.success'
+    echo "✓ deployed"
+
 # Run the Astro dev server bound to the tailnet (reachable from any tailnet
 # device, not LAN/internet). Override port with: just dev 4322
 dev port='4321':

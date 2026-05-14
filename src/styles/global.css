@@ -28,8 +28,36 @@
     @apply bg-surface-dark text-gray-200;
   }
 
-  .prose :where(code):not(:where([class~="not-prose"] *))::before,
-  .prose :where(code):not(:where([class~="not-prose"] *))::after {
-    content: "";
+  .prose code.inline-copy {
+    @apply relative cursor-pointer rounded bg-slate-100 px-[0.4em] py-[0.15em] transition-colors duration-150 ease-in-out;
+  }
+  .dark .prose code.inline-copy {
+    @apply bg-slate-800;
+  }
+  .prose code.inline-copy:hover {
+    @apply bg-slate-200;
+  }
+  .dark .prose code.inline-copy:hover {
+    @apply bg-slate-700;
+  }
+  .prose code.inline-copy:focus-visible {
+    @apply outline-2 outline-offset-2 outline-[var(--color-accent)];
+  }
+  .prose code.inline-copy.copied::after {
+    content: "Copied";
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--color-primary);
+    color: #fff;
+    font-size: 0.7em;
+    line-height: 1;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+    white-space: nowrap;
+    margin-bottom: 0.3rem;
+    pointer-events: none;
+    font-family: var(--font-sans);
   }
 }

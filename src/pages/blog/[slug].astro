@@ -49,6 +49,9 @@ export async function getStaticPaths(): Promise<StaticPath[]> {
               `<pre><code>${token.text}</code></pre>`
             );
           },
+          codespan(token) {
+            return `<code class="inline-copy" title="Click to copy" role="button" tabindex="0">${token.text}</code>`;
+          },
         },
       })
       .use(markedFootnote());
@@ -114,8 +117,9 @@ const dateDisplay = new Date(post.date + "T00:00:00").toLocaleDateString("en-US"
     )}
 
     <article
-      class="prose prose-sm dark:prose-invert max-w-none prose-headings:text-primary dark:prose-headings:text-white prose-a:text-accent"
+      class="prose prose-sm dark:prose-invert max-w-none prose-headings:text-primary dark:prose-headings:text-white prose-a:text-accent prose-code:before:content-none prose-code:after:content-none"
       set:html={post.bodyHtml}
     />
   </div>
+  <script is:inline src="/js/copy-code.js" defer></script>
 </PageLayout>

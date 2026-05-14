@@ -4,7 +4,14 @@ import tailwindcss from "@tailwindcss/vite";
 import sitemap from "@astrojs/sitemap";
 import react from "@astrojs/react";
 
-const commitHash = execSync("git rev-parse --short HEAD").toString().trim();
+const commitHash = (() => {
+  if (process.env.COMMIT_HASH) return process.env.COMMIT_HASH;
+  try {
+    return execSync("git rev-parse --short HEAD").toString().trim();
+  } catch {
+    return "unknown";
+  }
+})();
 
 export default defineConfig({
   site: "https://pikemd.com",
