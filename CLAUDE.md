@@ -8,17 +8,12 @@ Static site for pikemd.com. Astro 6 + React 19 + Tailwind 4. Deploys to **Cloudf
 
 Public GitHub repo: `pike00/personal-site`. Per global rules: **never push without explicit user approval**.
 
-## Publishing a blog post
+## Just recipes (run `just` for the full list)
 
-Use the `publish-post` just recipe — it handles the cross-repo dance end-to-end:
-
-```sh
-just publish-post sops-age-docker-compose
-```
-
-That flips `draft: false` in `blog-posts/posts/<slug>.md`, commits + pushes the blog-posts submodule (`pike00/blog`), then bumps the submodule pointer here and pushes (`pike00/personal-site`). Idempotent: rerunning on an already-published post is a no-op except for the submodule pointer if it lags.
-
-Manual cross-repo dispatch (if you only want to *rebuild* against an already-updated submodule pointer, no commit) is documented under Triggers below — but in normal flow `publish-post` covers it.
+- `just deploy` — bumps `package.json` version (prompts patch/minor/major), commits, tags, pushes, then `wrangler pages deploy` + cache purge using sops-loaded creds from `.env.sops`. Refuses to run with a dirty tree. This is the canonical release path; CI also runs on the resulting push.
+- `just dev [port]` — Astro dev server bound to the host's Tailscale IP with `VITE_ALLOWED_HOSTS` set to the MagicDNS name. Default port 4321. Use this instead of `npm run dev` so the dev box is reachable from other tailnet devices.
+- `just publish-post <slug>` — flips `draft: false` in `blog-posts/posts/<slug>.md`, commits+pushes the `pike00/blog` submodule, bumps the pointer here, pushes. Idempotent.
+- `just update-pubs` / `just update-blog` — fast-forward submodule + copy assets + commit pointer bump (no push).
 
 ## Deploy
 
@@ -57,26 +52,13 @@ git push origin main          # only after explicit user approval — public rep
 - `CLOUDFLARE_ACCOUNT_ID`
 - `CLOUDFLARE_ZONE_ID`
 
-### Manual deploy from a laptop (escape hatch)
+### Manual deploy from a laptop
 
-Only if CI is wedged. Requires `wrangler` and the same token in `CLOUDFLARE_API_TOKEN`:
+Use `just deploy` (preferred — see Just recipes above). It runs `sops exec-env .env.sops just _deploy` so credentials never hit the shell. Required keys in `.env.sops`: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_ZONE_ID`. Edit with `sops .env.sops` (recipients/age key configured in `.sops.yaml`).
 
-```sh
-npm ci
-npm run build:cv         # CI runs this separately — see gotcha below
-npm run build
-npx wrangler pages deploy dist --project-name=personal-site
-```
+### Self-hosted Caddy build (alternative, not currently deployed)
 
-Cache purge afterward (CI does this automatically):
-
-```sh
-curl -s -X POST \
-  "https://api.cloudflare.com/client/v4/zones/$CLOUDFLARE_ZONE_ID/purge_cache" \
-  -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
-  -H "Content-Type: application/json" \
-  --data '{"purge_everything":true}'
-```
+`Dockerfile` + `Caddyfile` build a static Caddy container serving `dist/` on `:8080`. Used only if migrating off Cloudflare Pages. The Caddyfile hard-codes its own copy of the CSP — if you update `public/_headers`, update `Caddyfile` too or the two diverge silently.
 
 ## Build gotchas
 
@@ -87,6 +69,10 @@ curl -s -X POST \
 ```sh
 npm run build:cv && npm run build
 ```
+
+### `build:citations` is dead
+
+`package.json` defines `build:citations` (`tsx scripts/generate-citations.ts`) but nothing invokes it — not the `build` chain, not CI, not the Dockerfile. Citation metadata is generated at runtime from publication source files via `src/lib/`, not from a prebuilt artifact. The README claim that `npm run build` runs citations is wrong. Either wire it into `build` or delete it; do not assume it has run.
 
 ### Submodules are required
 
@@ -107,13 +93,14 @@ If you add another markdown-rendering page (about, projects), repeat the same pa
 
 ### CSP allowlist must be re-extracted after Astro upgrades
 
-[public/_headers](public/_headers) pins a strict CSP with **per-script sha256 hashes** for every inline `<script>` Astro emits. Three of the hashes are Astro-emitted boilerplate:
+CSP is defined in **two** places that must stay in sync:
 
-- the `astro:load` shim
-- the client-directive runner that hydrates `client:load` islands (this is what makes `<SearchPublications>` work)
-- per-page inline handlers (e.g. the projects-page card-click code)
+- [public/_headers](public/_headers) — served by Cloudflare Pages (the live deploy)
+- [Caddyfile](Caddyfile) — used only by the alternative self-hosted container build
 
-These hashes change with **every Astro version bump**. When that happens, the React island on `/publications/` silently stops hydrating in production (search box and dropdowns become inert; dev mode looks fine because it ships different scripts). Recompute and update them with:
+Both pin per-script `sha256-...` hashes for every inline `<script>` Astro emits. Current allowlist has 4 hashes covering the `astro:load` shim, the client-directive runner that hydrates `client:load` islands (what makes `<SearchPublications>` work), per-page inline handlers (e.g. projects-page card-click, dark-mode toggle, inline-code copy-on-click), and the analytics shim. These hashes change with **every Astro version bump** and when any inline `<script>` in `src/` changes. Symptoms when stale: the React island on `/publications/` silently stops hydrating in production (search and dropdowns inert; dev mode looks fine because it ships different scripts).
+
+Recompute and update with:
 
 ```sh
 npm run build
@@ -129,27 +116,39 @@ for h, p in seen.items():
 PY
 ```
 
-Compare the printed set against `script-src` in `public/_headers`; add any missing hashes. Verify on the deployed site by opening DevTools console on `/publications/` — any `Content Security Policy` violation there means a hash is missing.
+Compare the printed set against `script-src` in **both** `public/_headers` and `Caddyfile`; add any missing hashes to both. Verify on the deployed site by opening DevTools console on `/publications/` — any `Content Security Policy` violation there means a hash is missing.
+
+Other CSP origins currently allowlisted: `https://umami.khanpikehome.com` (script-src + connect-src) for analytics; `https://rsms.me` (style-src + font-src) for Inter web font. Update both files if you change either.
 
 ## Local dev
 
 ```sh
 npm install
-npm run dev          # http://localhost:4321
+just dev             # tailnet-bound, reachable from other devices
+# or: npm run dev    # localhost:4321 only
 ```
 
-Dev server does not run `build:cv` or the PDF copy steps eagerly on every reload — restart it after touching `publications/` or the CV `.typ` source.
+`npm run dev` chains `build:pdfs` + `build:blog-assets` once at startup. The dev server does not re-run them on reload — restart after touching `publications/`, `blog-posts/`, or the CV `.typ` source. CV PDF is not rebuilt by the dev server at all; run `npm run build:cv` separately if you change the `.typ`.
+
+## Content layout
+
+- `src/content/` — Astro content collections: `cv/` (single doc), `projects/` (per-project markdown), `about.md`, `publication-tags.yaml`. Schemas in `src/content.config.ts`. There is no `blog` content collection in `src/content/` — blog posts live in the `blog-posts/` submodule and are loaded directly by `src/pages/blog/[slug].astro` via `fs` + `gray-matter`.
+- `publications/` (submodule) — publication PDFs + frontmatter, copied into `public/Publications/` by `scripts/copy-pdfs.sh`.
+- `blog-posts/` (submodule, `pike00/blog`) — blog markdown + assets, copied into `public/blog/` by `scripts/copy-blog-assets.sh`.
+
+`src/pages/` is route-based (no `_routes.json`). `whoami` is filtered out of the sitemap in `astro.config.mjs`.
+
+No Pagefind. No MDX integration. Search is in-browser via Fuse.js over a JSON bundle generated at build time.
 
 ## Analytics
 
-Two trackers are wired in [src/layouts/BaseLayout.astro](src/layouts/BaseLayout.astro):
+Only **Umami** (self-hosted at `umami.khanpikehome.com`, homelab `apps/umami`, website ID `e195e031-845c-4950-a08b-bd4a44038ab3`) — wired in [src/layouts/BaseLayout.astro](src/layouts/BaseLayout.astro). GoatCounter was removed in commit `19819ed`. Umami runs on the same parent domain as the rest of the homelab so household-wide blocklists can't filter it selectively.
 
-- **GoatCounter** — `pikemd.goatcounter.com` (SaaS). Note: blocked by aggressive tracker-blocklists including the household NextDNS profile, so admin and other privacy-tooled visitors won't appear in its counts.
-- **Umami** — self-hosted at `umami.khanpikehome.com` (homelab `apps/umami`). Website ID `e195e031-845c-4950-a08b-bd4a44038ab3`. Default-allow on the same domain as the homelab so blocklists can't selectively filter it.
-
-If you change either tracker, update the CSP in [public/_headers](public/_headers): `script-src` needs the script's origin and `connect-src` needs the API origin (Umami POSTs to `/api/send`).
+If you swap analytics: update `script-src` (script origin) and `connect-src` (API origin — Umami POSTs to `/api/send`) in **both** `public/_headers` and `Caddyfile`, and recompute the inline-script hash if you add a shim.
 
 ## Repo metadata to keep in sync
 
-- README's "GitHub Pages" line and "Astro 5" stack line are both stale. Update if rewriting.
-- `package.json` engines pin Node `>=22.12.0`; CI uses `24.15.0`. Don't downgrade CI without a reason.
+- `README.md` still says "GitHub Pages", "Astro 5", and lists `build:citations` as part of the build pipeline. All three are wrong as of 2026-05. Fix if you rewrite README; do not trust it for runtime facts.
+- `package.json` engines pin Node `>=22.12.0`; CI and the Dockerfile both pin Node 24. Don't downgrade.
+- `astro.config.mjs` injects `import.meta.env.COMMIT_HASH` from `git rev-parse --short HEAD` (or `$COMMIT_HASH` env var if set — Dockerfile passes `--build-arg COMMIT_HASH`). Used in the footer; expect `unknown` if built outside a git checkout.
+- `.pre-push-allowlist` exists at repo root — the global pre-push secret scanner respects it. Add new public-by-design hostnames here, not by widening the scanner.
