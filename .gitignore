@@ -31,3 +31,13 @@ public/Abstracts/
 public/Unpublished/
 public/blog/
 .superpowers/
+
+# playwright-mcp runtime artifacts
+.playwright-mcp/
+
+# ad-hoc debug screenshots
+blog-final.png
+blog-fixed.png
+
+# sops format-conversion backups
+*.sops.bak.*
