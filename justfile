@@ -15,10 +15,15 @@ deploy:
         echo "error: uncommitted changes — commit or stash before deploying" >&2
         exit 1
     fi
-    # `--input-type dotenv` is required because sops's autodetect doesn't
-    # treat the .sops extension as dotenv; without it sops tries JSON and
-    # fails with "Error unmarshalling input json" / "missing file to decrypt".
-    sops exec-env --input-type dotenv .env.sops just _deploy
+    # sops's autodetect treats the .sops extension as non-dotenv (parses as
+    # JSON and fails with "missing file to decrypt"), and `sops exec-env`
+    # does NOT accept --input-type. Workaround: explicit decrypt with the
+    # input/output type pinned, then source into this shell with set -a so
+    # the env is exported into the `just _deploy` child.
+    set -a
+    . <(sops --decrypt --input-type dotenv --output-type dotenv .env.sops)
+    set +a
+    just _deploy
 
 _deploy:
     #!/usr/bin/env bash
