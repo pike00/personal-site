@@ -2,10 +2,12 @@
 default:
     @just --list
 
-# Bump version, push, and deploy to Cloudflare Pages.
-# Errors on uncommitted changes. Prompts for patch/minor/major.
-# Credentials loaded from sops-encrypted .env.sops — create with: sops .env.sops
-# Required keys: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_ZONE_ID
+# Build the site and deploy to Cloudflare Pages. Replaces the old GHA
+# deploy.yml — all build + deploy steps run locally now.
+#
+# Credentials loaded from sops-encrypted .env.sops; create with `sops .env.sops`.
+# Required keys: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_ZONE_ID.
+# Refuses to deploy on a dirty tree to keep the deployed commit traceable.
 deploy:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -13,35 +15,27 @@ deploy:
         echo "error: uncommitted changes — commit or stash before deploying" >&2
         exit 1
     fi
-    current=$(jq -r .version package.json)
-    echo "Current version: $current"
-    printf "Bump type [patch/minor/major]: "
-    read -r bump
-    case "$bump" in
-        patch|minor|major) ;;
-        *) echo "error: invalid bump type '$bump'" >&2; exit 1 ;;
-    esac
-    npm version "$bump" --no-git-tag-version
-    new=$(jq -r .version package.json)
-    git add package.json package-lock.json
-    git commit -m "chore: release v${new}"
-    git tag "v${new}"
-    git push && git push --tags
     sops exec-env .env.sops just _deploy
 
 _deploy:
     #!/usr/bin/env bash
     set -euo pipefail
+    echo "→ building CV PDF"
     npm run build:cv
+    echo "→ building site (Astro + postbuild CSP-hash sync)"
     npm run build
-    npx wrangler pages deploy dist --project-name=personal-site
+    sha=$(git rev-parse --short HEAD)
+    echo "→ deploying dist/ at commit ${sha}"
+    npx wrangler pages deploy dist \
+        --project-name=personal-site \
+        --commit-hash="$(git rev-parse HEAD)"
     echo "→ purging Cloudflare cache..."
     curl -sf -X POST \
       "https://api.cloudflare.com/client/v4/zones/${CLOUDFLARE_ZONE_ID}/purge_cache" \
       -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
       -H "Content-Type: application/json" \
       --data '{"purge_everything":true}' | jq -r '.success'
-    echo "✓ deployed"
+    echo "✓ deployed personal-site @ ${sha}"
 
 # Run the Astro dev server bound to the tailnet (reachable from any tailnet
 # device, not LAN/internet). Override port with: just dev 4322
@@ -54,6 +48,42 @@ dev port='4321':
     npm run build:pdfs
     npm run build:blog-assets
     VITE_ALLOWED_HOSTS="$TS_HOST" npx astro dev --host="$TS_IP" --port={{port}}
+
+# Scaffold a new blog post in the blog-posts submodule.
+# Creates blog-posts/posts/<slug>.md with default frontmatter (draft: true)
+# and opens it in $EDITOR. Title defaults to the slug, capitalized.
+#
+#   just new-post my-cool-post
+#   just new-post my-cool-post "My Cool Post: An Adventure"
+new-post slug title="":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    POST="blog-posts/posts/{{slug}}.md"
+    if [[ -f "$POST" ]]; then
+        echo "error: $POST already exists" >&2
+        exit 1
+    fi
+    today=$(date -u +%Y-%m-%d)
+    title="{{title}}"
+    if [[ -z "$title" ]]; then
+        # Derive title from slug: kebab-case → Title Case
+        title=$(echo "{{slug}}" | tr '-' ' ' | awk '{for(i=1;i<=NF;i++)$i=toupper(substr($i,1,1))substr($i,2)}1')
+    fi
+    {
+        echo '---'
+        echo "title: \"$title\""
+        echo 'description: ""'
+        echo "date: \"$today\""
+        echo 'tags: []'
+        echo 'draft: true'
+        echo '---'
+        echo ''
+    } > "$POST"
+    echo "✓ scaffolded $POST"
+    echo "→ opening in \${EDITOR:-vim}"
+    ${EDITOR:-vim} "$POST"
+    echo ""
+    echo "When ready to publish:  just publish-post {{slug}}"
 
 # Update publications submodule to latest and commit the pointer
 update-pubs:
@@ -108,14 +138,20 @@ publish-post slug:
     fi
     popd >/dev/null
     # 3. Bump submodule pointer in personal-site if it lags
+    bumped=0
     if ! git diff --quiet -- blog-posts; then
         git add blog-posts
         git commit -m "blog: bump submodule for {{slug}}" -- blog-posts
         git push
+        bumped=1
         echo "→ pushed personal-site submodule bump"
     else
         echo "→ personal-site submodule pointer already current"
     fi
     echo ""
-    echo "✓ published. watch the deploy:"
-    echo "  gh run watch --repo pike00/personal-site"
+    if [[ "$bumped" -eq 1 ]]; then
+        echo "→ triggering deploy"
+        just deploy
+    else
+        echo "✓ nothing changed; site already serving this content"
+    fi
