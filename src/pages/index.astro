@@ -8,12 +8,13 @@ import headshot from "../assets/headshot.jpg";
 import PageLayout from "../layouts/PageLayout.astro";
 import StatBlock from "../components/StatBlock.astro";
 import PublicationCard from "../components/PublicationCard.astro";
-import PostCard from "../components/PostCard.astro";
+import FeedCard from "../components/FeedCard.astro";
 import TopicPill from "../components/TopicPill.astro";
 import { getPublications } from "../lib/publications";
 import { getAbstracts } from "../lib/abstracts";
 
-interface PostEntry {
+interface FeedEntry {
+  type: "post" | "project";
   slug: string;
   title: string;
   description: string;
@@ -29,18 +30,47 @@ const recentPubs = publications.slice(0, 2);
 const allTags = [...new Set(publications.flatMap((p) => p.researchArea))].sort();
 
 const blogDir = path.resolve("blog-posts/posts");
-const posts: PostEntry[] = (fs.existsSync(blogDir) ? fs.readdirSync(blogDir) : [])
+const projectsDir = path.resolve("src/content/projects");
+
+const posts: FeedEntry[] = (fs.existsSync(blogDir) ? fs.readdirSync(blogDir) : [])
   .filter((f: string) => f.endsWith(".md"))
-  .map((file: string): PostEntry => {
+  .map((file: string): FeedEntry => {
     const slug = file.replace(/\.md$/, "");
     const raw = fs.readFileSync(path.join(blogDir, file), "utf-8");
     const { data } = matter(raw);
-    return { slug, ...(data as Omit<PostEntry, "slug">) };
+    return {
+      type: "post",
+      slug,
+      title: data.title,
+      description: data.description,
+      date: data.date,
+      tags: data.tags ?? [],
+      draft: data.draft,
+    };
   })
-  .filter((p: PostEntry) => !p.draft)
-  .sort((a: PostEntry, b: PostEntry) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  .filter((p: FeedEntry) => !p.draft);
 
-const recentPosts = posts.slice(0, 3);
+const projects: FeedEntry[] = (fs.existsSync(projectsDir) ? fs.readdirSync(projectsDir) : [])
+  .filter((f: string) => f.endsWith(".md"))
+  .map((file: string): FeedEntry => {
+    const slug = file.replace(/\.md$/, "");
+    const raw = fs.readFileSync(path.join(projectsDir, file), "utf-8");
+    const { data } = matter(raw);
+    return {
+      type: "project",
+      slug,
+      title: data.title,
+      description: data.description,
+      date: data.date,
+      tags: data.tags ?? [],
+    };
+  });
+
+const feed: FeedEntry[] = [...posts, ...projects].sort(
+  (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+);
+
+const recentFeed = feed.slice(0, 4);
 ---
 
 <PageLayout
@@ -87,32 +117,33 @@ const recentPosts = posts.slice(0, 3);
   <section class="bg-white dark:bg-surface-card-dark border-b border-gray-200 dark:border-gray-800">
     <div class="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 divide-x divide-gray-200 dark:divide-gray-700">
       <StatBlock value={posts.length} label="Blog Posts" />
+      <StatBlock value={projects.length} label="Projects" />
       <StatBlock value={publications.length} label="Publications" />
       <StatBlock value={abstracts.length} label="Abstracts" />
-      <StatBlock value={allTags.length} label="Research Areas" />
     </div>
   </section>
 
-  {recentPosts.length > 0 && (
-    <!-- Recent Posts -->
+  {recentFeed.length > 0 && (
+    <!-- Recent -->
     <section class="max-w-6xl mx-auto px-6 py-12">
       <div class="flex items-center justify-between mb-6">
         <div>
-          <h2 class="text-xl font-bold text-primary dark:text-white">Recent Posts</h2>
-          <p class="text-sm text-gray-500 dark:text-gray-400">Notes on research, tools, and engineering</p>
+          <h2 class="text-xl font-bold text-primary dark:text-white">Recent</h2>
+          <p class="text-sm text-gray-500 dark:text-gray-400">Notes, tools, and projects</p>
         </div>
         <a href="/blog" class="text-sm text-accent font-semibold hover:text-accent-dark transition-colors">
           View all &rarr;
         </a>
       </div>
       <div class="flex flex-col gap-4">
-        {recentPosts.map((post) => (
-          <PostCard
-            slug={post.slug}
-            title={post.title}
-            description={post.description}
-            date={post.date}
-            tags={post.tags}
+        {recentFeed.map((entry: FeedEntry) => (
+          <FeedCard
+            type={entry.type}
+            slug={entry.slug}
+            title={entry.title}
+            description={entry.description}
+            date={entry.date}
+            tags={entry.tags}
           />
         ))}
       </div>

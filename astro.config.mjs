@@ -15,6 +15,9 @@ const commitHash = (() => {
 
 export default defineConfig({
   site: "https://pikemd.com",
+  redirects: {
+    "/projects": "/blog",
+  },
   integrations: [
     sitemap({ filter: (page) => !page.includes("/whoami") }),
     react(),

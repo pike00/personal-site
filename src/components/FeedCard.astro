@@ -1,7 +1,10 @@
 ---
 import TopicPill from "./TopicPill.astro";
 
+type FeedType = "post" | "project";
+
 interface Props {
+  type: FeedType;
   slug: string;
   title: string;
   description: string;
@@ -9,21 +12,34 @@ interface Props {
   tags: string[];
 }
 
-const { slug, title, description, date, tags } = Astro.props;
+const { type, slug, title, description, date, tags } = Astro.props;
+
+const href = type === "post" ? `/blog/${slug}` : `/projects/${slug}`;
 
 const dateDisplay = new Date(date + "T00:00:00").toLocaleDateString("en-US", {
   year: "numeric",
   month: "short",
   day: "numeric",
 });
+
+const typeLabel = type === "post" ? "Post" : "Project";
+const typeClasses =
+  type === "post"
+    ? "bg-accent/10 text-accent dark:bg-accent/20"
+    : "bg-primary/10 text-primary dark:bg-white/10 dark:text-gray-200";
 ---
 
 <article class="bg-white dark:bg-surface-card-dark border border-gray-200 dark:border-gray-700 rounded-lg p-5 hover:shadow-md transition-shadow">
-  <a href={`/blog/${slug}`} class="block group">
+  <a href={href} class="block group">
     <div class="flex items-baseline justify-between gap-4 mb-2">
-      <h3 class="text-sm font-semibold text-primary dark:text-gray-100 group-hover:text-accent dark:group-hover:text-accent transition-colors">
-        {title}
-      </h3>
+      <div class="flex items-center gap-2 min-w-0">
+        <span class={`inline-block text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded ${typeClasses}`}>
+          {typeLabel}
+        </span>
+        <h3 class="text-sm font-semibold text-primary dark:text-gray-100 group-hover:text-accent dark:group-hover:text-accent transition-colors truncate">
+          {title}
+        </h3>
+      </div>
       <time class="text-xs text-gray-400 dark:text-gray-500 shrink-0">{dateDisplay}</time>
     </div>
     <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">{description}</p>
