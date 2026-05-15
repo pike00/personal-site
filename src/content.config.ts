@@ -17,6 +17,10 @@ const projects = defineCollection({
     repo: z.string().optional(),
     tags: z.array(z.string()),
     date: z.string(),
+    status: z.enum(["active", "shipped", "archived"]).optional(),
+    period: z.string().optional(),
+    stack: z.array(z.string()).optional(),
+    image: z.string().optional(),
   }),
 });
 
