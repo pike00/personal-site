@@ -89,12 +89,12 @@ just new-post my-cool-post "My Cool Post"       # with explicit title
 
 # write the post, save and quit $EDITOR ...
 
-just publish-post my-cool-post                  # flip draft, commit/push both repos, deploy
+just publish my-cool-post                  # flip draft, commit/push both repos, deploy
 ```
 
 `just new-post <slug>` creates `blog-posts/posts/<slug>.md` with frontmatter (`title`, `description`, `date`, `tags`, `draft: true`) and opens it in `$EDITOR`. Title defaults to the slug capitalized.
 
-`just publish-post <slug>` is idempotent. It:
+`just publish <slug>` is idempotent. It:
 1. Flips `draft: true` -> `draft: false` in `blog-posts/posts/<slug>.md`.
 2. Commits + pushes inside the `blog-posts` submodule.
 3. Bumps the submodule pointer in the parent repo, commits + pushes.

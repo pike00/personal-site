@@ -83,7 +83,7 @@ new-post slug title="":
     echo "→ opening in \${EDITOR:-vim}"
     ${EDITOR:-vim} "$POST"
     echo ""
-    echo "When ready to publish:  just publish-post {{slug}}"
+    echo "When ready to publish:  just publish {{slug}}"
 
 # Update publications submodule to latest and commit the pointer
 update-pubs:
@@ -102,10 +102,11 @@ update-blog:
     git diff --cached --quiet blog-posts || git commit -m "chore: update blog-posts submodule"
 
 # Publish a blog post end-to-end: flip draft:false in blog-posts, push it,
-# bump the submodule pointer in personal-site, push that. Idempotent.
+# bump the submodule pointer in personal-site, push that, then deploy.
+# Idempotent.
 #
-#   just publish-post sops-age-docker-compose
-publish-post slug:
+#   just publish sops-age-docker-compose
+publish slug:
     #!/usr/bin/env bash
     set -euo pipefail
     POST="posts/{{slug}}.md"
