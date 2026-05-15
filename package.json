@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "npm run build:pdfs && npm run build:blog-assets && astro dev",
-    "build": "npm run build:pdfs && npm run build:blog-assets && astro build",
+    "build": "npm run build:pdfs && npm run build:blog-assets && npm run build:citations && astro build",
     "postbuild": "node scripts/sync-csp-hashes.mjs",
     "build:pdfs": "bash scripts/copy-pdfs.sh",
     "build:blog-assets": "bash scripts/copy-blog-assets.sh",

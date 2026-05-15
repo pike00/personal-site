@@ -4,9 +4,9 @@ Personal site and academic portfolio built with [Astro](https://astro.build), de
 
 ## Stack
 
-- **Astro 5** + TypeScript (strict)
-- **Tailwind CSS** with dark mode
-- **React** for interactive components (publication search via Fuse.js)
+- **Astro 6** + TypeScript (strict)
+- **Tailwind CSS 4** with dark mode
+- **React 19** for interactive components (publication search via Fuse.js)
 - **Typst** for CV compilation (`.typ` -> PDF)
 - **Publications** sourced from a git submodule with auto-generated citations
 
@@ -14,15 +14,18 @@ Personal site and academic portfolio built with [Astro](https://astro.build), de
 
 ```
 src/
-├── pages/          # Routes: index, about, projects, blog, publications, cv, contact
+├── pages/          # Routes: index, about, blog (posts + projects), publications, cv, contact
 ├── components/     # Astro + React components
 ├── layouts/        # Base and page layouts
-├── content/        # Content collections (cv, projects, blog, publication tags)
-├── lib/            # Utilities (citations, abstracts, types)
+├── content/        # Content collections (cv, projects, publication tags)
+├── lib/            # Utilities (publications, abstracts, citations, pairings)
 └── styles/         # Global CSS
 scripts/            # Build utilities (Bash + Tsx)
 publications/       # Git submodule
+blog-posts/         # Git submodule
 ```
+
+Blog posts and projects are merged into one chronological feed at `/blog`. Project detail pages still live at `/projects/[slug]`; `/projects` redirects to `/blog`.
 
 ## Development
 
@@ -35,7 +38,8 @@ git submodule update --init --recursive
 
 npm install
 npm run dev          # Start dev server at localhost:4321
-npm run build        # Full pipeline: PDFs -> citations -> CV -> Astro build
+npm run build        # Full pipeline: PDFs -> blog assets -> citations -> Astro build
+npm run build:cv     # Build the CV PDF separately (NOT part of npm run build)
 npm run preview      # Preview production build
 ```
 
@@ -45,10 +49,13 @@ npm run preview      # Preview production build
 
 `npm run build` runs these steps in sequence:
 
-1. `build:pdfs` -- copy publication PDFs from the submodule
-2. `build:citations` -- generate citation metadata from source files
-3. `build:cv` -- compile CV from Typst template to PDF
+1. `build:pdfs` -- copy publication PDFs from the `publications/` submodule into `public/Publications/`
+2. `build:blog-assets` -- copy blog post images from the `blog-posts/` submodule into `public/blog/`
+3. `build:citations` -- generate `public/CITATION.cff` from publication metadata
 4. `astro build` -- build the static site
+5. `postbuild` (auto) -- sync CSP hashes (see below)
+
+`build:cv` is **not** part of `npm run build`. CI runs it separately before `npm run build`; locally, run `npm run build:cv` yourself when you change the Typst source.
 
 ### Postbuild: CSP hash sync
 

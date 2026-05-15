@@ -94,22 +94,24 @@ if (!/Content-Security-Policy:/i.test(headersContent)) {
 const sortedHashes = [...hashes].sort();
 const scriptSrc = ["'self'", ...sortedHashes, ...EXTRA_SCRIPT_SRC].join(" ");
 
-// Rewrite just the `script-src` directive within the CSP value.
-const newHeaders = headersContent.replace(
-  /(Content-Security-Policy:[^\n]*?)script-src [^;]+;/,
-  `$1script-src ${scriptSrc};`
-);
-
-if (newHeaders === headersContent) {
+const scriptSrcRe = /(Content-Security-Policy:[^\n]*?)script-src [^;]+;/;
+if (!scriptSrcRe.test(headersContent)) {
   console.error(
-    `error: failed to rewrite script-src in ${HEADERS_PATH}. ` +
-      "The CSP line may not contain a `script-src` directive."
+    `error: no script-src directive found in the Content-Security-Policy line of ${HEADERS_PATH}.`
   );
   process.exit(1);
 }
 
-writeFileSync(HEADERS_PATH, newHeaders);
-console.log(
-  `✓ synced ${sortedHashes.length} inline-script hash(es) into ${HEADERS_PATH}`
-);
+const newHeaders = headersContent.replace(scriptSrcRe, `$1script-src ${scriptSrc};`);
+
+if (newHeaders === headersContent) {
+  console.log(
+    `✓ ${sortedHashes.length} inline-script hash(es) already in sync in ${HEADERS_PATH}`
+  );
+} else {
+  writeFileSync(HEADERS_PATH, newHeaders);
+  console.log(
+    `✓ synced ${sortedHashes.length} inline-script hash(es) into ${HEADERS_PATH}`
+  );
+}
 for (const h of sortedHashes) console.log(`  ${h}`);
