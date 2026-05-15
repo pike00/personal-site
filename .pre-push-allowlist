@@ -1,7 +1,47 @@
-# Strings that may appear in this repo intentionally and should NOT be flagged
-# by the global pre-push secrets/PII scanner. One entry per line.
+# Pre-push secrets scanner — per-repo allowlist.
+# Strings/patterns intentionally present in this public repo. Confirmed
+# non-sensitive by the maintainer; the LLM scanner should NOT flag these.
+# One entry per line; lines starting with # are comments.
 
-# Self-hosted Umami analytics endpoint — referenced from BaseLayout.astro and
-# the CSP allowlist in public/_headers. The hostname is publicly resolvable
-# (DNS-only Cloudflare record) and the script is part of the live deployed site.
-umami.khanpikehome.com
+# ── Apex homelab domain ───────────────────────────────────────────────
+# Already publicly enumerable via Certificate Transparency for any
+# subdomain that has ever been issued a TLS cert. Subdomains under it
+# (umami, kindred, chat, plaid-sync, finance-hub, etc.) are likewise
+# enumerable and the security model relies on auth/authz at each service,
+# not on hostname obscurity.
+khanpikehome.com
+
+# ── Tailscale tailnet name ────────────────────────────────────────────
+# MagicDNS-only; not internet-routable.
+savannah-mimosa.ts.net
+
+# ── Tailnet hostnames ─────────────────────────────────────────────────
+# MagicDNS-only labels for homelab host, laptop, backup workstation.
+ares
+willbook
+calypso
+
+# ── Private/internal IP ranges (not internet-routable) ────────────────
+# Any 100.x.x.x address — Tailscale CGNAT (RFC 6598, 100.64.0.0/10).
+# Any 172.x.x.x address — Docker bridge networks / RFC 1918 (172.16-31).
+# Any 192.168.x.x address — RFC 1918 home LAN.
+# Any 10.x.x.x address — RFC 1918.
+
+# ── Internal Docker network names ─────────────────────────────────────
+pikenet-public
+pikenet-private
+pikenet-monitoring
+pikenet-internal
+
+# ── Linux username path ───────────────────────────────────────────────
+# Username "will" is already public via GitHub handle (pike00), CV, blog.
+/home/will/
+
+# ── Private GitHub repos referenced by name ───────────────────────────
+# Existence is mentioned in content; auth still gates clone/contents.
+pike00/plaid-sync
+pike00/finance-hub
+pike00/documents-vault
+pike00/Kindred
+pike00/personal-crm
+pike00/homelab-skills
