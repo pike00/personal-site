@@ -2,6 +2,15 @@
 default:
     @just --list
 
+# Build the site bundle only (Astro + CV PDF + postbuild CSP-hash sync). Does not deploy.
+build:
+    npm run build:cv
+    npm run build
+
+# Alias for `deploy` — build and push to Cloudflare Pages.
+ship:
+    @just deploy
+
 # Build the site and deploy to Cloudflare Pages. Replaces the old GHA
 # deploy.yml — all build + deploy steps run locally now.
 #
