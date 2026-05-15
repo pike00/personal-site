@@ -15,7 +15,10 @@ deploy:
         echo "error: uncommitted changes — commit or stash before deploying" >&2
         exit 1
     fi
-    sops exec-env .env.sops just _deploy
+    # `--input-type dotenv` is required because sops's autodetect doesn't
+    # treat the .sops extension as dotenv; without it sops tries JSON and
+    # fails with "Error unmarshalling input json" / "missing file to decrypt".
+    sops exec-env --input-type dotenv .env.sops just _deploy
 
 _deploy:
     #!/usr/bin/env bash
