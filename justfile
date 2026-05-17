@@ -1,3 +1,6 @@
+# `release` / `version` / changelog recipes come from release.just (shared).
+import 'release.just'
+
 # List available commands
 default:
     @just --list

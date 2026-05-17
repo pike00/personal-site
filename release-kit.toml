@@ -1,0 +1,13 @@
+[release-kit]
+project_name = "personal-site"
+project_description = "Personal website / blog — Astro + Pagefind + MDX, deployed to Cloudflare Pages."
+litellm_model = "deepseek-v4-pro-cloud"
+reasoning_effort = "low"
+changelog_path = "CHANGELOG.md"
+branch = "main"
+# install_command_template intentionally omitted — personal-site is deployed
+# to Cloudflare Pages via `just deploy`, not installed by external users.
+
+# `just version` is history-only; the live deploy lives on Cloudflare Pages.
+# Flip to "pages" once that resolver is wired into release-kit.
+prod_source = "none"
