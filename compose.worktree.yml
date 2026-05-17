@@ -26,13 +26,13 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=pikenet-private"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-app.rule=Host(`${WORKTREE_HOST}`)"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-app.entrypoints=websecure"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-app.tls=true"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-app.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-app.tls.domains[0].main=*.personal-site.${DOMAIN:-khanpikehome.com}"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-app.middlewares=tailnet-ipallowlist@file"
-      - "traefik.http.services.${COMPOSE_PROJECT_NAME}-app.loadbalancer.server.port=4321"
+      - "traefik.http.routers.${SLUG}-personal-site.rule=Host(`${WORKTREE_HOST}`)"
+      - "traefik.http.routers.${SLUG}-personal-site.entrypoints=websecure"
+      - "traefik.http.routers.${SLUG}-personal-site.tls=true"
+      - "traefik.http.routers.${SLUG}-personal-site.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.${SLUG}-personal-site.tls.domains[0].main=*.personal-site.${DOMAIN:-khanpikehome.com}"
+      - "traefik.http.routers.${SLUG}-personal-site.middlewares=tailnet-ipallowlist@file"
+      - "traefik.http.services.${SLUG}-personal-site.loadbalancer.server.port=4321"
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost:4321/"]
       interval: 30s
