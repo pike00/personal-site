@@ -1,7 +1,9 @@
+set shell := ["bash", "-uc"]
+
 # `release` / `version` / changelog recipes come from release.just (shared).
+
 import 'release.just'
 
-# List available commands
 default:
     @just --list
 
@@ -58,8 +60,8 @@ _deploy:
     echo "✓ deployed personal-site @ ${sha}"
 
 # Run the Astro dev server bound to the tailnet (reachable from any tailnet
-# device, not LAN/internet). Override port with: just dev 4322
-dev port='4321':
+# device, not LAN/internet). Override port with: just astro-dev 4322
+astro-dev port='4321':
     #!/usr/bin/env bash
     set -euo pipefail
     TS_IP=$(tailscale ip -4)
