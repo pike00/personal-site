@@ -1,0 +1,45 @@
+---
+# Per-worktree dev stack — Traefik-routed at ${SLUG}.personal-site.${DOMAIN}.
+# Driven by preview.just (`just dev`, `just worktree <slug>`).
+#
+# Runs the Astro dev server inside a Node container with the source tree
+# bind-mounted. First `just dev` is slow (npm install in container);
+# subsequent edits hot-reload via Vite's WebSocket (Traefik passes ws/wss
+# through to the container's port 4321).
+#
+# For pure host-side iteration without Traefik, use `just astro-dev` instead.
+
+services:
+  app:
+    image: node:22
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: ["sh", "-c", "npm install && npm run build:pdfs && npm run build:blog-assets && exec npx astro dev --host 0.0.0.0 --port 4321"]
+    environment:
+      NODE_ENV: development
+      VITE_ALLOWED_HOSTS: ${WORKTREE_HOST}
+      APP_VERSION: ${APP_VERSION:-dev}
+      GIT_HASH: ${GIT_HASH:-unknown}
+    networks:
+      - pikenet-private
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=pikenet-private"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-app.rule=Host(`${WORKTREE_HOST}`)"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-app.entrypoints=websecure"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-app.tls=true"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-app.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-app.tls.domains[0].main=*.personal-site.${DOMAIN:-khanpikehome.com}"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-app.middlewares=tailnet-ipallowlist@file"
+      - "traefik.http.services.${COMPOSE_PROJECT_NAME}-app.loadbalancer.server.port=4321"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:4321/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+
+networks:
+  pikenet-private:
+    external: true

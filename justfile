@@ -1,8 +1,12 @@
 set shell := ["bash", "-uc"]
 
 # `release` / `version` / changelog recipes come from release.just (shared).
+# `dev` / `down` / `down-clean` / `logs` / `ps` / `shell` / `pytest` /
+# `worktree` / `worktree-rm` / `pr` come from preview.just. preview-kit
+# threads GIT_HASH + APP_VERSION as build args.
 
 import 'release.just'
+import 'preview.just'
 
 default:
     @just --list
