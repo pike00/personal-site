@@ -13,8 +13,8 @@ default:
 
 # Build the site bundle only (Astro + CV PDF + postbuild CSP-hash sync). Does not deploy.
 build:
-    npm run build:cv
-    npm run build
+    pnpm build:cv
+    pnpm build
 
 # Alias for `deploy` — build and push to Cloudflare Pages.
 ship:
@@ -47,12 +47,12 @@ _deploy:
     #!/usr/bin/env bash
     set -euo pipefail
     echo "→ building CV PDF"
-    npm run build:cv
+    pnpm build:cv
     echo "→ building site (Astro + postbuild CSP-hash sync)"
-    npm run build
+    pnpm build
     sha=$(git rev-parse --short HEAD)
     echo "→ deploying dist/ at commit ${sha}"
-    npx wrangler pages deploy dist \
+    pnpm dlx wrangler pages deploy dist \
         --project-name=personal-site \
         --commit-hash="$(git rev-parse HEAD)"
     echo "→ purging Cloudflare cache..."
@@ -71,9 +71,9 @@ astro-dev port='4321':
     TS_IP=$(tailscale ip -4)
     TS_HOST=$(tailscale status --self --json | jq -r '.Self.DNSName' | sed 's/\.$//')
     echo "→ http://${TS_HOST}:{{port}}/"
-    npm run build:pdfs
-    npm run build:blog-assets
-    VITE_ALLOWED_HOSTS="$TS_HOST" npx astro dev --host="$TS_IP" --port={{port}}
+    pnpm build:pdfs
+    pnpm build:blog-assets
+    VITE_ALLOWED_HOSTS="$TS_HOST" pnpm exec astro dev --host="$TS_IP" --port={{port}}
 
 # Scaffold a new blog post in the blog-posts submodule.
 # Creates blog-posts/posts/<slug>.md with default frontmatter (draft: true)

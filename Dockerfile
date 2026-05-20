@@ -3,17 +3,17 @@
 # ---- builder ----
 FROM node:24-alpine AS builder
 WORKDIR /app
-RUN apk add --no-cache bash
+RUN apk add --no-cache bash && npm install -g corepack && corepack enable
 
-COPY package.json package-lock.json ./
-RUN npm ci
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
 
 COPY . .
 
 ARG COMMIT_HASH=unknown
 ENV COMMIT_HASH=$COMMIT_HASH
 
-RUN npm run build:cv && npm run build
+RUN pnpm build:cv && pnpm build
 
 # ---- runtime ----
 FROM caddy:2.11.2-alpine
