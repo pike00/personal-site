@@ -10,73 +10,75 @@ Public GitHub repo: `pike00/personal-site`. Per global rules: **never push witho
 
 ## Just recipes (run `just` for the full list)
 
-- `just deploy` — bumps `package.json` version (prompts patch/minor/major), commits, tags, pushes, then `wrangler pages deploy` + cache purge using sops-loaded creds from `.env.sops`. Refuses to run with a dirty tree. This is the canonical release path; CI also runs on the resulting push.
-- `just dev [port]` — Astro dev server bound to the host's Tailscale IP with `VITE_ALLOWED_HOSTS` set to the MagicDNS name. Default port 4321. Use this instead of `npm run dev` so the dev box is reachable from other tailnet devices.
-- `just publish-post <slug>` — flips `draft: false` in `blog-posts/posts/<slug>.md`, commits+pushes the `pike00/blog` submodule, bumps the pointer here, pushes. Idempotent.
+- `just deploy` (alias `just ship`) — refuses dirty tree, sources `.env.sops`, builds CV + site, runs `wrangler pages deploy dist --commit-hash=<HEAD>`, purges the Cloudflare zone cache. Does **not** bump `package.json`, tag, or push — those are independent. This is the canonical deploy path; there is no CI fallback.
+- `just dev` — brings up the per-worktree preview stack at `https://<slug>.personal-site.khanpikehome.com` via `compose.worktree.yml` (Traefik-routed, hot-reloaded). First boot is slow because pnpm install runs inside the container; subsequent edits hot-reload through Vite's WebSocket. From `preview.just`.
+- `just astro-dev [port]` — bare Astro dev server bound to the host's Tailscale IP with `VITE_ALLOWED_HOSTS` set to the MagicDNS name. Default port 4321. Use this for pure host-side iteration without Traefik.
+- `just publish <slug>` — flips `draft: false` in `blog-posts/posts/<slug>.md`, commits+pushes the `pike00/blog` submodule, bumps the pointer here, pushes. Idempotent.
+- `just new-post <slug> [title]` — scaffold a new draft in `blog-posts/posts/`.
 - `just update-pubs` / `just update-blog` — fast-forward submodule + copy assets + commit pointer bump (no push).
 
 ## Deploy
 
 ### How it actually deploys
 
-`git push origin main` → [.github/workflows/deploy.yml](.github/workflows/deploy.yml) runs on GitHub-hosted runner → builds → `wrangler pages deploy dist --project-name=personal-site` (via `cloudflare/wrangler-action@v4`) → Cloudflare zone-wide cache purge.
+**Local-only, no CI.** There is no `.github/workflows/` directory. Pushing to `main` archives the commit on GitHub but does **not** trigger a deploy. The only path to production is running `just deploy` on a machine that can decrypt `.env.sops` (today: `ares`).
 
-A successful run is ~50–70s. Watch with:
-
-```sh
-gh run watch                                     # most recent
-gh run list --workflow=deploy.yml --limit 5      # history
+```
+just deploy
+  ├─ refuses dirty tree (uncommitted/staged changes)
+  ├─ sources .env.sops via `sops --decrypt --input-type dotenv --output-type dotenv`
+  │   (NOT `sops exec-env` — autodetect treats .env.sops as JSON and fails)
+  └─ just _deploy
+       ├─ pnpm build:cv            # Typst → public/cv.pdf
+       ├─ pnpm build               # build:pdfs → build:blog-assets → astro build
+       │                           # → postbuild: scripts/sync-csp-hashes.mjs
+       ├─ wrangler pages deploy dist \
+       │     --project-name=personal-site \
+       │     --commit-hash=$(git rev-parse HEAD)
+       └─ POST /zones/$ZONE/purge_cache  (purge_everything: true)
 ```
 
-### Triggers
+Astro injects the short commit hash into the footer via `astro.config.mjs` (`import.meta.env.COMMIT_HASH`), so the live footer should match the SHA passed to wrangler. Pages records the same SHA in its deployment metadata. If those diverge the deploy was run on a dirty tree against the rule, or against a stale checkout.
 
-The workflow listens for:
+### Consequences worth knowing
 
-- `push` to `main` — the normal path.
-- `repository_dispatch` with `event_type: publications-updated` or `blog-updated` — fired from the `publications` / `blog-posts` submodule repos when their upstream content lands, so the site rebuilds without a code change here. Note: a dispatch rebuilds against the **submodule pointer recorded in this repo**, not the submodule's latest commit. New content needs the pointer bumped here too (which `just publish-post` does). Trigger a no-op rebuild manually with:
-  ```sh
-  gh api repos/pike00/personal-site/dispatches -f event_type=publications-updated
-  ```
-  Triggering blog-updated cross-repo from a workflow needs a token. The `pike00/blog` repo's `.github/workflows/notify-site.yml` does this with `SITE_DEPLOY_TOKEN` — a fine-grained PAT scoped to `pike00/personal-site` with **Contents: read+write**. (Counterintuitive but `repository_dispatch` maps to the Contents permission, not Actions.) If the token errors with "Bad credentials", regenerate it: https://github.com/settings/personal-access-tokens/new.
+- **`git push` is decoupled from deploy.** Land commits on `main` whenever; nothing ships until someone runs `just deploy`. This is intentional — Cloudflare-Pages-via-GitHub-integration was retired in favor of local-first deploys (see global CLAUDE.md "Release tooling").
+- **No version bump, no tag.** Despite the verb being shared with other repos' `release-kit cut`, `just deploy` here neither edits `package.json` nor creates a git tag. The "version" surfaced in the footer is the commit short SHA, not a semver.
+- **No `repository_dispatch`, no `workflow_dispatch`.** External submodule pushes (`pike00/blog`, `pike00/publications`) do not trigger anything. To ship new submodule content, locally: bump the submodule pointer, commit, then `just deploy`. `just publish <slug>`, `just update-pubs`, and `just update-blog` automate the pointer bump.
+- **CSP hashes must regenerate before deploy.** `scripts/sync-csp-hashes.mjs` runs as the `postbuild` hook of `pnpm build`, so a clean `just deploy` handles it; only the alternative Caddy container path bypasses it (see below).
+- **The pre-push secret scanner runs on push, not deploy.** Going from "merged commit" to "live site" never reaches the scanner. Secrets in committed code WILL deploy. The scanner only protects the GitHub mirror.
 
-No `workflow_dispatch` is configured, so `gh workflow run deploy.yml` does not work. To force a no-op deploy, push an empty commit:
+### Secrets
 
-```sh
-git commit --allow-empty -m "chore: trigger deploy"
-git push origin main          # only after explicit user approval — public repo
-```
+Lives in `.env.sops` at the repo root (NOT in GitHub repo settings — those have no role anymore).
 
-### Required secrets (already set on the repo)
-
-- `CLOUDFLARE_PAGES_TOKEN` — API token scoped to Pages:Edit + Cache Purge
+- `CLOUDFLARE_API_TOKEN` — scoped to Pages:Edit + Cache Purge for the personal-site project
 - `CLOUDFLARE_ACCOUNT_ID`
 - `CLOUDFLARE_ZONE_ID`
 
-### Manual deploy from a laptop
-
-Use `just deploy` (preferred — see Just recipes above). It runs `sops exec-env .env.sops just _deploy` so credentials never hit the shell. Required keys in `.env.sops`: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_ZONE_ID`. Edit with `sops .env.sops` (recipients/age key configured in `.sops.yaml`).
+Edit with `sops .env.sops` (recipients/age key configured in `.sops.yaml`; private key at `~/.config/sops/age/keys.txt` on each authorized host).
 
 ### Self-hosted Caddy build (alternative, not currently deployed)
 
-`Dockerfile` + `Caddyfile` build a static Caddy container serving `dist/` on `:8080`. Used only if migrating off Cloudflare Pages. The Caddyfile hard-codes its own copy of the CSP — if you update `public/_headers`, update `Caddyfile` too or the two diverge silently.
+`Dockerfile` + `Caddyfile` build a static Caddy container serving `dist/` on `:8080`. Used only if migrating off Cloudflare Pages. The Caddyfile hard-codes its own copy of the CSP — if you update `public/_headers`, update `Caddyfile` too or the two diverge silently. This path does NOT run the `sync-csp-hashes` postbuild against `Caddyfile`, so the hashes must be transferred manually.
 
 ## Build gotchas
 
 ### `npm run build` does NOT build the CV
 
-`package.json` `"build"` is `build:pdfs && build:blog-assets && astro build`. CV PDF generation (`build:cv` → Typst) is a **separate** script that the GHA workflow runs explicitly before `npm run build`. Locally, `npm run build` will produce a site whose `/cv.pdf` is whatever was last committed to `public/`. To match CI exactly:
+`package.json` `"build"` is `build:pdfs && build:blog-assets && astro build`. CV PDF generation (`build:cv` → Typst) is a **separate** script that `just deploy` runs explicitly before `pnpm build`. Running `pnpm build` alone will produce a site whose `/cv.pdf` is whatever was last committed to `public/`. To match a real deploy:
 
 ```sh
-npm run build:cv && npm run build
+pnpm build:cv && pnpm build
 ```
 
 ### `build:citations` is dead
 
-`package.json` defines `build:citations` (`tsx scripts/generate-citations.ts`) but nothing invokes it — not the `build` chain, not CI, not the Dockerfile. Citation metadata is generated at runtime from publication source files via `src/lib/`, not from a prebuilt artifact. The README claim that `npm run build` runs citations is wrong. Either wire it into `build` or delete it; do not assume it has run.
+`package.json` defines `build:citations` (`tsx scripts/generate-citations.ts`) but nothing invokes it — not the `build` chain, not `just deploy`, not the Dockerfile. Citation metadata is generated at runtime from publication source files via `src/lib/`, not from a prebuilt artifact. The README claim that `npm run build` runs citations is wrong. Either wire it into `build` or delete it; do not assume it has run.
 
 ### Submodules are required
 
-`publications/` and `blog-posts/` are git submodules. Without them the Publications page, homepage recent-pubs, CV pub counts, and blog index render empty. CI checks them out with `submodules: recursive`. Locally:
+`publications/` and `blog-posts/` are git submodules. Without them the Publications page, homepage recent-pubs, CV pub counts, and blog index render empty. `just deploy` does not initialize submodules — that's on you:
 
 ```sh
 git submodule update --init --recursive
@@ -149,6 +151,6 @@ If you swap analytics: update `script-src` (script origin) and `connect-src` (AP
 ## Repo metadata to keep in sync
 
 - `README.md` still says "GitHub Pages", "Astro 5", and lists `build:citations` as part of the build pipeline. All three are wrong as of 2026-05. Fix if you rewrite README; do not trust it for runtime facts.
-- `package.json` engines pin Node `>=22.12.0`; CI and the Dockerfile both pin Node 24. Don't downgrade.
+- `package.json` engines pin Node `>=22.12.0`; the Dockerfile pins Node 24. `just deploy` uses whatever Node is on the host (currently Node 24 on ares). Don't downgrade.
 - `astro.config.mjs` injects `import.meta.env.COMMIT_HASH` from `git rev-parse --short HEAD` (or `$COMMIT_HASH` env var if set — Dockerfile passes `--build-arg COMMIT_HASH`). Used in the footer; expect `unknown` if built outside a git checkout.
 - `.pre-push-allowlist` exists at repo root — the global pre-push secret scanner respects it. Add new public-by-design hostnames here, not by widening the scanner.
