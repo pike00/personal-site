@@ -52,7 +52,7 @@ _deploy:
     pnpm build
     sha=$(git rev-parse --short HEAD)
     echo "→ deploying dist/ at commit ${sha}"
-    pnpm dlx wrangler pages deploy dist \
+    pnpm exec wrangler pages deploy dist \
         --project-name=personal-site \
         --commit-hash="$(git rev-parse HEAD)"
     echo "→ purging Cloudflare cache..."

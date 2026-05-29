@@ -30,9 +30,9 @@ just deploy
   │   (NOT `sops exec-env` — autodetect treats .env.sops as JSON and fails)
   └─ just _deploy
        ├─ pnpm build:cv            # Typst → public/cv.pdf
-       ├─ pnpm build               # build:pdfs → build:blog-assets → astro build
+       ├─ pnpm build               # build:{pdfs,blog-assets,citations} in parallel → astro build
        │                           # → postbuild: scripts/sync-csp-hashes.mjs
-       ├─ wrangler pages deploy dist \
+       ├─ pnpm exec wrangler pages deploy dist \  # wrangler is a devDep, NOT pnpm dlx
        │     --project-name=personal-site \
        │     --commit-hash=$(git rev-parse HEAD)
        └─ POST /zones/$ZONE/purge_cache  (purge_everything: true)
@@ -66,15 +66,15 @@ Edit with `sops .env.sops` (recipients/age key configured in `.sops.yaml`; priva
 
 ### `npm run build` does NOT build the CV
 
-`package.json` `"build"` is `build:pdfs && build:blog-assets && astro build`. CV PDF generation (`build:cv` → Typst) is a **separate** script that `just deploy` runs explicitly before `pnpm build`. Running `pnpm build` alone will produce a site whose `/cv.pdf` is whatever was last committed to `public/`. To match a real deploy:
+`package.json` `"build"` runs `build:pdfs`, `build:blog-assets`, `build:citations` in parallel via pnpm's regex script runner (`pnpm run "/^build:(pdfs|blog-assets|citations)$/"`), then `astro build`. CV PDF generation (`build:cv` → Typst) is a **separate** script that `just deploy` runs explicitly before `pnpm build`. Running `pnpm build` alone will produce a site whose `/cv.pdf` is whatever was last committed to `public/`. `build:cv` short-circuits if `public/cv.pdf` is newer than both `src/content/cv/template.typ` and `src/content/cv/cv.md`. To match a real deploy:
 
 ```sh
 pnpm build:cv && pnpm build
 ```
 
-### `build:citations` is dead
+### `build:citations` emits `public/CITATION.cff`
 
-`package.json` defines `build:citations` (`tsx scripts/generate-citations.ts`) but nothing invokes it — not the `build` chain, not `just deploy`, not the Dockerfile. Citation metadata is generated at runtime from publication source files via `src/lib/`, not from a prebuilt artifact. The README claim that `npm run build` runs citations is wrong. Either wire it into `build` or delete it; do not assume it has run.
+`build:citations` (`tsx scripts/generate-citations.ts`) IS part of the `build` chain — it walks `publications/Publications/*/metadata.yml` + `src/content/publication-tags.yaml`, builds a CITATION.cff, and writes it to `public/`. The runtime publication listings on the site come from the same source data via `src/lib/publications.ts`; the .cff is a separate artifact for GitHub's Citation File Format integration. The script is cached by source-file SHA-256 in `node_modules/.cache/citations.stamp` — clean rebuilds invalidate, edits to a `metadata.yml` or the tags file invalidate, everything else short-circuits to "up to date".
 
 ### Submodules are required
 
@@ -150,7 +150,7 @@ If you swap analytics: update `script-src` (script origin) and `connect-src` (AP
 
 ## Repo metadata to keep in sync
 
-- `README.md` still says "GitHub Pages", "Astro 5", and lists `build:citations` as part of the build pipeline. All three are wrong as of 2026-05. Fix if you rewrite README; do not trust it for runtime facts.
+- `README.md` still says "GitHub Pages" and "Astro 5" — both wrong as of 2026-05 (it's Cloudflare Pages + Astro 6). Fix if you rewrite README; do not trust it for runtime facts.
 - `package.json` engines pin Node `>=22.12.0`; the Dockerfile pins Node 24. `just deploy` uses whatever Node is on the host (currently Node 24 on ares). Don't downgrade.
 - `astro.config.mjs` injects `import.meta.env.COMMIT_HASH` from `git rev-parse --short HEAD` (or `$COMMIT_HASH` env var if set — Dockerfile passes `--build-arg COMMIT_HASH`). Used in the footer; expect `unknown` if built outside a git checkout.
 - `.pre-push-allowlist` exists at repo root — the global pre-push secret scanner respects it. Add new public-by-design hostnames here, not by widening the scanner.

@@ -8,6 +8,11 @@ OUTPUT="$PROJECT_DIR/public/cv.pdf"
 
 mkdir -p "$(dirname "$OUTPUT")"
 
+if [ -f "$OUTPUT" ] && [ "$OUTPUT" -nt "$CV_DIR/template.typ" ] && [ "$OUTPUT" -nt "$CV_DIR/cv.md" ]; then
+  echo "CV PDF up to date: $OUTPUT"
+  exit 0
+fi
+
 TYPST=""
 if command -v typst &> /dev/null; then
   TYPST="typst"

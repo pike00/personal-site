@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "pnpm run build:pdfs && pnpm run build:blog-assets && astro dev",
-    "build": "pnpm run build:pdfs && pnpm run build:blog-assets && pnpm run build:citations && astro build",
+    "build": "pnpm run \"/^build:(pdfs|blog-assets|citations)$/\" && astro build",
     "postbuild": "node scripts/sync-csp-hashes.mjs",
     "build:pdfs": "bash scripts/copy-pdfs.sh",
     "build:blog-assets": "bash scripts/copy-blog-assets.sh",
@@ -43,6 +43,7 @@
   "devDependencies": {
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
-    "typst": "^0.10.0-8"
+    "typst": "^0.10.0-8",
+    "wrangler": "^4.0.0"
   }
 }
