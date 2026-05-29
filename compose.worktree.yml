@@ -3,7 +3,7 @@
 # Driven by preview.just (`just dev`, `just worktree <slug>`).
 #
 # Runs the Astro dev server inside a Node container with the source tree
-# bind-mounted. First `just dev` is slow (npm install in container);
+# bind-mounted. First `just dev` is slow (pnpm install in container);
 # subsequent edits hot-reload via Vite's WebSocket (Traefik passes ws/wss
 # through to the container's port 4321).
 #
@@ -15,7 +15,7 @@ services:
     working_dir: /app
     volumes:
       - .:/app
-    command: ["sh", "-c", "npm install && npm run build:pdfs && npm run build:blog-assets && exec npx astro dev --host 0.0.0.0 --port 4321"]
+    command: ["sh", "-c", "corepack enable && corepack prepare pnpm@9.15.9 --activate && pnpm install --frozen-lockfile && pnpm run build:pdfs && pnpm run build:blog-assets && exec pnpm exec astro dev --host 0.0.0.0 --port 4321"]
     environment:
       NODE_ENV: development
       VITE_ALLOWED_HOSTS: ${WORKTREE_HOST}
