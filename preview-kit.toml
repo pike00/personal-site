@@ -1,7 +1,7 @@
 [preview-kit]
 project_name = "personal-site"
 project_prefix = "personal-site"
-host_pattern = "{slug}.personal-site.{domain}"
+host_pattern = "{slug}.personal-site.khanpikehome.com"
 compose_file = "compose.worktree.yml"
 health_path = "/"
 base = "main"

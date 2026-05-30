@@ -11,12 +11,13 @@ import 'preview.just'
 default:
     @just --list
 
-# Decrypt build.env.sops to stdout as dotenv. build.env.sops is the single
-# source of truth for all config + secrets (DOMAIN included). Prefers the
-# `sopsx` wrapper; falls back to raw sops with this repo's own .sops.yaml so it
-# still works where the homelab scripts aren't on PATH. `sops exec-env` is
-# unusable here: it has no --input-type and mis-detects a .sops dotenv as JSON
-# (sops #717), so we always decrypt explicitly.
+# Decrypt the Cloudflare deploy secrets in build.env.sops to stdout as dotenv,
+# for `just deploy` to source. Prefers the `sopsx` wrapper; falls back to raw
+# sops with this repo's own .sops.yaml so it still works where the homelab
+# scripts aren't on PATH. `sops exec-env` is unusable here: it has no
+# --input-type and mis-detects a .sops dotenv as JSON (sops #717), so we always
+# decrypt explicitly. The dev stack needs no secrets and no .env — the preview
+# domain is hardcoded in preview-kit.toml's host_pattern.
 _decrypt:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -25,22 +26,6 @@ _decrypt:
     else
         sops --config .sops.yaml --decrypt --input-type dotenv --output-type dotenv build.env.sops
     fi
-
-# preview-kit reads DOMAIN from the .env FILE (Python open(.env) in preview.just),
-# not from the environment, so the dev tooling needs a .env on disk. We pull
-# DOMAIN out of build.env.sops via sopsx and write ONLY that — the deploy
-# secrets stay encrypted and never land on disk (the dev stack in
-# compose.worktree.yml needs none; `just deploy` injects them at runtime).
-#
-# Seed the gitignored .env (DOMAIN only) from build.env.sops; run before `just dev`.
-dev-env:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    umask 077
-    domain="$(just _decrypt | sed -n 's/^DOMAIN=//p' | head -1)"
-    [ -n "$domain" ] || { echo "error: DOMAIN not found in build.env.sops (add it with: sopsx build.env.sops)" >&2; exit 1; }
-    printf 'DOMAIN=%s\n' "$domain" > .env
-    echo "✓ wrote .env (DOMAIN=$domain) from build.env.sops — secrets stay encrypted"
 
 # Build the site bundle only (Astro + CV PDF + postbuild CSP-hash sync). Does not deploy.
 build:
@@ -55,7 +40,7 @@ ship:
 # deploy.yml — all build + deploy steps run locally now.
 #
 # Credentials loaded from sops-encrypted build.env.sops; edit with `sopsx build.env.sops`.
-# Required keys: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_ZONE_ID (DOMAIN too).
+# Required keys: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_ZONE_ID.
 # Refuses to deploy on a dirty tree to keep the deployed commit traceable.
 deploy:
     #!/usr/bin/env bash

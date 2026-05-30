@@ -114,6 +114,6 @@ Required keys in `build.env.sops`:
 - `CLOUDFLARE_API_TOKEN` -- Cloudflare Pages + cache-purge scope.
 - `CLOUDFLARE_ACCOUNT_ID`
 - `CLOUDFLARE_ZONE_ID` -- for the cache purge call.
-- `DOMAIN` -- non-secret preview/dev domain; `just dev-env` extracts it into `.env`.
+- `PUBLIC_TURNSTILE_SITE_KEY` -- public Turnstile key baked into the build.
 
 The deploy is tagged with the current commit SHA via `wrangler --commit-hash`, so the Cloudflare Pages dashboard shows the exact source revision live.
