@@ -40,3 +40,9 @@
   tags: ["Neurology", "Gynecology"]
 "021 PJI Racial Disparities TKA":
   tags: ["Orthopedics", "Health Equity"]
+"022 AUD Pharmacotherapy in Hospitalized Patients":
+  tags: ["Substance Use", "Psychiatry"]
+"023 Statin Use and Crohns Disease Stricture":
+  tags: ["Gastroenterology"]
+"024 Answering Clinical Questions with LLM":
+  tags: ["Health Informatics", "Artificial Intelligence"]
