@@ -11,24 +11,36 @@ import 'preview.just'
 default:
     @just --list
 
-# Decrypt build.env.sops into the gitignored .env that preview-kit's `dev`/`env`
-# recipes read (they source plaintext .env by design — see preview.just). This
-# makes build.env.sops the single source of dev config + secrets. Run once, and
-# again whenever build.env.sops changes; then `just dev`. `just deploy` decrypts
-# build.env.sops directly and does not use .env.
+# Decrypt build.env.sops to stdout as dotenv. build.env.sops is the single
+# source of truth for all config + secrets (DOMAIN included). Prefers the
+# `sopsx` wrapper; falls back to raw sops with this repo's own .sops.yaml so it
+# still works where the homelab scripts aren't on PATH. `sops exec-env` is
+# unusable here: it has no --input-type and mis-detects a .sops dotenv as JSON
+# (sops #717), so we always decrypt explicitly.
+_decrypt:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if command -v sopsx >/dev/null 2>&1; then
+        sopsx build.env.sops -d
+    else
+        sops --config .sops.yaml --decrypt --input-type dotenv --output-type dotenv build.env.sops
+    fi
+
+# preview-kit reads DOMAIN from the .env FILE (Python open(.env) in preview.just),
+# not from the environment, so the dev tooling needs a .env on disk. We pull
+# DOMAIN out of build.env.sops via sopsx and write ONLY that — the deploy
+# secrets stay encrypted and never land on disk (the dev stack in
+# compose.worktree.yml needs none; `just deploy` injects them at runtime).
 #
-# DOMAIN drives the preview FQDN (<slug>.personal-site.{domain}); if build.env.sops
-# does not carry it, we seed the known value so the preview host resolves.
-env-decrypt:
+# Seed the gitignored .env (DOMAIN only) from build.env.sops; run before `just dev`.
+dev-env:
     #!/usr/bin/env bash
     set -euo pipefail
     umask 077
-    tmp="$(mktemp)"
-    trap 'rm -f "$tmp"' EXIT
-    sops --decrypt --input-type dotenv --output-type dotenv build.env.sops > "$tmp"
-    grep -q '^DOMAIN=' "$tmp" || echo 'DOMAIN=khanpikehome.com' >> "$tmp"
-    mv "$tmp" .env
-    echo "✓ wrote .env from build.env.sops ($(grep -cE '^[A-Za-z_]' .env) vars, DOMAIN=$(grep '^DOMAIN=' .env | cut -d= -f2-))"
+    domain="$(just _decrypt | sed -n 's/^DOMAIN=//p' | head -1)"
+    [ -n "$domain" ] || { echo "error: DOMAIN not found in build.env.sops (add it with: sopsx build.env.sops)" >&2; exit 1; }
+    printf 'DOMAIN=%s\n' "$domain" > .env
+    echo "✓ wrote .env (DOMAIN=$domain) from build.env.sops — secrets stay encrypted"
 
 # Build the site bundle only (Astro + CV PDF + postbuild CSP-hash sync). Does not deploy.
 build:
@@ -42,8 +54,8 @@ ship:
 # Build the site and deploy to Cloudflare Pages. Replaces the old GHA
 # deploy.yml — all build + deploy steps run locally now.
 #
-# Credentials loaded from sops-encrypted build.env.sops; create with `sops build.env.sops`.
-# Required keys: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_ZONE_ID.
+# Credentials loaded from sops-encrypted build.env.sops; edit with `sopsx build.env.sops`.
+# Required keys: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_ZONE_ID (DOMAIN too).
 # Refuses to deploy on a dirty tree to keep the deployed commit traceable.
 deploy:
     #!/usr/bin/env bash
@@ -52,13 +64,12 @@ deploy:
         echo "error: uncommitted changes — commit or stash before deploying" >&2
         exit 1
     fi
-    # sops's autodetect treats the .sops extension as non-dotenv (parses as
-    # JSON and fails with "missing file to decrypt"), and `sops exec-env`
-    # does NOT accept --input-type. Workaround: explicit decrypt with the
-    # input/output type pinned, then source into this shell with set -a so
-    # the env is exported into the `just _deploy` child.
+    # Decrypt build.env.sops (via `just _decrypt` → sopsx) and source into this
+    # shell with set -a so the vars export into the `just _deploy` child.
+    # Process substitution keeps plaintext off disk. `sops exec-env` can't be
+    # used: no --input-type, mis-detects .sops as JSON (sops #717).
     set -a
-    . <(sops --decrypt --input-type dotenv --output-type dotenv build.env.sops)
+    . <(just _decrypt)
     set +a
     just _deploy
 

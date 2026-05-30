@@ -11,7 +11,8 @@ Public GitHub repo: `pike00/personal-site`. Per global rules: **never push witho
 ## Just recipes (run `just` for the full list)
 
 - `just deploy` (alias `just ship`) — refuses dirty tree, sources `build.env.sops`, builds CV + site, runs `wrangler pages deploy dist --commit-hash=<HEAD>`, purges the Cloudflare zone cache. Does **not** bump `package.json`, tag, or push — those are independent. This is the canonical deploy path; there is no CI fallback.
-- `just dev` — brings up the per-worktree preview stack at `https://<slug>.personal-site.khanpikehome.com` via `compose.worktree.yml` (Traefik-routed, hot-reloaded). First boot is slow because pnpm install runs inside the container; subsequent edits hot-reload through Vite's WebSocket. From `preview.just`.
+- `just dev-env` — extracts `DOMAIN` from `build.env.sops` (via `sopsx`) into the gitignored `.env` that preview-kit reads. Run once before `just dev` (and again if `DOMAIN` changes). Without it, preview-kit defaults `{domain}` to `example.com` and the DNS pre-flight fails.
+- `just dev` — brings up the per-worktree preview stack at `https://<slug>.personal-site.khanpikehome.com` via `compose.worktree.yml` (Traefik-routed, hot-reloaded). Reads `DOMAIN` from `.env` (seed it with `just dev-env`). First boot is slow because pnpm install runs inside the container; subsequent edits hot-reload through Vite's WebSocket. From `preview.just`.
 - `just astro-dev [port]` — bare Astro dev server bound to the host's Tailscale IP with `VITE_ALLOWED_HOSTS` set to the MagicDNS name. Default port 4321. Use this for pure host-side iteration without Traefik.
 - `just publish <slug>` — flips `draft: false` in `blog-posts/posts/<slug>.md`, commits+pushes the `pike00/blog` submodule, bumps the pointer here, pushes. Idempotent.
 - `just new-post <slug> [title]` — scaffold a new draft in `blog-posts/posts/`.
@@ -26,8 +27,9 @@ Public GitHub repo: `pike00/personal-site`. Per global rules: **never push witho
 ```
 just deploy
   ├─ refuses dirty tree (uncommitted/staged changes)
-  ├─ sources build.env.sops via `sops --decrypt --input-type dotenv --output-type dotenv`
-  │   (NOT `sops exec-env` — autodetect treats build.env.sops as JSON and fails)
+  ├─ sources build.env.sops via `just _decrypt` (→ `sopsx build.env.sops -d`,
+  │   falls back to `sops --config .sops.yaml --decrypt --input-type dotenv …`)
+  │   (NOT `sops exec-env` — no --input-type, mis-detects .sops as JSON, sops #717)
   └─ just _deploy
        ├─ pnpm build:cv            # Typst → public/cv.pdf
        ├─ pnpm build               # build:{pdfs,blog-assets,citations} in parallel → astro build
@@ -50,13 +52,14 @@ Astro injects the short commit hash into the footer via `astro.config.mjs` (`imp
 
 ### Secrets
 
-Lives in `build.env.sops` at the repo root (NOT in GitHub repo settings — those have no role anymore).
+`build.env.sops` at the repo root is the single source of truth for all config + secrets (NOT GitHub repo settings — those have no role anymore):
 
 - `CLOUDFLARE_API_TOKEN` — scoped to Pages:Edit + Cache Purge for the personal-site project
 - `CLOUDFLARE_ACCOUNT_ID`
 - `CLOUDFLARE_ZONE_ID`
+- `DOMAIN` — non-secret, but lives here too so there's one config file. `just dev-env` extracts only this into the gitignored `.env` that preview-kit reads (the dev stack needs no secrets); secrets are never written to disk.
 
-Edit with `sops build.env.sops` (recipients/age key configured in `.sops.yaml`; private key at `~/.config/sops/age/keys.txt` on each authorized host).
+Edit with `sopsx build.env.sops` (interactive) or `sopsx build.env.sops -d|-e` (decrypt/encrypt stdio). Recipients/age key are in `.sops.yaml`; private key at `~/.config/sops/age/keys.txt` on each authorized host. `sopsx` is the homelab wrapper (`infra/scripts/sopsx`); it forces the homelab `.sops.yaml`, which carries the identical age recipient, so re-encrypts stay decryptable.
 
 ### Self-hosted Caddy build (alternative, not currently deployed)
 
@@ -112,6 +115,7 @@ Static origins currently allowlisted (in `SHARED_ORIGINS`): `https://umami.khanp
 
 ```sh
 npm install
+just dev-env         # once: extract DOMAIN from build.env.sops into .env (preview-kit reads it)
 just dev             # tailnet-bound, reachable from other devices
 # or: npm run dev    # localhost:4321 only
 ```

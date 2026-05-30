@@ -108,11 +108,12 @@ If nothing moved (post was already `draft: false` and the pointer was current), 
 just deploy           # build + wrangler pages deploy + CF cache purge (local; no GHA)
 ```
 
-Runs entirely from a workstation (typically ares). Credentials live in `build.env.sops`; `sops exec-env` decrypts them into the build's environment for the wrangler call only. Refuses to deploy on a dirty tree.
+Runs entirely from a workstation (typically ares). Credentials live in `build.env.sops`; `just _decrypt` (via `sopsx`) decrypts them into the build's environment for the wrangler call only, using process substitution so no plaintext hits disk. (`sops exec-env` can't read a dotenv `.sops` file -- no `--input-type`, mis-detects as JSON; sops #717.) Refuses to deploy on a dirty tree.
 
 Required keys in `build.env.sops`:
 - `CLOUDFLARE_API_TOKEN` -- Cloudflare Pages + cache-purge scope.
 - `CLOUDFLARE_ACCOUNT_ID`
 - `CLOUDFLARE_ZONE_ID` -- for the cache purge call.
+- `DOMAIN` -- non-secret preview/dev domain; `just dev-env` extracts it into `.env`.
 
 The deploy is tagged with the current commit SHA via `wrangler --commit-hash`, so the Cloudflare Pages dashboard shows the exact source revision live.
