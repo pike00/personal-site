@@ -34,6 +34,9 @@ const SHARED_ORIGINS = {
   umami: "https://umami.khanpikehome.com", // Umami analytics (script + API)
   fonts: "https://rsms.me", // Inter web font (stylesheet + font files)
   turnstile: "https://challenges.cloudflare.com", // Turnstile (contact form): api.js + iframe + siteverify
+  // Algolia DocSearch (⌘K palette): search-API + crawler-fed index endpoints.
+  // connect-src only — the DocSearch JS is bundled from npm, not a CDN.
+  algolia: "https://*.algolia.net https://*.algolianet.com https://*.algolia.io",
 };
 
 // The full CSP, single-sourced. `script-src` receives the computed inline-script
@@ -42,7 +45,7 @@ const SHARED_ORIGINS = {
 const CSP_DIRECTIVES = [
   ["default-src", ["'self'"]],
   ["script-src", ["'self'", "__HASHES__", SHARED_ORIGINS.umami, SHARED_ORIGINS.turnstile]],
-  ["connect-src", ["'self'", SHARED_ORIGINS.umami, SHARED_ORIGINS.turnstile]],
+  ["connect-src", ["'self'", SHARED_ORIGINS.umami, SHARED_ORIGINS.turnstile, SHARED_ORIGINS.algolia]],
   ["style-src", ["'self'", "'unsafe-inline'", SHARED_ORIGINS.fonts]],
   ["img-src", ["'self'", "data:"]],
   ["font-src", ["'self'", SHARED_ORIGINS.fonts]],

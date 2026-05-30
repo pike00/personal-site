@@ -29,4 +29,14 @@ Allow: /
 Disallow: /og/
 Disallow: /whoami
 
+# Algolia DocSearch crawler (powers the ⌘K site search). Its HTTP user-agent is
+# "Algolia Crawler/<version>"; this group matches that token, not the crawler's
+# dashboard name. A crawler matching a specific group ignores "User-agent: *",
+# so the disallows below are mirrored from it.
+User-agent: Algolia Crawler
+Content-Signal: search=yes, ai-input=no, ai-train=no
+Allow: /
+Disallow: /og/
+Disallow: /whoami
+
 Sitemap: https://pikemd.com/sitemap-index.xml

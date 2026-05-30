@@ -3,9 +3,13 @@ import BaseLayout from "./BaseLayout.astro";
 import NavBar from "../components/NavBar.astro";
 import Footer from "../components/Footer.astro";
 import CommandPalette from "../components/CommandPalette";
+import DocSearchPalette from "../components/DocSearchPalette";
 import { buildGlobalIndex } from "../lib/search";
+import { flags } from "../lib/flags";
 
-const searchIndex = buildGlobalIndex();
+const useDocSearch = flags.search === "docsearch";
+// Skip building the Fuse index entirely when DocSearch owns search.
+const searchIndex = useDocSearch ? [] : buildGlobalIndex();
 
 interface Props {
   title: string;
@@ -24,5 +28,7 @@ const { title, description, image, type, jsonLd } = Astro.props;
     <slot />
   </main>
   <Footer />
-  <CommandPalette client:idle index={searchIndex} />
+  {useDocSearch
+    ? <DocSearchPalette client:idle />
+    : <CommandPalette client:idle index={searchIndex} />}
 </BaseLayout>
