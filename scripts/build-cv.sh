@@ -5,20 +5,19 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 CV_DIR="$PROJECT_DIR/src/content/cv"
 OUTPUT="$PROJECT_DIR/public/cv.pdf"
+TEMPLATE="$CV_DIR/template.typ"
+CV_MD="$CV_DIR/cv.md"
+TEMP_TYPST=$(mktemp)
+trap "rm -f '$TEMP_TYPST'" EXIT
 
 # shellcheck source=scripts/loki.sh
 source "$SCRIPT_DIR/loki.sh"
 start=$(date +%s)
 loki_emit build-cv info started
 
-# DISABLED: CV generation broken, patch incoming
-loki_emit build-cv info complete "elapsed_s=$(($(date +%s) - start))" "result=disabled"
-echo "CV PDF generation disabled (broken, patch in progress)"
-exit 0
-
 mkdir -p "$(dirname "$OUTPUT")"
 
-if [ -f "$OUTPUT" ] && [ "$OUTPUT" -nt "$CV_DIR/template.typ" ] && [ "$OUTPUT" -nt "$CV_DIR/cv.md" ]; then
+if [ -f "$OUTPUT" ] && [ "$OUTPUT" -nt "$TEMPLATE" ] && [ "$OUTPUT" -nt "$CV_MD" ]; then
   loki_emit build-cv info complete "elapsed_s=$(($(date +%s) - start))" "result=cached"
   echo "CV PDF up to date: $OUTPUT"
   exit 0
@@ -31,12 +30,20 @@ elif [ -x "$PROJECT_DIR/node_modules/.bin/typst" ]; then
   TYPST="$PROJECT_DIR/node_modules/.bin/typst"
 fi
 
-if [ -n "$TYPST" ]; then
-  "$TYPST" compile "$CV_DIR/template.typ" "$OUTPUT"
-  loki_emit build-cv info complete "elapsed_s=$(($(date +%s) - start))" "result=generated"
-  echo "CV PDF generated: $OUTPUT"
-else
+if [ -z "$TYPST" ]; then
   loki_emit build-cv warn typst_missing "result=skipped"
   echo "Warning: typst not installed, skipping CV PDF generation"
   echo "Install: npm install --save-dev typst"
+  exit 0
 fi
+
+# Convert markdown to Typst and combine with template
+{
+  cat "$TEMPLATE"
+  echo ""
+  python3 "$SCRIPT_DIR/md-to-typst.py" "$CV_MD"
+} > "$TEMP_TYPST"
+
+"$TYPST" compile "$TEMP_TYPST" "$OUTPUT"
+loki_emit build-cv info complete "elapsed_s=$(($(date +%s) - start))" "result=generated"
+echo "CV PDF generated: $OUTPUT"
