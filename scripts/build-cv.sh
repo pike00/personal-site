@@ -11,6 +11,11 @@ source "$SCRIPT_DIR/loki.sh"
 start=$(date +%s)
 loki_emit build-cv info started
 
+# DISABLED: CV generation broken, patch incoming
+loki_emit build-cv info complete "elapsed_s=$(($(date +%s) - start))" "result=disabled"
+echo "CV PDF generation disabled (broken, patch in progress)"
+exit 0
+
 mkdir -p "$(dirname "$OUTPUT")"
 
 if [ -f "$OUTPUT" ] && [ "$OUTPUT" -nt "$CV_DIR/template.typ" ] && [ "$OUTPUT" -nt "$CV_DIR/cv.md" ]; then
