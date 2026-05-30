@@ -1,32 +1,33 @@
-#set page(margin: (x: 0.75in, y: 0.75in))
-#set text(font: "Inter", size: 10pt, weight: 400)
-#set par(leading: 0.6em)
+#set page(margin: (x: 0.7in, y: 0.7in))
+#set text(font: "Inter", size: 9.5pt, weight: 400, fill: rgb("#1f2937"))
+#set par(leading: 0.55em)
 #set heading(numbering: none)
 
-#show heading.where(level: 1): it => [
-  #text(size: 11pt, weight: 600, fill: rgb("#000000"))[#it.body]
-  #line(length: 100%, stroke: 0.5pt + rgb("#d1d5db"))
-]
+#show heading.where(level: 2): it => block(
+  spacing: 0.3em,
+  above: 0.6em,
+  below: 0.2em,
+  text(size: 11pt, weight: 700, fill: rgb("#000000"))[#it.body]
+)
 
-#show heading.where(level: 2): it => [
-  #text(size: 10pt, weight: 600, fill: rgb("#1f2937"))[#it.body]
-]
+#show heading.where(level: 3): it => block(
+  spacing: 0em,
+  text(size: 10pt, weight: 600, fill: rgb("#1f2937"))[#it.body]
+)
 
-#show heading.where(level: 3): it => [
-  #text(size: 9.5pt, weight: 500, fill: rgb("#374151"), style: "italic")[#it.body]
-]
+#show list: it => block(spacing: 0.25em, it)
 
-#show link: it => [
-  #underline(offset: 2pt, it.body)
-]
+#show list.item: it => {
+  set text(size: 9.5pt)
+  [#h(0.25em) • #h(0.35em)] + it.body
+}
 
-#show list: it => block(spacing: 0.4em, it)
-
+// Header
 #align(center)[
-  #text(size: 16pt, weight: 700)[Will Pike, MD]
-  #v(2pt)
-  #text(size: 10pt, fill: rgb("#6b7280"))[Physician-Clinical Informatician]
+  #text(size: 18pt, weight: 700, tracking: 0.5pt)[Will Pike, MD]
+  #v(1pt)
+  #text(size: 11pt, weight: 500, fill: rgb("#4b5563"))[Physician-Clinical Informatician]
 ]
 
-#v(8pt)
+#v(6pt)
 

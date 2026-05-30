@@ -8,21 +8,30 @@ from pathlib import Path
 
 def escape_typst(text: str) -> str:
     """Escape special Typst characters."""
-    # Convert email addresses with angle brackets to plain text
+    # Convert email addresses with angle brackets to monospace
     text = re.sub(r'<([^>]+@[^>]+)>', r'`\1`', text)
     return text
+
+
+def process_inline_formatting(text: str) -> str:
+    """Process inline markdown formatting."""
+    # Bold → weight
+    text = re.sub(r'\*\*(.+?)\*\*', r'*\1*', text)
+    # Italic school/company names (not markdown italic)
+    text = re.sub(r'(?:^|\s)_([A-Z][^_]*?)_(?:\s|$)', lambda m: f' _{m.group(1)}_ ', text)
+    # Links
+    text = re.sub(r'\[([^\]]+)\]\(([^)]+)\)', r'#link("\2")[\1]', text)
+    return escape_typst(text)
 
 
 def convert_md_to_typst(md_content: str) -> str:
     """Convert markdown content to Typst format."""
     lines = md_content.split('\n')
     typst_lines = []
-    in_frontmatter = False
     frontmatter_end = 0
 
     # Skip YAML frontmatter
     if lines and lines[0].strip() == '---':
-        in_frontmatter = True
         for i in range(1, len(lines)):
             if lines[i].strip() == '---':
                 frontmatter_end = i + 1
@@ -46,26 +55,26 @@ def convert_md_to_typst(md_content: str) -> str:
         elif line.startswith('### '):
             heading = line[4:].strip()
             typst_lines.append(f'#heading(level: 3)[{heading}]')
-            typst_lines.append('')
-        elif line.startswith('# '):
-            heading = line[2:].strip()
-            typst_lines.append(f'#heading(level: 1)[{heading}]')
-            typst_lines.append('')
+            # Add the next line (usually job title/dates)
+            if i + 1 < len(lines):
+                i += 1
+                next_line = lines[i].strip()
+                if next_line and not next_line.startswith('-') and not next_line.startswith('#'):
+                    # Format as: Company Name | Location/Dates
+                    formatted = process_inline_formatting(next_line)
+                    typst_lines.append(formatted)
+                    typst_lines.append('')
+                    i += 1
+                    continue
         # List items
         elif line.startswith('- '):
             item = line[2:].strip()
-            # Process inline formatting in list items
-            item = re.sub(r'\*\*(.+?)\*\*', r'*\1*', item)
-            item = re.sub(r'\[([^\]]+)\]\(([^)]+)\)', r'#link("\2")[\1]', item)
-            item = escape_typst(item)
-            typst_lines.append(f'  - {item}')
+            item = process_inline_formatting(item)
+            typst_lines.append(f'- {item}')
         # Regular paragraph
         elif line.strip():
-            # Process inline formatting
-            line = re.sub(r'\*\*(.+?)\*\*', r'*\1*', line)
-            line = re.sub(r'\[([^\]]+)\]\(([^)]+)\)', r'#link("\2")[\1]', line)
-            line = escape_typst(line)
-            typst_lines.append(line)
+            text = process_inline_formatting(line)
+            typst_lines.append(text)
         # Empty line
         else:
             if typst_lines and typst_lines[-1]:  # Avoid multiple empty lines
