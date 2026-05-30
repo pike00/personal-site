@@ -10,5 +10,5 @@ export const flags = {
    * (3) the crawler has indexed the live site at least once. Otherwise search
    * returns nothing.
    */
-  search: "fuse" as "fuse" | "docsearch",
+  search: "docsearch" as "fuse" | "docsearch",
 } as const;
