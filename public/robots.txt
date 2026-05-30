@@ -38,5 +38,6 @@ Content-Signal: search=yes, ai-input=no, ai-train=no
 Allow: /
 Disallow: /og/
 Disallow: /whoami
+# Algolia-Crawler-Verif: F6DAEDB5C525CBF5
 
 Sitemap: https://pikemd.com/sitemap-index.xml
