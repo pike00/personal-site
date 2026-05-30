@@ -1,3 +1,3 @@
 export const flags = {
-  contact: false,
+  contact: true,
 } as const;

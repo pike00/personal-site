@@ -1,9 +1,6 @@
 ---
 export const prerender = true;
 import { Image } from "astro:assets";
-import fs from "node:fs";
-import path from "node:path";
-import matter from "gray-matter";
 import headshot from "../assets/headshot.jpg";
 import PageLayout from "../layouts/PageLayout.astro";
 import StatBlock from "../components/StatBlock.astro";
@@ -12,6 +9,8 @@ import FeedCard from "../components/FeedCard.astro";
 import TopicPill from "../components/TopicPill.astro";
 import { getPublications } from "../lib/publications";
 import { getAbstracts } from "../lib/abstracts";
+import { getPosts, getProjects } from "../lib/posts";
+import { personJsonLd } from "../lib/jsonld";
 
 interface FeedEntry {
   type: "post" | "project";
@@ -29,42 +28,24 @@ const recentPubs = publications.slice(0, 2);
 
 const allTags = [...new Set(publications.flatMap((p) => p.researchArea))].sort();
 
-const blogDir = path.resolve("blog-posts/posts");
-const projectsDir = path.resolve("src/content/projects");
+const posts: FeedEntry[] = getPosts().map((p) => ({
+  type: "post",
+  slug: p.slug,
+  title: p.title,
+  description: p.description,
+  date: p.date,
+  tags: p.tags,
+  draft: p.draft,
+}));
 
-const posts: FeedEntry[] = (fs.existsSync(blogDir) ? fs.readdirSync(blogDir) : [])
-  .filter((f: string) => f.endsWith(".md"))
-  .map((file: string): FeedEntry => {
-    const slug = file.replace(/\.md$/, "");
-    const raw = fs.readFileSync(path.join(blogDir, file), "utf-8");
-    const { data } = matter(raw);
-    return {
-      type: "post",
-      slug,
-      title: data.title,
-      description: data.description,
-      date: data.date,
-      tags: data.tags ?? [],
-      draft: data.draft,
-    };
-  })
-  .filter((p: FeedEntry) => !p.draft);
-
-const projects: FeedEntry[] = (fs.existsSync(projectsDir) ? fs.readdirSync(projectsDir) : [])
-  .filter((f: string) => f.endsWith(".md"))
-  .map((file: string): FeedEntry => {
-    const slug = file.replace(/\.md$/, "");
-    const raw = fs.readFileSync(path.join(projectsDir, file), "utf-8");
-    const { data } = matter(raw);
-    return {
-      type: "project",
-      slug,
-      title: data.title,
-      description: data.description,
-      date: data.date,
-      tags: data.tags ?? [],
-    };
-  });
+const projects: FeedEntry[] = getProjects().map((p) => ({
+  type: "project",
+  slug: p.slug,
+  title: p.title,
+  description: p.description,
+  date: p.date,
+  tags: p.tags,
+}));
 
 const feed: FeedEntry[] = [...posts, ...projects].sort(
   (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
@@ -76,6 +57,8 @@ const recentFeed = feed.slice(0, 4);
 <PageLayout
   title="Will Pike, MD"
   description="Physician and researcher. Publications, CV, and projects."
+  image="/og/home.png"
+  jsonLd={personJsonLd()}
 >
   <!-- Hero -->
   <section class="bg-gradient-to-br from-primary to-primary-light text-white relative overflow-hidden">
@@ -93,8 +76,8 @@ const recentFeed = feed.slice(0, 4);
           research across multiple specialties.
         </p>
         <div class="flex gap-3 mt-8">
-          <a href="/blog" class="bg-accent hover:bg-accent-dark text-white px-6 py-3 rounded-lg text-sm font-semibold transition-colors">
-            Read Blog
+          <a href="/notes" class="bg-accent hover:bg-accent-dark text-white px-6 py-3 rounded-lg text-sm font-semibold transition-colors">
+            Read Notes
           </a>
           <a href="/cv" class="bg-accent hover:bg-accent-dark text-white px-6 py-3 rounded-lg text-sm font-semibold transition-colors">
             View CV
@@ -116,7 +99,7 @@ const recentFeed = feed.slice(0, 4);
   <!-- Stats -->
   <section class="bg-white dark:bg-surface-card-dark border-b border-gray-200 dark:border-gray-800">
     <div class="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 divide-x divide-gray-200 dark:divide-gray-700">
-      <StatBlock value={posts.length} label="Blog Posts" />
+      <StatBlock value={posts.length} label="Posts" />
       <StatBlock value={projects.length} label="Projects" />
       <StatBlock value={publications.length} label="Publications" />
       <StatBlock value={abstracts.length} label="Abstracts" />
@@ -131,7 +114,7 @@ const recentFeed = feed.slice(0, 4);
           <h2 class="text-xl font-bold text-primary dark:text-white">Recent</h2>
           <p class="text-sm text-gray-500 dark:text-gray-400">Notes, tools, and projects</p>
         </div>
-        <a href="/blog" class="text-sm text-accent font-semibold hover:text-accent-dark transition-colors">
+        <a href="/notes" class="text-sm text-accent font-semibold hover:text-accent-dark transition-colors">
           View all &rarr;
         </a>
       </div>
@@ -173,7 +156,7 @@ const recentFeed = feed.slice(0, 4);
     <h2 class="text-xl font-bold text-primary dark:text-white mb-5">Research Areas</h2>
     <div class="flex flex-wrap gap-2">
       {allTags.map((tag) => (
-        <TopicPill tag={tag} href={`/publications?tag=${encodeURIComponent(tag)}`} />
+        <TopicPill tag={tag} />
       ))}
     </div>
   </section>

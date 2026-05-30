@@ -2,21 +2,27 @@
 import BaseLayout from "./BaseLayout.astro";
 import NavBar from "../components/NavBar.astro";
 import Footer from "../components/Footer.astro";
+import CommandPalette from "../components/CommandPalette";
+import { buildGlobalIndex } from "../lib/search";
+
+const searchIndex = buildGlobalIndex();
 
 interface Props {
   title: string;
   description: string;
   image?: string;
   type?: string;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 }
 
-const { title, description, image, type } = Astro.props;
+const { title, description, image, type, jsonLd } = Astro.props;
 ---
 
-<BaseLayout title={title} description={description} image={image} type={type}>
+<BaseLayout title={title} description={description} image={image} type={type} jsonLd={jsonLd}>
   <NavBar />
   <main class="flex-1">
     <slot />
   </main>
   <Footer />
+  <CommandPalette client:idle index={searchIndex} />
 </BaseLayout>

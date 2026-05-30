@@ -2,22 +2,56 @@
 export const prerender = true;
 import PageLayout from "../layouts/PageLayout.astro";
 import { flags } from "../lib/flags";
+import { TURNSTILE_SITE_KEY } from "../lib/contact";
 
 if (!flags.contact) return new Response(null, { status: 404, statusText: "Not found" });
 
 const links = [
   { label: "GitHub", href: "https://github.com/pike00" },
-  { label: "LinkedIn", href: "https://www.linkedin.com/in/willpike" },
+  { label: "LinkedIn", href: "https://www.linkedin.com/in/pike00" },
   { label: "Google Scholar", href: "https://scholar.google.com" },
 ];
+
+const inputClass =
+  "w-full px-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-surface-card-dark text-sm text-primary dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-accent/50 placeholder:text-gray-400";
 ---
 
 <PageLayout title="Contact" description="Get in touch with Will Pike.">
   <div class="max-w-3xl mx-auto px-6 py-12">
     <h1 class="text-2xl font-bold text-primary dark:text-white mb-2">Contact</h1>
     <p class="text-sm text-gray-500 dark:text-gray-400 mb-8">
-      Feel free to reach out through any of the channels below.
+      Send a message below, or reach out through any of the channels.
     </p>
+
+    <form id="contact-form" class="space-y-4 mb-12" novalidate>
+      <div class="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label for="name" class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">Name</label>
+          <input id="name" name="name" type="text" required autocomplete="name" class={inputClass} />
+        </div>
+        <div>
+          <label for="email" class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">Email</label>
+          <input id="email" name="email" type="email" required autocomplete="email" class={inputClass} />
+        </div>
+      </div>
+      <div>
+        <label for="message" class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">Message</label>
+        <textarea id="message" name="message" rows="6" required maxlength="5000" class={inputClass}></textarea>
+      </div>
+
+      <div class="cf-turnstile" data-sitekey={TURNSTILE_SITE_KEY}></div>
+
+      <div class="flex items-center gap-4">
+        <button
+          type="submit"
+          id="contact-submit"
+          class="inline-flex items-center gap-2 px-5 py-2.5 bg-accent hover:bg-accent-dark disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-sm font-semibold transition-colors"
+        >
+          Send message
+        </button>
+        <p id="contact-status" role="status" aria-live="polite" class="text-sm"></p>
+      </div>
+    </form>
 
     <div class="grid gap-4 sm:grid-cols-2">
       {links.map((link) => (
@@ -38,4 +72,12 @@ const links = [
       ))}
     </div>
   </div>
+
+  <script
+    src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+    async
+    defer
+    is:inline
+  ></script>
+  <script src="/js/contact-form.js" defer is:inline></script>
 </PageLayout>

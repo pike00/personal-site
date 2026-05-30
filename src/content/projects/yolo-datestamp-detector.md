@@ -4,7 +4,6 @@ description: Fine-tuned YOLO object detector that locates burned-in LED date sta
 repo: https://github.com/pike00/yolo-datestamp-detector
 tags: ["YOLOv8", "Python", "Computer Vision", "PyTorch"]
 date: "2026-04-15"
-status: "shipped"
 stack: ["Ultralytics YOLO", "PyTorch", "Python", "Docker", "Claude Haiku (OCR)"]
 image: "/blog/teaching-neural-net/golden-gate-stamp.jpg"
 ---

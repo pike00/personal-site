@@ -14,7 +14,7 @@ interface Props {
 
 const { type, slug, title, description, date, tags } = Astro.props;
 
-const href = type === "post" ? `/blog/${slug}` : `/projects/${slug}`;
+const href = type === "post" ? `/notes/${slug}` : `/projects/${slug}`;
 
 const dateDisplay = new Date(date + "T00:00:00").toLocaleDateString("en-US", {
   year: "numeric",

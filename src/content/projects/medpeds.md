@@ -3,9 +3,9 @@ title: MedPeds
 description: Free clinical quick-reference for Internal Medicine and Pediatrics — 105 curated resources, in-page PDF viewer, faceted search, print-optimized for bedside use.
 url: https://mp.khanpikehome.com
 tags: ["Astro", "Tailwind CSS", "Cloudflare Pages", "Medicine"]
-date: "2026-05-11"
-status: "active"
+date: "2026-05-29"
 stack: ["Astro 4", "Tailwind CSS", "Pagefind", "Cloudflare Pages", "Python", "docling", "LiteLLM"]
+image: "/projects/medpeds/screenshot.png"
 ---
 
 A free clinical quick-reference site for residents in combined Internal Medicine and Pediatrics, built for my wife while she's in residency. The motivating problem: the canonical guidelines for any given clinical question are scattered across the AAP, USPSTF, CDC, AHA, ADA, NICE, individual specialty societies, and a long tail of calculators and bedside tools. A senior resident in clinic or hospital shouldn't have to remember which PDF lives on which org's site.

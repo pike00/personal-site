@@ -7,9 +7,10 @@ interface Props {
   description: string;
   image?: string;
   type?: string;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 }
 
-const { title, description, image, type } = Astro.props;
+const { title, description, image, type, jsonLd } = Astro.props;
 ---
 
 <!doctype html>
@@ -20,7 +21,7 @@ const { title, description, image, type } = Astro.props;
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://rsms.me/" />
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
-    <SEO title={title} description={description} image={image} type={type} />
+    <SEO title={title} description={description} image={image} type={type} jsonLd={jsonLd} />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <link rel="alternate" type="application/rss+xml" title="Will Pike" href="/rss.xml" />
     <script

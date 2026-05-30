@@ -11,6 +11,25 @@ import 'preview.just'
 default:
     @just --list
 
+# Decrypt build.env.sops into the gitignored .env that preview-kit's `dev`/`env`
+# recipes read (they source plaintext .env by design — see preview.just). This
+# makes build.env.sops the single source of dev config + secrets. Run once, and
+# again whenever build.env.sops changes; then `just dev`. `just deploy` decrypts
+# build.env.sops directly and does not use .env.
+#
+# DOMAIN drives the preview FQDN (<slug>.personal-site.{domain}); if build.env.sops
+# does not carry it, we seed the known value so the preview host resolves.
+env-decrypt:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    umask 077
+    tmp="$(mktemp)"
+    trap 'rm -f "$tmp"' EXIT
+    sops --decrypt --input-type dotenv --output-type dotenv build.env.sops > "$tmp"
+    grep -q '^DOMAIN=' "$tmp" || echo 'DOMAIN=khanpikehome.com' >> "$tmp"
+    mv "$tmp" .env
+    echo "✓ wrote .env from build.env.sops ($(grep -cE '^[A-Za-z_]' .env) vars, DOMAIN=$(grep '^DOMAIN=' .env | cut -d= -f2-))"
+
 # Build the site bundle only (Astro + CV PDF + postbuild CSP-hash sync). Does not deploy.
 build:
     pnpm build:cv
@@ -23,7 +42,7 @@ ship:
 # Build the site and deploy to Cloudflare Pages. Replaces the old GHA
 # deploy.yml — all build + deploy steps run locally now.
 #
-# Credentials loaded from sops-encrypted .env.sops; create with `sops .env.sops`.
+# Credentials loaded from sops-encrypted build.env.sops; create with `sops build.env.sops`.
 # Required keys: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_ZONE_ID.
 # Refuses to deploy on a dirty tree to keep the deployed commit traceable.
 deploy:
@@ -39,7 +58,7 @@ deploy:
     # input/output type pinned, then source into this shell with set -a so
     # the env is exported into the `just _deploy` child.
     set -a
-    . <(sops --decrypt --input-type dotenv --output-type dotenv .env.sops)
+    . <(sops --decrypt --input-type dotenv --output-type dotenv build.env.sops)
     set +a
     just _deploy
 

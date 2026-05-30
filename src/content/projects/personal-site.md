@@ -4,7 +4,6 @@ description: Static portfolio that pulls publications and blog posts from git su
 repo: https://github.com/pike00/personal-site
 tags: ["Astro", "Tailwind CSS", "TypeScript", "Typst"]
 date: "2026-04-10"
-status: "active"
 stack: ["Astro 6", "Tailwind 4", "React 19", "TypeScript", "Typst", "Cloudflare Pages"]
 ---
 

@@ -2,24 +2,15 @@
 export const prerender = true;
 import PageLayout from "../../layouts/PageLayout.astro";
 import TopicPill from "../../components/TopicPill.astro";
-import fs from "node:fs";
-import path from "node:path";
-import matter from "gray-matter";
 import { Marked } from "marked";
 import markedFootnote from "marked-footnote";
 import { codeToHtml } from "shiki";
 import { getPairedProject } from "../../lib/pairings";
-
-interface PostFrontmatter {
-  title: string;
-  description: string;
-  date: string;
-  tags: string[];
-  draft?: boolean;
-}
+import { getPosts, readingTimeMinutes, type PostFrontmatter } from "../../lib/posts";
 
 interface PostData extends PostFrontmatter {
   bodyHtml: string;
+  readingMinutes: number;
 }
 
 interface StaticPath {
@@ -57,32 +48,26 @@ export async function getStaticPaths(): Promise<StaticPath[]> {
       })
       .use(markedFootnote());
 
-  const blogDir = path.resolve("blog-posts/posts");
-  if (!fs.existsSync(blogDir)) return [];
-
-  const files: string[] = fs
-    .readdirSync(blogDir)
-    .filter((f: string) => f.endsWith(".md"));
-
   const paths = await Promise.all(
-    files.map(async (file: string): Promise<StaticPath | null> => {
-      const slug = file.replace(/\.md$/, "");
-      const raw = fs.readFileSync(path.join(blogDir, file), "utf-8");
-      const { data, content } = matter(raw);
-      if ((data as PostFrontmatter & { draft?: boolean }).draft) return null;
-      const bodyHtml = await makeMarked().parse(content);
+    getPosts().map(async (post): Promise<StaticPath> => {
+      const bodyHtml = await makeMarked().parse(post.content);
       return {
-        params: { slug },
+        params: { slug: post.slug },
         props: {
           post: {
-            ...(data as PostFrontmatter),
+            title: post.title,
+            description: post.description,
+            date: post.date,
+            tags: post.tags,
+            draft: post.draft,
             bodyHtml,
+            readingMinutes: readingTimeMinutes(post.content),
           },
         },
       };
     }),
   );
-  return paths.filter((p): p is StaticPath => p !== null);
+  return paths;
 }
 
 interface Props {
@@ -103,13 +88,13 @@ const pairedProject = getPairedProject(Astro.params.slug as string);
 <PageLayout title={post.title} description={post.description} image={`/og/blog-${Astro.params.slug}.png`}>
   <div class="max-w-3xl mx-auto px-6 py-12">
     <nav class="text-sm text-gray-400 dark:text-gray-500 mb-8">
-      <a href="/blog" class="hover:text-accent transition-colors">Blog</a>
+      <a href="/notes" class="hover:text-accent transition-colors">Notes</a>
       <span class="mx-2">/</span>
       <span class="text-gray-600 dark:text-gray-300">{post.title}</span>
     </nav>
 
     <h1 class="text-2xl font-bold text-primary dark:text-white mb-3">{post.title}</h1>
-    <p class="text-xs text-gray-400 dark:text-gray-500 mb-4">{dateDisplay}</p>
+    <p class="text-xs text-gray-400 dark:text-gray-500 mb-4">{dateDisplay} &middot; {post.readingMinutes} min read</p>
 
     {post.tags.length > 0 && (
       <div class="flex flex-wrap gap-2 mb-8">

@@ -1,4 +1,6 @@
 ---
+import { tagSlug } from "../lib/tags";
+
 interface Props {
   tag: string;
   href?: string;
@@ -6,28 +8,19 @@ interface Props {
 }
 
 const { tag, href, size = "md" } = Astro.props;
+// Default every tag pill to its topic landing page; an explicit href still wins.
+const resolvedHref = href ?? `/topics/${tagSlug(tag)}`;
 const sizeClasses = size === "sm"
   ? "text-xs px-2.5 py-0.5"
   : "text-sm px-4 py-2";
 ---
 
-{href ? (
-  <a
-    href={href}
-    class:list={[
-      "inline-block rounded-full font-medium bg-purple-50 text-accent-dark dark:bg-purple-950 dark:text-accent hover:bg-purple-100 dark:hover:bg-purple-900 transition-colors",
-      sizeClasses,
-    ]}
-  >
-    {tag}
-  </a>
-) : (
-  <span
-    class:list={[
-      "inline-block rounded-full font-medium bg-purple-50 text-accent-dark dark:bg-purple-950 dark:text-accent",
-      sizeClasses,
-    ]}
-  >
-    {tag}
-  </span>
-)}
+<a
+  href={resolvedHref}
+  class:list={[
+    "inline-block rounded-full font-medium bg-purple-50 text-accent-dark dark:bg-purple-950 dark:text-accent hover:bg-purple-100 dark:hover:bg-purple-900 transition-colors",
+    sizeClasses,
+  ]}
+>
+  {tag}
+</a>

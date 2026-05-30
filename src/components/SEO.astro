@@ -4,9 +4,11 @@ interface Props {
   description: string;
   image?: string;
   type?: string;
+  /** schema.org JSON-LD object(s) emitted as a <script type="application/ld+json">. */
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 }
 
-const { title, description, image, type = "website" } = Astro.props;
+const { title, description, image, type = "website", jsonLd } = Astro.props;
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
 const siteTitle = "Will Pike";
 const fullTitle = title === siteTitle ? title : `${title} | ${siteTitle}`;
@@ -27,3 +29,9 @@ const fullTitle = title === siteTitle ? title : `${title} | ${siteTitle}`;
 <meta name="twitter:title" content={fullTitle} />
 <meta name="twitter:description" content={description} />
 {image && <meta name="twitter:image" content={new URL(image, Astro.site)} />}
+
+{
+  jsonLd && (
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
+  )
+}

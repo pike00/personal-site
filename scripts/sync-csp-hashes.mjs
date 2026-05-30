@@ -1,23 +1,25 @@
 #!/usr/bin/env node
 /**
- * Sync the script-src CSP hashes in public/_headers with the inline scripts
- * Astro emitted into dist/.
+ * Single-source the Content-Security-Policy across BOTH deploy targets:
+ *   - public/_headers  (served by Cloudflare Pages — the live deploy)
+ *   - Caddyfile        (the alternative self-hosted container build)
  *
- * Astro emits inline scripts whose contents (and therefore SHA-256 hashes)
- * change on every Astro version bump. Without this, an Astro upgrade silently
- * ships a CSP that blocks the new inline scripts, breaking React hydration
- * with no visible build error. This script extracts every <script>...</script>
- * (and <script type="module">...</script>) body from every .html under dist/,
- * computes the SHA-256, and rewrites the `script-src` directive in
- * public/_headers with the resulting allowlist.
+ * The whole CSP is assembled here from one structured definition (CSP_DIRECTIVES
+ * + the SHARED_ORIGINS constants) plus the SHA-256 hashes of every inline
+ * <script> Astro emitted into dist/. The resulting policy string is written
+ * verbatim into both files, in each file's own syntax. Because the policy is
+ * generated from one source, the two files can no longer silently diverge —
+ * the documented footgun where a stale Caddyfile hash silently breaks React
+ * hydration on /publications/ in the self-hosted build.
  *
- * It's invoked from package.json as a `postbuild` step. CI/local builds
- * (`npm run build`) thus always emit a fresh _headers file before the
- * wrangler deploy uploads dist/.
+ * Astro emits inline scripts whose contents (and therefore hashes) change on
+ * every Astro version bump. Without this sync an upgrade ships a CSP that
+ * blocks the new inline scripts, breaking hydration with no visible build
+ * error. This runs as a package.json `postbuild` step so every build emits a
+ * fresh, consistent CSP into both files before the wrangler deploy uploads dist/.
  *
- * Exits non-zero if no inline scripts are found (unexpected for an Astro
- * build) or if the _headers file is missing a `Content-Security-Policy`
- * line to rewrite.
+ * Exits non-zero if no inline scripts are found (unexpected for an Astro build)
+ * or if either target file is missing a CSP directive to rewrite.
  */
 
 import { createHash } from "node:crypto";
@@ -25,11 +27,53 @@ import { readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 const DIST_DIR = "dist";
-const HEADERS_PATH = "public/_headers";
 
-// Allowlist of OUT-OF-DOC sources to preserve in script-src. Anything the
-// CSP needs beyond 'self' + the computed hashes goes here.
-const EXTRA_SCRIPT_SRC = ["https://umami.khanpikehome.com"];
+// Out-of-document origins, single-sourced so analytics/font changes stay in
+// sync across both target files. Reference these in CSP_DIRECTIVES below.
+const SHARED_ORIGINS = {
+  umami: "https://umami.khanpikehome.com", // Umami analytics (script + API)
+  fonts: "https://rsms.me", // Inter web font (stylesheet + font files)
+  turnstile: "https://challenges.cloudflare.com", // Turnstile (contact form): api.js + iframe + siteverify
+};
+
+// The full CSP, single-sourced. `script-src` receives the computed inline-script
+// hashes at build time (spliced in after 'self'); every other directive is
+// static. Order is preserved in the emitted policy string.
+const CSP_DIRECTIVES = [
+  ["default-src", ["'self'"]],
+  ["script-src", ["'self'", "__HASHES__", SHARED_ORIGINS.umami, SHARED_ORIGINS.turnstile]],
+  ["connect-src", ["'self'", SHARED_ORIGINS.umami, SHARED_ORIGINS.turnstile]],
+  ["style-src", ["'self'", "'unsafe-inline'", SHARED_ORIGINS.fonts]],
+  ["img-src", ["'self'", "data:"]],
+  ["font-src", ["'self'", SHARED_ORIGINS.fonts]],
+  ["frame-src", ["'self'", SHARED_ORIGINS.turnstile]],
+  ["frame-ancestors", ["'self'"]],
+];
+
+// Each target file: its path and how to splice the policy into its own syntax.
+const TARGETS = [
+  {
+    path: "public/_headers",
+    // Cloudflare _headers: `  Content-Security-Policy: <policy>` (unquoted).
+    pattern: /(Content-Security-Policy:)[^\n]*/,
+    replace: (policy) => `$1 ${policy}`,
+  },
+  {
+    path: "Caddyfile",
+    // Caddy header directive: `Content-Security-Policy "<policy>"` (quoted).
+    pattern: /(Content-Security-Policy )"[^"]*"/,
+    replace: (policy) => `$1"${policy}"`,
+  },
+];
+
+function buildPolicy(sortedHashes) {
+  return CSP_DIRECTIVES.map(([directive, sources]) => {
+    const expanded = sources.flatMap((s) =>
+      s === "__HASHES__" ? sortedHashes : [s]
+    );
+    return `${directive} ${expanded.join(" ")}`;
+  }).join("; ");
+}
 
 function walkHtml(dir) {
   const out = [];
@@ -53,6 +97,10 @@ function extractInlineScripts(html) {
     const attrs = match[1];
     const body = match[2];
     if (/\bsrc\s*=/i.test(attrs)) continue; // external script, no hash needed
+    // Non-JS data blocks (e.g. JSON-LD) are not executed and aren't governed by
+    // script-src, so they must not be hashed — doing so bloats the policy with a
+    // per-page hash for every <script type="application/ld+json"> block.
+    if (/\btype\s*=\s*["']application\/(ld\+json|json)["']/i.test(attrs)) continue;
     if (body.trim() === "") continue;
     scripts.push(body);
   }
@@ -85,33 +133,30 @@ if (hashes.size === 0) {
   process.exit(1);
 }
 
-const headersContent = readFileSync(HEADERS_PATH, "utf8");
-if (!/Content-Security-Policy:/i.test(headersContent)) {
-  console.error(`error: no Content-Security-Policy line found in ${HEADERS_PATH}`);
-  process.exit(1);
-}
-
 const sortedHashes = [...hashes].sort();
-const scriptSrc = ["'self'", ...sortedHashes, ...EXTRA_SCRIPT_SRC].join(" ");
+const policy = buildPolicy(sortedHashes);
 
-const scriptSrcRe = /(Content-Security-Policy:[^\n]*?)script-src [^;]+;/;
-if (!scriptSrcRe.test(headersContent)) {
-  console.error(
-    `error: no script-src directive found in the Content-Security-Policy line of ${HEADERS_PATH}.`
-  );
-  process.exit(1);
+let changed = false;
+for (const target of TARGETS) {
+  const content = readFileSync(target.path, "utf8");
+  if (!target.pattern.test(content)) {
+    console.error(
+      `error: no Content-Security-Policy directive to rewrite in ${target.path}`
+    );
+    process.exit(1);
+  }
+  const updated = content.replace(target.pattern, target.replace(policy));
+  if (updated === content) {
+    console.log(`✓ CSP already in sync in ${target.path}`);
+  } else {
+    writeFileSync(target.path, updated);
+    console.log(`✓ synced CSP into ${target.path}`);
+    changed = true;
+  }
 }
 
-const newHeaders = headersContent.replace(scriptSrcRe, `$1script-src ${scriptSrc};`);
-
-if (newHeaders === headersContent) {
-  console.log(
-    `✓ ${sortedHashes.length} inline-script hash(es) already in sync in ${HEADERS_PATH}`
-  );
-} else {
-  writeFileSync(HEADERS_PATH, newHeaders);
-  console.log(
-    `✓ synced ${sortedHashes.length} inline-script hash(es) into ${HEADERS_PATH}`
-  );
+console.log(`  ${sortedHashes.length} inline-script hash(es):`);
+for (const h of sortedHashes) console.log(`    ${h}`);
+if (changed) {
+  console.log("  (both _headers and Caddyfile are generated from one source)");
 }
-for (const h of sortedHashes) console.log(`  ${h}`);

@@ -5,7 +5,7 @@ import TopicPill from "../../components/TopicPill.astro";
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
-import { marked } from "marked";
+import { Marked } from "marked";
 import { getPairedPost } from "../../lib/pairings";
 
 interface ProjectFrontmatter {
@@ -35,6 +35,16 @@ export async function getStaticPaths(): Promise<StaticPath[]> {
   const files: string[] = fs
     .readdirSync(projectsDir)
     .filter((f: string) => f.endsWith(".md"));
+
+  // Inline code becomes a click-to-copy pill (styling in global.css, behavior
+  // in /js/copy-code.js). Only codespans get the class; fenced blocks don't.
+  const marked = new Marked().use({
+    renderer: {
+      codespan(token) {
+        return `<code class="inline-copy" title="Click to copy" role="button" tabindex="0">${token.text}</code>`;
+      },
+    },
+  });
 
   const paths = await Promise.all(
     files.map(async (file: string): Promise<StaticPath> => {
@@ -85,7 +95,7 @@ const pairedPost = getPairedPost(Astro.params.slug as string);
 <PageLayout title={project.title} description={project.description} image={`/og/project-${Astro.params.slug}.png`}>
   <div class="max-w-3xl mx-auto px-6 py-12">
     <nav class="text-sm text-gray-400 dark:text-gray-500 mb-8">
-      <a href="/projects" class="hover:text-accent transition-colors">Projects</a>
+      <a href="/" class="hover:text-accent transition-colors">Home</a>
       <span class="mx-2">/</span>
       <span class="text-gray-600 dark:text-gray-300">{project.title}</span>
     </nav>
@@ -158,7 +168,7 @@ const pairedPost = getPairedPost(Astro.params.slug as string);
     {pairedPost && (
       <aside class="not-prose mb-8 p-4 border-l-4 border-accent bg-accent/5 dark:bg-accent/10 rounded-r-lg">
         <p class="text-[10px] font-semibold uppercase tracking-wider text-accent mb-1">Related post</p>
-        <a href={`/blog/${pairedPost.slug}`} class="text-sm font-semibold text-primary dark:text-gray-100 hover:text-accent dark:hover:text-accent transition-colors">
+        <a href={`/notes/${pairedPost.slug}`} class="text-sm font-semibold text-primary dark:text-gray-100 hover:text-accent dark:hover:text-accent transition-colors">
           {pairedPost.title} &rarr;
         </a>
         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">{pairedPost.description}</p>
@@ -167,9 +177,10 @@ const pairedPost = getPairedPost(Astro.params.slug as string);
 
     {hasBody && (
       <article
-        class="prose prose-sm dark:prose-invert max-w-none prose-headings:text-primary dark:prose-headings:text-white prose-a:text-accent"
+        class="prose prose-sm dark:prose-invert max-w-none prose-headings:text-primary dark:prose-headings:text-white prose-a:text-accent prose-code:before:content-none prose-code:after:content-none"
         set:html={project.bodyHtml}
       />
     )}
   </div>
+  <script is:inline src="/js/copy-code.js" defer></script>
 </PageLayout>

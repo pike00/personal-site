@@ -1,0 +1,84 @@
+---
+export const prerender = true;
+import PageLayout from "../../layouts/PageLayout.astro";
+import PublicationCard from "../../components/PublicationCard.astro";
+import FeedCard from "../../components/FeedCard.astro";
+import { getAllTopics, type TopicData } from "../../lib/tags";
+
+export function getStaticPaths() {
+  return getAllTopics().map((topic) => ({
+    params: { tag: topic.slug },
+    props: { topic },
+  }));
+}
+
+interface Props {
+  topic: TopicData;
+}
+
+const { topic } = Astro.props;
+const total =
+  topic.publications.length + topic.posts.length + topic.projects.length;
+const noun = total === 1 ? "item" : "items";
+---
+
+<PageLayout
+  title={`${topic.tag}`}
+  description={`Publications, notes, and projects tagged ${topic.tag}.`}
+>
+  <div class="max-w-4xl mx-auto px-6 py-12">
+    <nav class="text-sm text-gray-400 dark:text-gray-500 mb-8">
+      <a href="/" class="hover:text-accent transition-colors">Home</a>
+      <span class="mx-2">/</span>
+      <span class="text-gray-600 dark:text-gray-300">Topics</span>
+      <span class="mx-2">/</span>
+      <span class="text-gray-600 dark:text-gray-300">{topic.tag}</span>
+    </nav>
+
+    <h1 class="text-2xl font-bold text-primary dark:text-white mb-1">{topic.tag}</h1>
+    <p class="text-sm text-gray-500 dark:text-gray-400 mb-10">{total} {noun}</p>
+
+    {topic.publications.length > 0 && (
+      <section class="mb-10">
+        <h2 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">
+          Publications
+        </h2>
+        <div class="flex flex-col gap-3">
+          {topic.publications.map((pub) => (
+            <PublicationCard publication={pub} />
+          ))}
+        </div>
+      </section>
+    )}
+
+    {(topic.posts.length > 0 || topic.projects.length > 0) && (
+      <section>
+        <h2 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">
+          Notes &amp; Projects
+        </h2>
+        <div class="flex flex-col gap-4">
+          {topic.posts.map((post) => (
+            <FeedCard
+              type="post"
+              slug={post.slug}
+              title={post.title}
+              description={post.description}
+              date={post.date}
+              tags={post.tags}
+            />
+          ))}
+          {topic.projects.map((project) => (
+            <FeedCard
+              type="project"
+              slug={project.slug}
+              title={project.title}
+              description={project.description}
+              date={project.date}
+              tags={project.tags}
+            />
+          ))}
+        </div>
+      </section>
+    )}
+  </div>
+</PageLayout>

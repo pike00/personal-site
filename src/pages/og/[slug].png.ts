@@ -2,9 +2,10 @@ export const prerender = true;
 
 import fs from "node:fs";
 import path from "node:path";
-import matter from "gray-matter";
 import satori from "satori";
 import { Resvg } from "@resvg/resvg-js";
+import { getPosts, getProjects } from "../../lib/posts";
+import { getPublications } from "../../lib/publications";
 
 interface Props {
   title: string;
@@ -21,32 +22,47 @@ function loadFont(filename: string): Buffer {
 export async function getStaticPaths() {
   const paths: { params: { slug: string }; props: Props }[] = [];
 
-  const blogDir = path.resolve("blog-posts/posts");
-  if (fs.existsSync(blogDir)) {
-    for (const file of fs.readdirSync(blogDir).filter((f) => f.endsWith(".md"))) {
-      const raw = fs.readFileSync(path.join(blogDir, file), "utf-8");
-      const { data } = matter(raw);
-      if (data.draft) continue;
-      const slug = file.replace(/\.md$/, "");
-      paths.push({
-        params: { slug: `blog-${slug}` },
-        props: { title: data.title, description: data.description, label: "Blog" },
-      });
-    }
+  for (const post of getPosts()) {
+    paths.push({
+      params: { slug: `blog-${post.slug}` },
+      props: { title: post.title, description: post.description, label: "Blog" },
+    });
   }
 
-  const projectsDir = path.resolve("src/content/projects");
-  if (fs.existsSync(projectsDir)) {
-    for (const file of fs.readdirSync(projectsDir).filter((f) => f.endsWith(".md"))) {
-      const raw = fs.readFileSync(path.join(projectsDir, file), "utf-8");
-      const { data } = matter(raw);
-      const slug = file.replace(/\.md$/, "");
-      paths.push({
-        params: { slug: `project-${slug}` },
-        props: { title: data.title, description: data.description, label: "Project" },
-      });
-    }
+  for (const project of getProjects()) {
+    paths.push({
+      params: { slug: `project-${project.slug}` },
+      props: { title: project.title, description: project.description, label: "Project" },
+    });
   }
+
+  for (const pub of getPublications()) {
+    const year = pub.pubDate ? pub.pubDate.split("-")[0] : "";
+    const description = [pub.journal, year].filter(Boolean).join(", ");
+    paths.push({
+      params: { slug: `pub-${pub.slug}` },
+      props: { title: pub.title, description, label: "Publication" },
+    });
+  }
+
+  // Static cards for the home page and CV (fixed copy, no source content).
+  paths.push({
+    params: { slug: "home" },
+    props: {
+      title: "Will Pike, MD",
+      description: "Physician and researcher. Publications, CV, and projects.",
+      label: "pikemd.com",
+    },
+  });
+  paths.push({
+    params: { slug: "cv" },
+    props: {
+      title: "Will Pike, MD",
+      description:
+        "Curriculum vitae — physician-clinical informatician specializing in real-world evidence.",
+      label: "Curriculum Vitae",
+    },
+  });
 
   return paths;
 }

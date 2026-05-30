@@ -3,6 +3,10 @@ import fs from "node:fs";
 import path from "node:path";
 import { getPublications } from "../src/lib/publications";
 import { generateCitationCff } from "../src/lib/citations";
+import { lokiEmit } from "./loki";
+
+const t0 = Date.now();
+await lokiEmit("generate-citations", "info", "started");
 
 const outputPath = path.resolve("public/CITATION.cff");
 const stampPath = path.resolve("node_modules/.cache/citations.stamp");
@@ -32,6 +36,10 @@ if (
   fs.existsSync(stampPath) &&
   fs.readFileSync(stampPath, "utf8").trim() === hash
 ) {
+  await lokiEmit("generate-citations", "info", "complete", {
+    elapsed_s: (Date.now() - t0) / 1000,
+    result: "cached",
+  });
   console.log("CITATION.cff up to date");
   process.exit(0);
 }
@@ -44,6 +52,10 @@ fs.mkdirSync(path.dirname(stampPath), { recursive: true });
 fs.writeFileSync(outputPath, cff);
 fs.writeFileSync(stampPath, hash + "\n");
 
-console.log(
-  `CITATION.cff generated with ${publications.filter((p) => p.id).length} references`
-);
+const refCount = publications.filter((p) => p.id).length;
+await lokiEmit("generate-citations", "info", "complete", {
+  elapsed_s: (Date.now() - t0) / 1000,
+  result: "generated",
+  references: refCount,
+});
+console.log(`CITATION.cff generated with ${refCount} references`);

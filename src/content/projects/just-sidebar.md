@@ -4,7 +4,6 @@ description: VS Code extension that surfaces just recipes in a persistent sideba
 repo: https://github.com/pike00/just-sidebar
 tags: ["VS Code", "TypeScript", "just"]
 date: "2026-04-14"
-status: "shipped"
 stack: ["TypeScript", "VS Code Extension API", "esbuild"]
 image: "/projects/just-sidebar/screenshot.png"
 ---

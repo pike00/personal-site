@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import Fuse from "fuse.js";
 import type { SearchablePublication } from "../lib/types";
+import { highlightAuthors } from "../lib/authors";
 
 interface Props {
   publications: SearchablePublication[];
@@ -11,13 +12,6 @@ interface Props {
 function getInitialTag(): string {
   if (typeof window === "undefined") return "";
   return new URLSearchParams(window.location.search).get("tag") ?? "";
-}
-
-function highlightAuthor(authors: string): string {
-  return authors
-    .split(", ")
-    .map((a) => (/\bPike\b/.test(a) && !/\bMorgan\b/.test(a) ? `<strong>${a}</strong>` : a))
-    .join(", ");
 }
 
 export default function SearchPublications({
@@ -130,7 +124,7 @@ export default function SearchPublications({
                 {pub.authors && (
                   <p
                     className="text-xs text-gray-500 dark:text-gray-400"
-                    dangerouslySetInnerHTML={{ __html: highlightAuthor(pub.authors) }}
+                    dangerouslySetInnerHTML={{ __html: highlightAuthors(pub.authors) }}
                   />
                 )}
                 {pub.journal && (

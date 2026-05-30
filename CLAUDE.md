@@ -10,7 +10,7 @@ Public GitHub repo: `pike00/personal-site`. Per global rules: **never push witho
 
 ## Just recipes (run `just` for the full list)
 
-- `just deploy` (alias `just ship`) — refuses dirty tree, sources `.env.sops`, builds CV + site, runs `wrangler pages deploy dist --commit-hash=<HEAD>`, purges the Cloudflare zone cache. Does **not** bump `package.json`, tag, or push — those are independent. This is the canonical deploy path; there is no CI fallback.
+- `just deploy` (alias `just ship`) — refuses dirty tree, sources `build.env.sops`, builds CV + site, runs `wrangler pages deploy dist --commit-hash=<HEAD>`, purges the Cloudflare zone cache. Does **not** bump `package.json`, tag, or push — those are independent. This is the canonical deploy path; there is no CI fallback.
 - `just dev` — brings up the per-worktree preview stack at `https://<slug>.personal-site.khanpikehome.com` via `compose.worktree.yml` (Traefik-routed, hot-reloaded). First boot is slow because pnpm install runs inside the container; subsequent edits hot-reload through Vite's WebSocket. From `preview.just`.
 - `just astro-dev [port]` — bare Astro dev server bound to the host's Tailscale IP with `VITE_ALLOWED_HOSTS` set to the MagicDNS name. Default port 4321. Use this for pure host-side iteration without Traefik.
 - `just publish <slug>` — flips `draft: false` in `blog-posts/posts/<slug>.md`, commits+pushes the `pike00/blog` submodule, bumps the pointer here, pushes. Idempotent.
@@ -21,13 +21,13 @@ Public GitHub repo: `pike00/personal-site`. Per global rules: **never push witho
 
 ### How it actually deploys
 
-**Local-only, no CI.** There is no `.github/workflows/` directory. Pushing to `main` archives the commit on GitHub but does **not** trigger a deploy. The only path to production is running `just deploy` on a machine that can decrypt `.env.sops` (today: `ares`).
+**Local-only, no CI.** There is no `.github/workflows/` directory. Pushing to `main` archives the commit on GitHub but does **not** trigger a deploy. The only path to production is running `just deploy` on a machine that can decrypt `build.env.sops` (today: `ares`).
 
 ```
 just deploy
   ├─ refuses dirty tree (uncommitted/staged changes)
-  ├─ sources .env.sops via `sops --decrypt --input-type dotenv --output-type dotenv`
-  │   (NOT `sops exec-env` — autodetect treats .env.sops as JSON and fails)
+  ├─ sources build.env.sops via `sops --decrypt --input-type dotenv --output-type dotenv`
+  │   (NOT `sops exec-env` — autodetect treats build.env.sops as JSON and fails)
   └─ just _deploy
        ├─ pnpm build:cv            # Typst → public/cv.pdf
        ├─ pnpm build               # build:{pdfs,blog-assets,citations} in parallel → astro build
@@ -50,17 +50,17 @@ Astro injects the short commit hash into the footer via `astro.config.mjs` (`imp
 
 ### Secrets
 
-Lives in `.env.sops` at the repo root (NOT in GitHub repo settings — those have no role anymore).
+Lives in `build.env.sops` at the repo root (NOT in GitHub repo settings — those have no role anymore).
 
 - `CLOUDFLARE_API_TOKEN` — scoped to Pages:Edit + Cache Purge for the personal-site project
 - `CLOUDFLARE_ACCOUNT_ID`
 - `CLOUDFLARE_ZONE_ID`
 
-Edit with `sops .env.sops` (recipients/age key configured in `.sops.yaml`; private key at `~/.config/sops/age/keys.txt` on each authorized host).
+Edit with `sops build.env.sops` (recipients/age key configured in `.sops.yaml`; private key at `~/.config/sops/age/keys.txt` on each authorized host).
 
 ### Self-hosted Caddy build (alternative, not currently deployed)
 
-`Dockerfile` + `Caddyfile` build a static Caddy container serving `dist/` on `:8080`. Used only if migrating off Cloudflare Pages. The Caddyfile hard-codes its own copy of the CSP — if you update `public/_headers`, update `Caddyfile` too or the two diverge silently. This path does NOT run the `sync-csp-hashes` postbuild against `Caddyfile`, so the hashes must be transferred manually.
+`Dockerfile` + `Caddyfile` build a static Caddy container serving `dist/` on `:8080`. Used only if migrating off Cloudflare Pages. As of 2026-05-29 the CSP is single-sourced: `scripts/sync-csp-hashes.mjs` (the `pnpm build` `postbuild` hook) generates the full policy from one structured definition and writes it into **both** `public/_headers` and `Caddyfile`, so the two can no longer diverge. Do not hand-edit the CSP in either file — change `CSP_DIRECTIVES`/`SHARED_ORIGINS` in the script and rebuild.
 
 ## Build gotchas
 
@@ -93,34 +93,20 @@ git submodule update --init --recursive
 
 If you add another markdown-rendering page (about, projects), repeat the same pattern — don't try to share a Marked instance.
 
-### CSP allowlist must be re-extracted after Astro upgrades
+### CSP is single-sourced — never hand-edit it
 
-CSP is defined in **two** places that must stay in sync:
+CSP is enforced in two files but **authored in one place**. As of 2026-05-29, `scripts/sync-csp-hashes.mjs` (the `pnpm build` `postbuild` hook) generates the entire policy from one structured definition and writes it into **both**:
 
-- [public/_headers](public/_headers) — served by Cloudflare Pages (the live deploy)
-- [Caddyfile](Caddyfile) — used only by the alternative self-hosted container build
+- [public/_headers](public/_headers) — served by Cloudflare Pages (the live deploy), `Content-Security-Policy: <policy>` syntax
+- [Caddyfile](Caddyfile) — the alternative self-hosted container build, `Content-Security-Policy "<policy>"` syntax
 
-Both pin per-script `sha256-...` hashes for every inline `<script>` Astro emits. Current allowlist has 4 hashes covering the `astro:load` shim, the client-directive runner that hydrates `client:load` islands (what makes `<SearchPublications>` work), per-page inline handlers (e.g. projects-page card-click, dark-mode toggle, inline-code copy-on-click), and the analytics shim. These hashes change with **every Astro version bump** and when any inline `<script>` in `src/` changes. Symptoms when stale: the React island on `/publications/` silently stops hydrating in production (search and dropdowns inert; dev mode looks fine because it ships different scripts).
+The two can no longer silently diverge. The previous failure mode — a stale `Caddyfile` hash silently breaking the `/publications/` React island in the self-hosted build — is structurally eliminated.
 
-Recompute and update with:
+`script-src` pins per-script `sha256-...` hashes for every inline `<script>` Astro emits (the `astro:load` shim, the `client:load` island runner that hydrates `<SearchPublications>`, per-page inline handlers, the analytics shim). These change on **every Astro version bump** and whenever any inline `<script>` in `src/` changes — but you don't track them by hand: the postbuild hook re-extracts them from `dist/` on every build.
 
-```sh
-npm run build
-python3 - <<'PY'
-import re, hashlib, base64, glob, os
-seen = {}
-for p in glob.glob('dist/**/*.html', recursive=True):
-    for m in re.finditer(r'<script(?![^>]*\bsrc=)[^>]*>(.*?)</script>', open(p).read(), re.S):
-        h = 'sha256-' + base64.b64encode(hashlib.sha256(m.group(1).encode()).digest()).decode()
-        seen.setdefault(h, os.path.relpath(p, 'dist'))
-for h, p in seen.items():
-    print(h, p)
-PY
-```
+To change the CSP (add an origin, swap analytics/fonts, etc.), edit `CSP_DIRECTIVES` / `SHARED_ORIGINS` at the top of `scripts/sync-csp-hashes.mjs` and rebuild — **do not** edit `public/_headers` or `Caddyfile` directly; the next build would overwrite a `_headers` edit and the script owns the whole policy. Verify after a deploy by opening DevTools on `/publications/`; any CSP violation there means a hash or origin is missing from the generated policy.
 
-Compare the printed set against `script-src` in **both** `public/_headers` and `Caddyfile`; add any missing hashes to both. Verify on the deployed site by opening DevTools console on `/publications/` — any `Content Security Policy` violation there means a hash is missing.
-
-Other CSP origins currently allowlisted: `https://umami.khanpikehome.com` (script-src + connect-src) for analytics; `https://rsms.me` (style-src + font-src) for Inter web font. Update both files if you change either.
+Static origins currently allowlisted (in `SHARED_ORIGINS`): `https://umami.khanpikehome.com` (script-src + connect-src) for analytics; `https://rsms.me` (style-src + font-src) for the Inter web font.
 
 ## Local dev
 
@@ -146,7 +132,52 @@ No Pagefind. No MDX integration. Search is in-browser via Fuse.js over a JSON bu
 
 Only **Umami** (self-hosted at `umami.khanpikehome.com`, homelab `apps/umami`, website ID `e195e031-845c-4950-a08b-bd4a44038ab3`) — wired in [src/layouts/BaseLayout.astro](src/layouts/BaseLayout.astro). GoatCounter was removed in commit `19819ed`. Umami runs on the same parent domain as the rest of the homelab so household-wide blocklists can't filter it selectively.
 
-If you swap analytics: update `script-src` (script origin) and `connect-src` (API origin — Umami POSTs to `/api/send`) in **both** `public/_headers` and `Caddyfile`, and recompute the inline-script hash if you add a shim.
+If you swap analytics: update the `script-src` (script origin) and `connect-src` (API origin — Umami POSTs to `/api/send`) entries in `SHARED_ORIGINS`/`CSP_DIRECTIVES` in `scripts/sync-csp-hashes.mjs` (single-sourced into both `public/_headers` and `Caddyfile` on build). A new inline shim is hashed automatically by the postbuild step.
+
+## Contact form
+
+Gated behind `flags.contact` in [src/lib/flags.ts](src/lib/flags.ts) (currently `true`). The page [src/pages/contact.astro](src/pages/contact.astro) renders a name/email/message form plus a Cloudflare **Turnstile** widget; [public/js/contact-form.js](public/js/contact-form.js) serializes it and POSTs JSON to `/api/contact`.
+
+### Backend: a Cloudflare Pages Function, NOT an Astro route
+
+[functions/api/contact.ts](functions/api/contact.ts) is a **Pages Function** at the repo root (outside `src/`, so Astro never touches it). `wrangler pages deploy dist` auto-bundles the top-level `functions/` directory — no config or recipe change needed. The function: validates input → verifies the Turnstile token via `challenges.cloudflare.com/turnstile/v0/siteverify` → posts the message to a **Mattermost incoming webhook**.
+
+**Why Mattermost and not Cloudflare Email:** Email Sending is the obvious fit but it requires a **paid Workers plan** — on the free plan `wrangler email sending enable pikemd.com` returns `Unauthorized [code: 2036]` (account not entitled), and `send_email` is anyway **not a supported Pages Functions binding**. Mattermost is free, homelab-native, and reachable from the CF edge because `chat.khanpikehome.com` is public-tier.
+
+### Delivery target
+
+Submissions land in the private **#website-contact** channel on the `khanpikehome` Mattermost team (channel id `8in11tpc4bg7ipquhet9pnsnma`, owner `will`). The incoming webhook was created with `mmctl --local`:
+
+```sh
+docker exec mattermost mmctl --local channel create --team khanpikehome \
+  --name website-contact --display-name "Website Contact" --private
+docker exec mattermost mmctl --local channel users add khanpikehome:website-contact will
+docker exec mattermost mmctl --local webhook create-incoming \
+  --channel 8in11tpc4bg7ipquhet9pnsnma --user will \
+  --display-name "pikemd.com contact form"
+# URL = https://chat.khanpikehome.com/hooks/<returned-id>
+```
+
+To re-test delivery without Cloudflare in the path (bypass the bot-block per the global validation rule):
+
+```sh
+curl -sk --resolve "chat.khanpikehome.com:443:100.119.100.85" \
+  -X POST "https://chat.khanpikehome.com/hooks/<id>" \
+  -H 'Content-Type: application/json' -d '{"username":"pikemd.com","text":"test"}'
+# expect: ok / HTTP 200, message appears in #website-contact
+```
+
+### Secrets and config
+
+- **`MATTERMOST_WEBHOOK_URL`** — Pages project secret (set via `wrangler pages secret put MATTERMOST_WEBHOOK_URL --project-name=personal-site`). The webhook URL is a credential; it lives only in the Pages secret store, never in git or `build.env.sops`.
+- **`TURNSTILE_SECRET`** — Pages project secret. Create a Turnstile widget for hostname `pikemd.com` (CF dashboard → Turnstile), then `wrangler pages secret put TURNSTILE_SECRET --project-name=personal-site`.
+- **`PUBLIC_TURNSTILE_SITE_KEY`** — the public site key, baked into the page at build time. Set it in `build.env.sops` (exported into the build by `just deploy`'s `set -a`) or replace the placeholder default in [src/lib/contact.ts](src/lib/contact.ts). Until set, the widget shows "invalid site key" and the form fails safe (won't submit).
+
+Pages secrets are NOT in `build.env.sops` (those `CLOUDFLARE_*` keys are only for the wrangler deploy + cache purge). Set Pages secrets with `wrangler pages secret put <NAME> --project-name=personal-site` or the dashboard.
+
+### CSP
+
+Turnstile needs `https://challenges.cloudflare.com` in `script-src` (api.js), `connect-src` (siteverify), and `frame-src` (the challenge iframe). These live in `SHARED_ORIGINS.turnstile` / `CSP_DIRECTIVES` in `scripts/sync-csp-hashes.mjs`, single-sourced into both `public/_headers` and `Caddyfile`. Don't hand-edit either file.
 
 ## Repo metadata to keep in sync
 

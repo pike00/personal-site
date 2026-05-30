@@ -1,6 +1,7 @@
 ---
 import TopicPill from "./TopicPill.astro";
 import type { Publication } from "../lib/types";
+import { highlightAuthors } from "../lib/authors";
 
 interface Props {
   publication: Publication;
@@ -8,9 +9,7 @@ interface Props {
 
 const { publication: pub } = Astro.props;
 
-const authorDisplay = pub.authors
-  .map((a) => (/\bPike\b/.test(a) && !/\bMorgan\b/.test(a) ? `<strong>${a}</strong>` : a))
-  .join(", ");
+const authorDisplay = highlightAuthors(pub.authors);
 
 const year = pub.pubDate ? pub.pubDate.split("-")[0] : "";
 const journalLine = [pub.journalAbbrev, year].filter(Boolean).join(", ");
