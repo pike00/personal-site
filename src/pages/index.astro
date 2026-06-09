@@ -3,13 +3,14 @@ export const prerender = true;
 import { Image } from "astro:assets";
 import headshot from "../assets/headshot.jpg";
 import PageLayout from "../layouts/PageLayout.astro";
-import StatBlock from "../components/StatBlock.astro";
-import PublicationCard from "../components/PublicationCard.astro";
+import Container from "../components/Container.astro";
+import Button from "../components/Button.astro";
 import FeedCard from "../components/FeedCard.astro";
 import TopicPill from "../components/TopicPill.astro";
 import { getPublications } from "../lib/publications";
 import { getAbstracts } from "../lib/abstracts";
 import { getPosts, getProjects } from "../lib/posts";
+import { highlightAuthors } from "../lib/authors";
 import { personJsonLd } from "../lib/jsonld";
 
 interface FeedEntry {
@@ -24,7 +25,7 @@ interface FeedEntry {
 
 const publications = getPublications();
 const abstracts = getAbstracts();
-const recentPubs = publications.slice(0, 2);
+const recentPubs = publications.slice(0, 4);
 
 const allTags = [...new Set(publications.flatMap((p) => p.researchArea))].sort();
 
@@ -52,6 +53,13 @@ const feed: FeedEntry[] = [...posts, ...projects].sort(
 );
 
 const recentFeed = feed.slice(0, 4);
+
+const stats = [
+  { value: posts.length, label: "Posts" },
+  { value: projects.length, label: "Projects" },
+  { value: publications.length, label: "Publications" },
+  { value: abstracts.length, label: "Abstracts" },
+];
 ---
 
 <PageLayout
@@ -60,104 +68,137 @@ const recentFeed = feed.slice(0, 4);
   image="/og/home.png"
   jsonLd={personJsonLd()}
 >
-  <!-- Hero -->
-  <section class="bg-gradient-to-br from-primary to-primary-light text-white relative overflow-hidden">
-    <div class="absolute top-[-80px] right-[-40px] w-96 h-96 rounded-full bg-accent/10 blur-3xl"></div>
-    <div class="max-w-6xl mx-auto px-6 py-20 md:py-28 relative z-10 flex flex-col md:flex-row items-center gap-6">
-      <div class="flex-1">
-        <p class="text-xs uppercase tracking-[3px] text-accent font-semibold mb-4">
-          Physician & Researcher
+  {/* Hero */}
+  <Container variant="full" class="mt-9">
+    <div class="flex flex-col-reverse items-start gap-8 sm:flex-row sm:items-center sm:justify-between">
+      <div class="max-w-2xl">
+        <p class="text-sm font-semibold uppercase tracking-[0.2em] text-violet-600 dark:text-violet-400">
+          Physician &amp; Researcher
         </p>
-        <h1 class="text-4xl md:text-5xl font-extrabold leading-tight tracking-tight mb-4">
-          Building evidence<br />for better patient care.
+        <h1 class="mt-4 text-4xl font-bold tracking-tight text-zinc-800 sm:text-5xl dark:text-zinc-100">
+          Building evidence for better patient care.
         </h1>
-        <p class="text-gray-300 max-w-lg leading-relaxed">
-          Clinician-researcher focused on real-world evidence, health outcomes, and translational
-          research across multiple specialties.
+        <p class="mt-6 text-base text-zinc-600 dark:text-zinc-400">
+          I'm Will, a physician-clinical informatician focused on real-world
+          evidence, health outcomes, and translational research. I build
+          scalable tools and processes that turn clinical data into
+          research-grade evidence.
         </p>
-        <div class="flex gap-3 mt-8">
-          <a href="/notes" class="bg-accent hover:bg-accent-dark text-white px-6 py-3 rounded-lg text-sm font-semibold transition-colors">
-            Read Notes
+        <div class="mt-8 flex flex-wrap gap-3">
+          <Button href="/notes" variant="primary">Read Notes</Button>
+          <Button href="/cv" variant="secondary">View CV</Button>
+        </div>
+        <div class="mt-8 flex gap-6">
+          <a href="https://github.com/pike00" target="_blank" rel="noopener noreferrer" aria-label="GitHub" class="group -m-1 p-1">
+            <svg class="h-6 w-6 fill-zinc-500 transition group-hover:fill-zinc-600 dark:fill-zinc-400 dark:group-hover:fill-zinc-300" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
           </a>
-          <a href="/cv" class="bg-accent hover:bg-accent-dark text-white px-6 py-3 rounded-lg text-sm font-semibold transition-colors">
-            View CV
+          <a href="https://www.linkedin.com/in/pike00" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="group -m-1 p-1">
+            <svg class="h-6 w-6 fill-zinc-500 transition group-hover:fill-zinc-600 dark:fill-zinc-400 dark:group-hover:fill-zinc-300" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
           </a>
         </div>
       </div>
+
       <div class="shrink-0">
-        <Image
-          src={headshot}
-          alt="Will Pike, MD"
-          width={280}
-          height={280}
-          class="w-48 h-48 md:w-60 md:h-60 rounded-full object-cover ring-4 ring-accent/30 shadow-2xl"
-        />
-      </div>
-    </div>
-  </section>
-
-  <!-- Stats -->
-  <section class="bg-white dark:bg-surface-card-dark border-b border-gray-200 dark:border-gray-800">
-    <div class="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 divide-x divide-gray-200 dark:divide-gray-700">
-      <StatBlock value={posts.length} label="Posts" />
-      <StatBlock value={projects.length} label="Projects" />
-      <StatBlock value={publications.length} label="Publications" />
-      <StatBlock value={abstracts.length} label="Abstracts" />
-    </div>
-  </section>
-
-  {recentFeed.length > 0 && (
-    <!-- Recent -->
-    <section class="max-w-6xl mx-auto px-6 py-12">
-      <div class="flex items-center justify-between mb-6">
-        <div>
-          <h2 class="text-xl font-bold text-primary dark:text-white">Recent</h2>
-          <p class="text-sm text-gray-500 dark:text-gray-400">Notes, tools, and projects</p>
-        </div>
-        <a href="/notes" class="text-sm text-accent font-semibold hover:text-accent-dark transition-colors">
-          View all &rarr;
-        </a>
-      </div>
-      <div class="flex flex-col gap-4">
-        {recentFeed.map((entry: FeedEntry) => (
-          <FeedCard
-            type={entry.type}
-            slug={entry.slug}
-            title={entry.title}
-            description={entry.description}
-            date={entry.date}
-            tags={entry.tags}
+        <div class="rounded-3xl bg-white/90 p-1 shadow-xl ring-1 shadow-zinc-800/5 ring-zinc-900/5 backdrop-blur-sm dark:bg-zinc-800/90 dark:ring-white/10">
+          <Image
+            src={headshot}
+            alt="Will Pike, MD"
+            width={280}
+            height={280}
+            class="h-40 w-40 rounded-[1.25rem] object-cover sm:h-52 sm:w-52"
           />
-        ))}
+        </div>
       </div>
-    </section>
-  )}
+    </div>
+  </Container>
 
-  <!-- Recent Publications -->
-  <section class="max-w-6xl mx-auto px-6 py-12">
-    <div class="flex items-center justify-between mb-6">
-      <div>
-        <h2 class="text-xl font-bold text-primary dark:text-white">Recent Publications</h2>
-        <p class="text-sm text-gray-500 dark:text-gray-400">Latest research and findings</p>
+  {/* Body: feed + sidebar */}
+  <Container variant="full" class="mt-24 md:mt-28">
+    <div class="mx-auto grid max-w-xl grid-cols-1 gap-y-20 lg:max-w-none lg:grid-cols-2">
+      {/* Left: recent notes & projects */}
+      <div class="flex flex-col gap-16">
+        <div class="flex items-baseline justify-between">
+          <h2 class="text-base font-semibold text-zinc-800 dark:text-zinc-100">Recent</h2>
+          <a href="/notes" class="text-sm font-medium text-violet-600 transition hover:text-violet-700 dark:text-violet-400 dark:hover:text-violet-300">
+            View all &rarr;
+          </a>
+        </div>
+        {recentFeed.length === 0 ? (
+          <p class="text-sm text-zinc-500 dark:text-zinc-400">Nothing here yet. Check back soon.</p>
+        ) : (
+          recentFeed.map((entry: FeedEntry) => (
+            <FeedCard
+              type={entry.type}
+              slug={entry.slug}
+              title={entry.title}
+              description={entry.description}
+              date={entry.date}
+              tags={entry.tags}
+            />
+          ))
+        )}
       </div>
-      <a href="/publications" class="text-sm text-accent font-semibold hover:text-accent-dark transition-colors">
-        View all &rarr;
-      </a>
-    </div>
-    <div class="flex flex-col gap-3">
-      {recentPubs.map((pub) => (
-        <PublicationCard publication={pub} />
-      ))}
-    </div>
-  </section>
 
-  <!-- Research Areas -->
-  <section class="max-w-6xl mx-auto px-6 pb-16">
-    <h2 class="text-xl font-bold text-primary dark:text-white mb-5">Research Areas</h2>
-    <div class="flex flex-wrap gap-2">
-      {allTags.map((tag) => (
-        <TopicPill tag={tag} />
-      ))}
+      {/* Right: sidebar */}
+      <div class="space-y-10 lg:pl-16 xl:pl-24">
+        {/* By the numbers */}
+        <div class="rounded-2xl border border-zinc-100 p-6 dark:border-zinc-700/40">
+          <h2 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">By the numbers</h2>
+          <dl class="mt-6 grid grid-cols-2 gap-y-6">
+            {stats.map((s) => (
+              <div>
+                <dd class="text-2xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100">{s.value}</dd>
+                <dt class="text-xs uppercase tracking-widest text-zinc-500 dark:text-zinc-400">{s.label}</dt>
+              </div>
+            ))}
+          </dl>
+        </div>
+
+        {/* Recent publications */}
+        <div class="rounded-2xl border border-zinc-100 p-6 dark:border-zinc-700/40">
+          <h2 class="flex items-center text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="h-6 w-6 flex-none">
+              <path d="M2.75 9.75a3 3 0 0 1 3-3h12.5a3 3 0 0 1 3 3v8.5a3 3 0 0 1-3 3H5.75a3 3 0 0 1-3-3v-8.5Z" class="fill-zinc-100 stroke-zinc-400 dark:fill-zinc-100/10 dark:stroke-zinc-500" />
+              <path d="M3 14.25h6.249c.484 0 .952-.002 1.316.319l.777.682a.996.996 0 0 0 1.316 0l.777-.682c.364-.32.832-.319 1.316-.319H21M8.75 6.5V4.75a2 2 0 0 1 2-2h2.5a2 2 0 0 1 2 2V6.5" class="stroke-zinc-400 dark:stroke-zinc-500" />
+            </svg>
+            <span class="ml-3">Recent publications</span>
+          </h2>
+          <ol class="mt-6 space-y-5">
+            {recentPubs.map((pub) => (
+              <li>
+                <a href={`/publications/${pub.slug}`} class="group block">
+                  <p class="text-sm font-medium leading-snug text-zinc-800 transition group-hover:text-violet-600 dark:text-zinc-100 dark:group-hover:text-violet-400">
+                    {pub.title}
+                  </p>
+                  {pub.journalAbbrev && (
+                    <p class="mt-1 text-xs text-zinc-400 dark:text-zinc-500">
+                      {[pub.journalAbbrev, pub.pubDate?.split("-")[0]].filter(Boolean).join(", ")}
+                    </p>
+                  )}
+                </a>
+              </li>
+            ))}
+          </ol>
+          <Button href="/publications" variant="secondary" class="mt-6 w-full">
+            View all publications
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="h-4 w-4 stroke-zinc-400">
+              <path d="M6.75 5.75 9.25 8l-2.5 2.25" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </Button>
+        </div>
+
+        {/* Research areas */}
+        {allTags.length > 0 && (
+          <div class="rounded-2xl border border-zinc-100 p-6 dark:border-zinc-700/40">
+            <h2 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Research areas</h2>
+            <div class="mt-5 flex flex-wrap gap-2">
+              {allTags.map((tag) => (
+                <TopicPill tag={tag} size="sm" />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
-  </section>
+  </Container>
 </PageLayout>

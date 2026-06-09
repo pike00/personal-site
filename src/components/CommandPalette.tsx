@@ -7,10 +7,10 @@ interface Props {
 }
 
 const TYPE_BADGE: Record<SearchDocType, string> = {
-  Note: "bg-accent/10 text-accent dark:bg-accent/20",
-  Project: "bg-primary/10 text-primary dark:bg-white/10 dark:text-gray-200",
+  Note: "bg-violet-500/10 text-violet-600 dark:bg-violet-400/20 dark:text-violet-300",
+  Project: "bg-zinc-500/10 text-zinc-600 dark:bg-white/10 dark:text-zinc-200",
   Publication:
-    "bg-purple-50 text-[#7c3aed] dark:bg-purple-950 dark:text-[#a78bfa]",
+    "bg-violet-100/70 text-violet-700 dark:bg-violet-500/10 dark:text-violet-300",
 };
 
 const MAX_RESULTS = 40;
@@ -122,10 +122,10 @@ export default function CommandPalette({ index }: Props) {
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
         onClick={close}
       />
-      <div className="relative w-full max-w-xl bg-white dark:bg-[#1e293b] rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-        <div className="flex items-center gap-3 px-4 border-b border-gray-200 dark:border-gray-700">
+      <div className="relative w-full max-w-xl overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-2xl dark:border-zinc-700 dark:bg-zinc-900">
+        <div className="flex items-center gap-3 border-b border-zinc-200 px-4 dark:border-zinc-700">
           <svg
-            className="w-5 h-5 text-gray-400 shrink-0"
+            className="h-5 w-5 shrink-0 text-zinc-400"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -139,16 +139,16 @@ export default function CommandPalette({ index }: Props) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search notes, projects, and publications..."
-            className="flex-1 py-3.5 bg-transparent text-sm text-[#1a1a2e] dark:text-gray-100 placeholder:text-gray-400 focus:outline-none"
+            className="flex-1 bg-transparent py-3.5 text-sm text-zinc-800 placeholder:text-zinc-400 focus:outline-none dark:text-zinc-100"
           />
-          <kbd className="text-[10px] text-gray-400 border border-gray-200 dark:border-gray-600 rounded px-1.5 py-0.5 shrink-0">
+          <kbd className="shrink-0 rounded border border-zinc-200 px-1.5 py-0.5 text-[10px] text-zinc-400 dark:border-zinc-600">
             Esc
           </kbd>
         </div>
 
         <ul ref={listRef} className="max-h-[50vh] overflow-y-auto py-2">
           {results.length === 0 && (
-            <li className="px-4 py-8 text-center text-sm text-gray-400">
+            <li className="px-4 py-8 text-center text-sm text-zinc-400">
               No results for “{query}”
             </li>
           )}
@@ -158,20 +158,20 @@ export default function CommandPalette({ index }: Props) {
                 href={doc.url}
                 onMouseEnter={() => setActive(i)}
                 className={`flex items-start gap-3 px-4 py-2.5 ${
-                  i === active ? "bg-gray-100 dark:bg-gray-800" : ""
+                  i === active ? "bg-zinc-100 dark:bg-zinc-800" : ""
                 }`}
               >
                 <span
-                  className={`mt-0.5 text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded shrink-0 ${TYPE_BADGE[doc.type]}`}
+                  className={`mt-0.5 shrink-0 rounded px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${TYPE_BADGE[doc.type]}`}
                 >
                   {doc.type}
                 </span>
                 <span className="min-w-0">
-                  <span className="block text-sm font-medium text-[#1a1a2e] dark:text-gray-100 truncate">
+                  <span className="block truncate text-sm font-medium text-zinc-800 dark:text-zinc-100">
                     {doc.title}
                   </span>
                   {doc.description && (
-                    <span className="block text-xs text-gray-500 dark:text-gray-400 truncate">
+                    <span className="block truncate text-xs text-zinc-500 dark:text-zinc-400">
                       {doc.description}
                     </span>
                   )}
@@ -181,7 +181,7 @@ export default function CommandPalette({ index }: Props) {
           ))}
         </ul>
 
-        <div className="flex items-center gap-4 px-4 py-2 border-t border-gray-200 dark:border-gray-700 text-[11px] text-gray-400">
+        <div className="flex items-center gap-4 border-t border-zinc-200 px-4 py-2 text-[11px] text-zinc-400 dark:border-zinc-700">
           <span><kbd className="font-sans">↑↓</kbd> navigate</span>
           <span><kbd className="font-sans">↵</kbd> open</span>
           <span className="ml-auto">{results.length} result{results.length === 1 ? "" : "s"}</span>

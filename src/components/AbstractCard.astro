@@ -8,19 +8,19 @@ interface Props {
 const { abstract: abs } = Astro.props;
 ---
 
-<div class="bg-white dark:bg-surface-card-dark border border-gray-200 dark:border-gray-700 rounded-lg p-5">
-  <div class="flex justify-between items-start gap-3">
-    <div class="flex-1 min-w-0">
-      <h3 class="text-sm font-semibold text-primary dark:text-gray-100 leading-snug">
+<div class="rounded-2xl border border-zinc-100 p-5 transition hover:bg-zinc-50/60 dark:border-zinc-700/40 dark:hover:bg-zinc-800/40">
+  <div class="flex items-start justify-between gap-3">
+    <div class="min-w-0 flex-1">
+      <h3 class="text-sm font-semibold leading-snug text-zinc-800 dark:text-zinc-100">
         {abs.title}
       </h3>
       {abs.abstractId && (
-        <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Abstract #{abs.abstractId}</p>
+        <p class="mt-1 text-xs text-zinc-400 dark:text-zinc-500">Abstract #{abs.abstractId}</p>
       )}
     </div>
-    <div class="flex items-center gap-2 shrink-0">
+    <div class="flex shrink-0 items-center gap-2">
       {abs.unpublished && (
-        <span class="text-xs px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-400 font-medium">
+        <span class="rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-950 dark:text-amber-400">
           Unpublished
         </span>
       )}
@@ -29,7 +29,7 @@ const { abstract: abs } = Astro.props;
           href={`/${abs.pdfPath}`}
           target="_blank"
           rel="noopener noreferrer"
-          class="text-xs text-accent hover:text-accent-dark font-medium"
+          class="text-xs font-medium text-violet-600 hover:text-violet-700 dark:text-violet-400 dark:hover:text-violet-300"
         >
           PDF
         </a>

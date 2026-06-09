@@ -1,6 +1,7 @@
 ---
 export const prerender = true;
 import PageLayout from "../../layouts/PageLayout.astro";
+import Container from "../../components/Container.astro";
 import TopicPill from "../../components/TopicPill.astro";
 import { Marked } from "marked";
 import markedFootnote from "marked-footnote";
@@ -86,38 +87,55 @@ const pairedProject = getPairedProject(Astro.params.slug as string);
 ---
 
 <PageLayout title={post.title} description={post.description} image={`/og/blog-${Astro.params.slug}.png`}>
-  <div class="max-w-3xl mx-auto px-6 py-12">
-    <nav class="text-sm text-gray-400 dark:text-gray-500 mb-8">
-      <a href="/notes" class="hover:text-accent transition-colors">Notes</a>
-      <span class="mx-2">/</span>
-      <span class="text-gray-600 dark:text-gray-300">{post.title}</span>
-    </nav>
-
-    <h1 class="text-2xl font-bold text-primary dark:text-white mb-3">{post.title}</h1>
-    <p class="text-xs text-gray-400 dark:text-gray-500 mb-4">{dateDisplay} &middot; {post.readingMinutes} min read</p>
-
-    {post.tags.length > 0 && (
-      <div class="flex flex-wrap gap-2 mb-8">
-        {post.tags.map((tag: string) => (
-          <TopicPill tag={tag} size="sm" />
-        ))}
-      </div>
-    )}
-
-    {pairedProject && (
-      <aside class="not-prose mb-8 p-4 border-l-4 border-accent bg-accent/5 dark:bg-accent/10 rounded-r-lg">
-        <p class="text-[10px] font-semibold uppercase tracking-wider text-accent mb-1">Related project</p>
-        <a href={`/projects/${pairedProject.slug}`} class="text-sm font-semibold text-primary dark:text-gray-100 hover:text-accent dark:hover:text-accent transition-colors">
-          {pairedProject.title} &rarr;
+  <Container variant="full" class="mt-16 lg:mt-32">
+    <div class="xl:relative">
+      <div class="mx-auto max-w-2xl">
+        <a
+          href="/notes"
+          aria-label="Back to notes"
+          class="group mb-8 flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-md ring-1 shadow-zinc-800/5 ring-zinc-900/5 transition lg:absolute lg:-left-5 lg:-mt-2 lg:mb-0 xl:-top-1.5 xl:left-0 xl:mt-0 dark:border dark:border-zinc-700/50 dark:bg-zinc-800 dark:ring-0 dark:ring-white/10 dark:hover:border-zinc-700 dark:hover:ring-white/20"
+        >
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="h-4 w-4 stroke-zinc-500 transition group-hover:stroke-zinc-700 dark:stroke-zinc-500 dark:group-hover:stroke-zinc-400">
+            <path d="M7.25 11.25 3.75 8m0 0 3.5-3.25M3.75 8h8.5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
         </a>
-        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">{pairedProject.description}</p>
-      </aside>
-    )}
 
-    <article
-      class="prose prose-sm dark:prose-invert max-w-none prose-headings:text-primary dark:prose-headings:text-white prose-a:text-accent prose-code:before:content-none prose-code:after:content-none"
-      set:html={post.bodyHtml}
-    />
-  </div>
+        <article>
+          <header class="flex flex-col">
+            <h1 class="mt-6 text-4xl font-bold tracking-tight text-zinc-800 sm:text-5xl dark:text-zinc-100">
+              {post.title}
+            </h1>
+            <p class="order-first flex items-center text-base text-zinc-400 dark:text-zinc-500">
+              <span class="h-4 w-0.5 rounded-full bg-zinc-200 dark:bg-zinc-500"></span>
+              <span class="ml-3">{dateDisplay} &middot; {post.readingMinutes} min read</span>
+            </p>
+          </header>
+
+          {post.tags.length > 0 && (
+            <div class="mt-6 flex flex-wrap gap-2">
+              {post.tags.map((tag: string) => (
+                <TopicPill tag={tag} size="sm" />
+              ))}
+            </div>
+          )}
+
+          {pairedProject && (
+            <aside class="mt-8 rounded-r-lg border-l-4 border-violet-500 bg-violet-500/5 p-4 dark:border-violet-400 dark:bg-violet-400/10">
+              <p class="mb-1 text-[10px] font-semibold uppercase tracking-wider text-violet-600 dark:text-violet-400">Related project</p>
+              <a href={`/projects/${pairedProject.slug}`} class="text-sm font-semibold text-zinc-800 transition-colors hover:text-violet-600 dark:text-zinc-100 dark:hover:text-violet-400">
+                {pairedProject.title} &rarr;
+              </a>
+              <p class="mt-1 text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">{pairedProject.description}</p>
+            </aside>
+          )}
+
+          <article
+            class="prose mt-8 max-w-none dark:prose-invert prose-code:before:content-none prose-code:after:content-none"
+            set:html={post.bodyHtml}
+          />
+        </article>
+      </div>
+    </div>
+  </Container>
   <script is:inline src="/js/copy-code.js" defer></script>
 </PageLayout>

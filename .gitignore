@@ -42,3 +42,6 @@ blog-fixed.png
 
 # sops format-conversion backups
 *.sops.bak.*
+
+# vendored Tailwind Plus "Spotlight" template — local design reference only
+tailwind-plus-spotlight/

@@ -1,6 +1,7 @@
 ---
 export const prerender = true;
 import PageLayout from "../../layouts/PageLayout.astro";
+import SimpleLayout from "../../components/SimpleLayout.astro";
 import AbstractCard from "../../components/AbstractCard.astro";
 import { getAbstracts } from "../../lib/abstracts";
 
@@ -13,12 +14,10 @@ const unpublished = allAbstracts.filter((a) => a.unpublished);
   title="Abstracts & Presentations"
   description="Conference abstracts, posters, and presentations by Will Pike."
 >
-  <div class="max-w-4xl mx-auto px-6 py-12">
-    <h1 class="text-2xl font-bold text-primary dark:text-white mb-2">Abstracts & Presentations</h1>
-    <p class="text-sm text-gray-500 dark:text-gray-400 mb-8">
-      Conference abstracts, posters, and presentations
-    </p>
-
+  <SimpleLayout
+    title="Abstracts & Presentations"
+    intro="Conference abstracts, posters, and presentations."
+  >
     <div class="flex flex-col gap-3">
       {published.map((abs) => (
         <AbstractCard abstract={abs} />
@@ -27,7 +26,7 @@ const unpublished = allAbstracts.filter((a) => a.unpublished);
 
     {unpublished.length > 0 && (
       <>
-        <h2 class="text-lg font-bold text-primary dark:text-white mt-12 mb-4">Unpublished</h2>
+        <h2 class="mb-4 mt-12 text-lg font-semibold text-zinc-800 dark:text-zinc-100">Unpublished</h2>
         <div class="flex flex-col gap-3">
           {unpublished.map((abs) => (
             <AbstractCard abstract={abs} />
@@ -35,5 +34,5 @@ const unpublished = allAbstracts.filter((a) => a.unpublished);
         </div>
       </>
     )}
-  </div>
+  </SimpleLayout>
 </PageLayout>

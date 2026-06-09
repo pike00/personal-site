@@ -55,6 +55,9 @@ export default function SearchPublications({
     return results;
   }, [query, selectedTag, selectedYear, sortOrder, fuse, publications]);
 
+  const selectClass =
+    "rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-800 focus:outline-none focus:ring-2 focus:ring-violet-500/40 dark:border-zinc-700 dark:bg-zinc-800/60 dark:text-zinc-200";
+
   return (
     <div>
       <div className="mb-6">
@@ -63,15 +66,15 @@ export default function SearchPublications({
           placeholder="Search publications..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e293b] text-[#1a1a2e] dark:text-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#a78bfa]/50 placeholder:text-gray-400"
+          className="w-full rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-800 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-violet-500/40 dark:border-zinc-700 dark:bg-zinc-800/60 dark:text-zinc-200"
         />
       </div>
 
-      <div className="flex flex-wrap gap-3 mb-6">
+      <div className="mb-6 flex flex-wrap gap-3">
         <select
           value={selectedYear}
           onChange={(e) => setSelectedYear(e.target.value)}
-          className="px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e293b] text-sm text-[#1a1a2e] dark:text-gray-200"
+          className={selectClass}
         >
           <option value="">All Years</option>
           {allYears.map((y) => (
@@ -82,7 +85,7 @@ export default function SearchPublications({
         <select
           value={selectedTag}
           onChange={(e) => setSelectedTag(e.target.value)}
-          className="px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e293b] text-sm text-[#1a1a2e] dark:text-gray-200"
+          className={selectClass}
         >
           <option value="">All Topics</option>
           {allTags.map((t) => (
@@ -93,7 +96,7 @@ export default function SearchPublications({
         <select
           value={sortOrder}
           onChange={(e) => setSortOrder(e.target.value as "newest" | "oldest")}
-          className="px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e293b] text-sm text-[#1a1a2e] dark:text-gray-200"
+          className={selectClass}
         >
           <option value="newest">Newest First</option>
           <option value="oldest">Oldest First</option>
@@ -102,42 +105,42 @@ export default function SearchPublications({
         {(selectedTag || selectedYear || query) && (
           <button
             onClick={() => { setQuery(""); setSelectedTag(""); setSelectedYear(""); }}
-            className="px-3 py-2 text-sm text-[#a78bfa] hover:text-[#7c3aed] font-medium"
+            className="px-3 py-2 text-sm font-medium text-violet-600 hover:text-violet-700 dark:text-violet-400 dark:hover:text-violet-300"
           >
             Clear filters
           </button>
         )}
       </div>
 
-      <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+      <p className="mb-4 text-sm text-zinc-500 dark:text-zinc-400">
         {filtered.length} publication{filtered.length !== 1 ? "s" : ""}
       </p>
 
       <div className="flex flex-col gap-3">
         {filtered.map((pub) => (
-          <a key={pub.slug} href={`/publications/${pub.slug}`} className="block group">
-            <div className="bg-white dark:bg-[#1e293b] border border-gray-200 dark:border-gray-700 border-l-[3px] border-l-[#a78bfa] rounded-lg p-5 hover:shadow-md transition-shadow">
+          <a key={pub.slug} href={`/publications/${pub.slug}`} className="group block">
+            <div className="rounded-2xl border border-l-[3px] border-zinc-100 border-l-violet-500 p-5 transition hover:border-zinc-200 hover:bg-zinc-50/60 dark:border-zinc-700/40 dark:border-l-violet-400 dark:hover:border-zinc-700 dark:hover:bg-zinc-800/40">
               <div className="space-y-2">
-                <h3 className="text-sm font-semibold text-[#1a1a2e] dark:text-gray-100 group-hover:text-[#7c3aed] dark:group-hover:text-[#a78bfa] transition-colors leading-snug">
+                <h3 className="text-sm font-semibold leading-snug text-zinc-800 transition-colors group-hover:text-violet-600 dark:text-zinc-100 dark:group-hover:text-violet-400">
                   {pub.title}
                 </h3>
                 {pub.authors && (
                   <p
-                    className="text-xs text-gray-500 dark:text-gray-400"
+                    className="text-xs text-zinc-500 dark:text-zinc-400"
                     dangerouslySetInnerHTML={{ __html: highlightAuthors(pub.authors) }}
                   />
                 )}
                 {pub.journal && (
-                  <p className="text-xs text-gray-400 dark:text-gray-500">
+                  <p className="text-xs text-zinc-400 dark:text-zinc-500">
                     {pub.journal}{pub.year ? `, ${pub.year}` : ""}
                   </p>
                 )}
                 {pub.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5">
+                  <div className="flex flex-wrap gap-1.5 pt-1">
                     {pub.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="text-xs px-2.5 py-0.5 rounded-full bg-purple-50 text-[#7c3aed] dark:bg-purple-950 dark:text-[#a78bfa] font-medium"
+                        className="rounded-full bg-violet-100/70 px-2.5 py-0.5 text-xs font-medium text-violet-700 ring-1 ring-violet-200/60 dark:bg-violet-500/10 dark:text-violet-300 dark:ring-violet-400/20"
                       >
                         {tag}
                       </span>

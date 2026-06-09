@@ -1,6 +1,7 @@
 ---
 export const prerender = true;
 import PageLayout from "../../layouts/PageLayout.astro";
+import SimpleLayout from "../../components/SimpleLayout.astro";
 import SearchPublications from "../../components/SearchPublications";
 import { getPublications, buildSearchIndex } from "../../lib/publications";
 
@@ -19,17 +20,15 @@ const allYears = [...new Set(
   title="Publications"
   description="Research publications by Will Pike across multiple medical specialties."
 >
-  <div class="max-w-4xl mx-auto px-6 py-12">
-    <h1 class="text-2xl font-bold text-primary dark:text-white mb-2">Publications</h1>
-    <p class="text-sm text-gray-500 dark:text-gray-400 mb-8">
-      {publications.length} peer-reviewed publications
-    </p>
-
+  <SimpleLayout
+    title="Publications"
+    intro={`${publications.length} peer-reviewed publications across multiple medical specialties.`}
+  >
     <SearchPublications
       client:load
       publications={searchIndex}
       allTags={allTags}
       allYears={allYears}
     />
-  </div>
+  </SimpleLayout>
 </PageLayout>

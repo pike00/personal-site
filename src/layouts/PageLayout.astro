@@ -23,11 +23,22 @@ const { title, description, image, type, jsonLd } = Astro.props;
 ---
 
 <BaseLayout title={title} description={description} image={image} type={type} jsonLd={jsonLd}>
-  <NavBar />
-  <main class="flex-1">
-    <slot />
-  </main>
-  <Footer />
+  {/* Spotlight scaffold: a fixed, centered background "card" with a hairline
+      ring that the page content floats over. */}
+  <div class="fixed inset-0 flex justify-center sm:px-8">
+    <div class="flex w-full max-w-7xl lg:px-8">
+      <div class="w-full bg-white ring-1 ring-zinc-100 dark:bg-zinc-900 dark:ring-zinc-300/20"></div>
+    </div>
+  </div>
+
+  <div class="relative flex w-full flex-col">
+    <NavBar />
+    <main class="flex-auto">
+      <slot />
+    </main>
+    <Footer />
+  </div>
+
   {useDocSearch
     ? <DocSearchPalette client:idle />
     : <CommandPalette client:idle index={searchIndex} />}

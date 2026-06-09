@@ -1,12 +1,44 @@
 ---
+import Container from "./Container.astro";
+
 const year = new Date().getFullYear();
 const commitHash = import.meta.env.COMMIT_HASH ?? "dev";
 const repoUrl = "https://github.com/pike00/personal-site";
+
+const navLinks = [
+  { href: "/cv", label: "CV" },
+  { href: "/publications", label: "Publications" },
+  { href: "/notes", label: "Notes" },
+  { href: "/topics", label: "Topics" },
+  { href: "/about", label: "About" },
+];
 ---
 
-<footer class="bg-primary dark:bg-gray-950 text-gray-400 mt-auto">
-  <div class="max-w-6xl mx-auto px-6 py-8 flex items-center justify-between">
-    <p class="text-sm">&copy; {year} Will Pike.</p>
-    <a href={`${repoUrl}/commit/${commitHash}`} class="text-sm text-gray-500 hover:text-gray-300 transition-colors font-mono" target="_blank" rel="noopener noreferrer">{commitHash}</a>
-  </div>
+<footer class="mt-32 flex-none">
+  <Container variant="outer">
+    <div class="border-t border-zinc-100 pb-16 pt-10 dark:border-zinc-700/40">
+      <Container variant="inner">
+        <div class="flex flex-col items-center justify-between gap-6 md:flex-row">
+          <div class="flex flex-wrap justify-center gap-x-6 gap-y-1 text-sm font-medium text-zinc-800 dark:text-zinc-200">
+            {navLinks.map((link) => (
+              <a href={link.href} class="transition hover:text-violet-500 dark:hover:text-violet-400">
+                {link.label}
+              </a>
+            ))}
+          </div>
+          <div class="flex items-center gap-4 text-sm text-zinc-400 dark:text-zinc-500">
+            <p>&copy; {year} Will Pike.</p>
+            <a
+              href={`${repoUrl}/commit/${commitHash}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="font-mono transition hover:text-violet-500 dark:hover:text-violet-400"
+            >
+              {commitHash}
+            </a>
+          </div>
+        </div>
+      </Container>
+    </div>
+  </Container>
 </footer>

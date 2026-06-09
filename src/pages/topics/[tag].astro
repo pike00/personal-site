@@ -1,6 +1,7 @@
 ---
 export const prerender = true;
 import PageLayout from "../../layouts/PageLayout.astro";
+import SimpleLayout from "../../components/SimpleLayout.astro";
 import PublicationCard from "../../components/PublicationCard.astro";
 import FeedCard from "../../components/FeedCard.astro";
 import { getAllTopics, type TopicData } from "../../lib/tags";
@@ -26,21 +27,10 @@ const noun = total === 1 ? "item" : "items";
   title={`${topic.tag}`}
   description={`Publications, notes, and projects tagged ${topic.tag}.`}
 >
-  <div class="max-w-4xl mx-auto px-6 py-12">
-    <nav class="text-sm text-gray-400 dark:text-gray-500 mb-8">
-      <a href="/" class="hover:text-accent transition-colors">Home</a>
-      <span class="mx-2">/</span>
-      <span class="text-gray-600 dark:text-gray-300">Topics</span>
-      <span class="mx-2">/</span>
-      <span class="text-gray-600 dark:text-gray-300">{topic.tag}</span>
-    </nav>
-
-    <h1 class="text-2xl font-bold text-primary dark:text-white mb-1">{topic.tag}</h1>
-    <p class="text-sm text-gray-500 dark:text-gray-400 mb-10">{total} {noun}</p>
-
+  <SimpleLayout title={topic.tag} intro={`${total} ${noun} tagged ${topic.tag}.`}>
     {topic.publications.length > 0 && (
-      <section class="mb-10">
-        <h2 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">
+      <section class="mb-12">
+        <h2 class="mb-5 text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
           Publications
         </h2>
         <div class="flex flex-col gap-3">
@@ -53,32 +43,34 @@ const noun = total === 1 ? "item" : "items";
 
     {(topic.posts.length > 0 || topic.projects.length > 0) && (
       <section>
-        <h2 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">
+        <h2 class="mb-6 text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
           Notes &amp; Projects
         </h2>
-        <div class="flex flex-col gap-4">
-          {topic.posts.map((post) => (
-            <FeedCard
-              type="post"
-              slug={post.slug}
-              title={post.title}
-              description={post.description}
-              date={post.date}
-              tags={post.tags}
-            />
-          ))}
-          {topic.projects.map((project) => (
-            <FeedCard
-              type="project"
-              slug={project.slug}
-              title={project.title}
-              description={project.description}
-              date={project.date}
-              tags={project.tags}
-            />
-          ))}
+        <div class="md:border-l md:border-zinc-100 md:pl-6 md:dark:border-zinc-700/40">
+          <div class="flex max-w-3xl flex-col space-y-16">
+            {topic.posts.map((post) => (
+              <FeedCard
+                type="post"
+                slug={post.slug}
+                title={post.title}
+                description={post.description}
+                date={post.date}
+                tags={post.tags}
+              />
+            ))}
+            {topic.projects.map((project) => (
+              <FeedCard
+                type="project"
+                slug={project.slug}
+                title={project.title}
+                description={project.description}
+                date={project.date}
+                tags={project.tags}
+              />
+            ))}
+          </div>
         </div>
       </section>
     )}
-  </div>
+  </SimpleLayout>
 </PageLayout>
