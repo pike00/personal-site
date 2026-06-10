@@ -130,6 +130,10 @@ just dev             # tailnet-bound, reachable from other devices
 
 No Pagefind. No MDX integration. Search is in-browser via Fuse.js over a JSON bundle generated at build time.
 
+## Writing posts
+
+Blog posts here are empirical, investigative technical pieces (see the neural-net date-stamp and tailnet-deploy posts), not marketing copy. **Before drafting a new post in `blog-posts/posts/` from scratch, or substantially rewriting an existing one, invoke the `measured-voice` skill first** — it owns the voice rules (hedged-but-committed claims, evidence accumulation, flat-affect tone, first-person investigation, peer-to-peer register) plus a review checklist. Don't hand-write or hand-edit post prose without it loaded; the skill is the source of truth for voice, not this file. `article-writing` is the umbrella long-form skill and `measured-voice` is its empirical preset — reach for `measured-voice` by default on this blog. New posts making empirical or factual claims should be fact-checked against primary sources before publish.
+
 ## Analytics
 
 Only **Umami** (self-hosted at `umami.khanpikehome.com`, homelab `apps/umami`, website ID `e195e031-845c-4950-a08b-bd4a44038ab3`) — wired in [src/layouts/BaseLayout.astro](src/layouts/BaseLayout.astro). GoatCounter was removed in commit `19819ed`. Umami runs on the same parent domain as the rest of the homelab so household-wide blocklists can't filter it selectively.
