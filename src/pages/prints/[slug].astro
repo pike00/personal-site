@@ -1,0 +1,133 @@
+---
+export const prerender = true;
+import PageLayout from "../../layouts/PageLayout.astro";
+import Container from "../../components/Container.astro";
+import TopicPill from "../../components/TopicPill.astro";
+import { Marked } from "marked";
+import markedFootnote from "marked-footnote";
+import { codeToHtml } from "shiki";
+import { getPrints } from "../../lib/posts";
+
+interface PrintData {
+  title: string;
+  description: string;
+  date: string;
+  tags: string[];
+  image?: string;
+  repo?: string;
+  bodyHtml: string;
+}
+
+interface StaticPath {
+  params: { slug: string };
+  props: { print: PrintData };
+}
+
+export async function getStaticPaths(): Promise<StaticPath[]> {
+  // Fresh Marked per page: marked-footnote keeps shared closure state that
+  // races under Promise.all otherwise.
+  const makeMarked = () =>
+    new Marked({
+      async: true,
+      async walkTokens(token) {
+        if (token.type === "code") {
+          (token as { html?: string }).html = await codeToHtml(token.text, {
+            lang: token.lang || "text",
+            theme: "github-dark",
+          });
+        }
+      },
+    })
+      .use({
+        renderer: {
+          code(token) {
+            return (
+              (token as { html?: string }).html ||
+              `<pre><code>${token.text}</code></pre>`
+            );
+          },
+          codespan(token) {
+            return `<code class="inline-copy" title="Click to copy" role="button" tabindex="0">${token.text}</code>`;
+          },
+        },
+      })
+      .use(markedFootnote());
+
+  const paths = await Promise.all(
+    getPrints().map(async (print): Promise<StaticPath> => {
+      const bodyHtml = await makeMarked().parse(print.content);
+      return {
+        params: { slug: print.slug },
+        props: {
+          print: {
+            title: print.title,
+            description: print.description,
+            date: print.date,
+            tags: print.tags,
+            image: print.image,
+            repo: print.repo,
+            bodyHtml,
+          },
+        },
+      };
+    }),
+  );
+  return paths;
+}
+
+interface Props {
+  print: PrintData;
+}
+
+const { print } = Astro.props;
+
+const dateDisplay = new Date(print.date + "T00:00:00").toLocaleDateString("en-US", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+});
+---
+
+<PageLayout title={print.title} description={print.description} image={print.image}>
+  <Container variant="full" class="mt-16 lg:mt-32">
+    <div class="xl:relative">
+      <div class="mx-auto max-w-2xl">
+        <a
+          href="/prints"
+          aria-label="Back to 3D prints"
+          class="group mb-8 flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-md ring-1 shadow-zinc-800/5 ring-zinc-900/5 transition lg:absolute lg:-left-5 lg:-mt-2 lg:mb-0 xl:-top-1.5 xl:left-0 xl:mt-0 dark:border dark:border-zinc-700/50 dark:bg-zinc-800 dark:ring-0 dark:ring-white/10 dark:hover:border-zinc-700 dark:hover:ring-white/20"
+        >
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="h-4 w-4 stroke-zinc-500 transition group-hover:stroke-zinc-700 dark:stroke-zinc-500 dark:group-hover:stroke-zinc-400">
+            <path d="M7.25 11.25 3.75 8m0 0 3.5-3.25M3.75 8h8.5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </a>
+
+        <article>
+          <header class="flex flex-col">
+            <h1 class="mt-6 text-4xl font-bold tracking-tight text-zinc-800 sm:text-5xl dark:text-zinc-100">
+              {print.title}
+            </h1>
+            <p class="order-first flex items-center text-base text-zinc-400 dark:text-zinc-500">
+              <span class="h-4 w-0.5 rounded-full bg-zinc-200 dark:bg-zinc-500"></span>
+              <span class="ml-3">{dateDisplay} &middot; 3D Print</span>
+            </p>
+          </header>
+
+          {print.tags.length > 0 && (
+            <div class="mt-6 flex flex-wrap gap-2">
+              {print.tags.map((tag: string) => (
+                <TopicPill tag={tag} size="sm" />
+              ))}
+            </div>
+          )}
+
+          <article
+            class="prose mt-8 max-w-none dark:prose-invert prose-code:before:content-none prose-code:after:content-none"
+            set:html={print.bodyHtml}
+          />
+        </article>
+      </div>
+    </div>
+  </Container>
+  <script is:inline src="/js/copy-code.js" defer></script>
+</PageLayout>

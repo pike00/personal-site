@@ -5,6 +5,7 @@ import { z } from "astro:content";
 
 const BLOG_DIR = path.resolve("blog-posts/posts");
 const PROJECTS_DIR = path.resolve("src/content/projects");
+const PRINTS_DIR = path.resolve("src/content/prints");
 
 /**
  * Schema for blog post frontmatter. Validated at load time so a typo'd `date`
@@ -122,6 +123,38 @@ export function getProjects(): ProjectEntry[] {
       date: data.date as string,
       tags: (data.tags as string[]) ?? [],
       url: data.url as string | undefined,
+      repo: data.repo as string | undefined,
+      content,
+    }),
+  );
+}
+
+export interface PrintEntry {
+  slug: string;
+  title: string;
+  description: string;
+  date: string;
+  tags: string[];
+  /** Hero image for the gallery card (path under /public). */
+  image?: string;
+  repo?: string;
+  /** Raw markdown body (frontmatter stripped). */
+  content: string;
+}
+
+/**
+ * Load 3D-print pages from `src/content/prints/`. No draft concept, so all are
+ * returned. Order is the raw directory order, unsorted.
+ */
+export function getPrints(): PrintEntry[] {
+  return readMarkdownDir(PRINTS_DIR).map(
+    ({ slug, data, content }): PrintEntry => ({
+      slug,
+      title: data.title as string,
+      description: data.description as string,
+      date: data.date as string,
+      tags: (data.tags as string[]) ?? [],
+      image: data.image as string | undefined,
       repo: data.repo as string | undefined,
       content,
     }),

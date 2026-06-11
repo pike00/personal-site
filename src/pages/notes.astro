@@ -8,7 +8,7 @@ import path from "node:path";
 import matter from "gray-matter";
 
 interface FeedEntry {
-  type: "post" | "project";
+  type: "post" | "project" | "print";
   slug: string;
   title: string;
   description: string;
@@ -19,6 +19,7 @@ interface FeedEntry {
 
 const blogDir = path.resolve("blog-posts/posts");
 const projectsDir = path.resolve("src/content/projects");
+const printsDir = path.resolve("src/content/prints");
 
 const posts: FeedEntry[] = (fs.existsSync(blogDir) ? fs.readdirSync(blogDir) : [])
   .filter((f: string) => f.endsWith(".md"))
@@ -54,7 +55,23 @@ const projects: FeedEntry[] = (fs.existsSync(projectsDir) ? fs.readdirSync(proje
     };
   });
 
-const entries: FeedEntry[] = [...posts, ...projects].sort(
+const prints: FeedEntry[] = (fs.existsSync(printsDir) ? fs.readdirSync(printsDir) : [])
+  .filter((f: string) => f.endsWith(".md"))
+  .map((file: string): FeedEntry => {
+    const slug = file.replace(/\.md$/, "");
+    const raw = fs.readFileSync(path.join(printsDir, file), "utf-8");
+    const { data } = matter(raw);
+    return {
+      type: "print",
+      slug,
+      title: data.title,
+      description: data.description,
+      date: data.date,
+      tags: data.tags ?? [],
+    };
+  });
+
+const entries: FeedEntry[] = [...posts, ...projects, ...prints].sort(
   (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
 );
 ---

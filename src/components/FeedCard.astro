@@ -1,7 +1,7 @@
 ---
 import TopicPill from "./TopicPill.astro";
 
-type FeedType = "post" | "project";
+type FeedType = "post" | "project" | "print";
 
 interface Props {
   type: FeedType;
@@ -14,7 +14,12 @@ interface Props {
 
 const { type, slug, title, description, date, tags } = Astro.props;
 
-const href = type === "post" ? `/notes/${slug}` : `/projects/${slug}`;
+const href =
+  type === "post"
+    ? `/notes/${slug}`
+    : type === "print"
+      ? `/prints/${slug}`
+      : `/projects/${slug}`;
 
 const dateDisplay = new Date(date + "T00:00:00").toLocaleDateString("en-US", {
   year: "numeric",
@@ -22,7 +27,10 @@ const dateDisplay = new Date(date + "T00:00:00").toLocaleDateString("en-US", {
   day: "numeric",
 });
 
-const typeLabel = type === "post" ? "Post" : "Project";
+const typeLabel =
+  type === "post" ? "Post" : type === "print" ? "3D Print" : "Project";
+const ctaLabel =
+  type === "post" ? "post" : type === "print" ? "print" : "project";
 ---
 
 <article class="group relative flex flex-col items-start">
@@ -57,7 +65,7 @@ const typeLabel = type === "post" ? "Post" : "Project";
   )}
 
   <div aria-hidden="true" class="relative z-10 mt-4 flex items-center text-sm font-medium text-violet-500">
-    Read {type === "post" ? "post" : "project"}
+    Read {ctaLabel}
     <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="ml-1 h-4 w-4 stroke-current">
       <path d="M6.75 5.75 9.25 8l-2.5 2.25" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
     </svg>
