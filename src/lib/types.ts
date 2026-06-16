@@ -46,5 +46,6 @@ export interface SearchablePublication {
   authors: string;
   journal: string;
   year: string;
+  date: string;
   tags: string[];
 }
