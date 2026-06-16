@@ -28,12 +28,11 @@
 // heading (small gap); later entries get a generous gap to separate groups.
 #let _entry(gap, role, org, date, loc) = block(above: gap, below: 0.2em,
   grid(columns: (1fr, auto), column-gutter: 1.2em,
-    align: (left + top, right + top),
-    [
+    align(left + top)[
       #text(size: 10pt, weight: 600, fill: ink)[#role]
       #if org != none [ #text(size: 9.5pt, weight: 400, fill: muted)[ #h(0.1em) -- #org] ]
     ],
-    [
+    align(right + top)[
       #if date != none [ #text(size: 9pt, weight: 500, fill: ink)[#date] ]
       #if loc != none [ #linebreak() #text(size: 8.5pt, fill: muted)[#loc] ]
     ],
