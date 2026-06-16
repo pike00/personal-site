@@ -17,7 +17,7 @@ loki_emit build-cv info started
 
 mkdir -p "$(dirname "$OUTPUT")"
 
-if [ -f "$OUTPUT" ] && [ "$OUTPUT" -nt "$TEMPLATE" ] && [ "$OUTPUT" -nt "$CV_MD" ]; then
+if [ -f "$OUTPUT" ] && [ "$OUTPUT" -nt "$TEMPLATE" ] && [ "$OUTPUT" -nt "$CV_MD" ] && [ "$OUTPUT" -nt "$SCRIPT_DIR/md-to-typst.py" ]; then
   loki_emit build-cv info complete "elapsed_s=$(($(date +%s) - start))" "result=cached"
   echo "CV PDF up to date: $OUTPUT"
   exit 0
@@ -44,6 +44,6 @@ fi
   python3 "$SCRIPT_DIR/md-to-typst.py" "$CV_MD"
 } > "$TEMP_TYPST"
 
-"$TYPST" compile "$TEMP_TYPST" "$OUTPUT"
+"$TYPST" compile --font-path "$CV_DIR/fonts" "$TEMP_TYPST" "$OUTPUT"
 loki_emit build-cv info complete "elapsed_s=$(($(date +%s) - start))" "result=generated"
 echo "CV PDF generated: $OUTPUT"

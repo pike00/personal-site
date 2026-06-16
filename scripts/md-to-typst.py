@@ -14,14 +14,39 @@ def escape_typst(text: str) -> str:
 
 
 def process_inline_formatting(text: str) -> str:
-    """Process inline markdown formatting."""
-    # Bold → weight
-    text = re.sub(r'\*\*(.+?)\*\*', r'*\1*', text)
-    # Italic school/company names (not markdown italic)
-    text = re.sub(r'(?:^|\s)_([A-Z][^_]*?)_(?:\s|$)', lambda m: f' _{m.group(1)}_ ', text)
+    """Process inline markdown formatting into Typst markup.
+
+    Typst uses *x* for bold and _x_ for italic, the opposite of markdown's
+    single-asterisk italic. Protect bold spans first so the italic pass cannot
+    see their asterisks, map markdown italic to Typst italic, then restore bold.
+    """
+    text = re.sub(r'\*\*(.+?)\*\*', '\x00\\1\x00', text)  # protect **bold**
+    text = re.sub(r'\*(.+?)\*', r'_\1_', text)             # *italic* -> _italic_
+    text = text.replace('\x00', '*')                        # bold -> Typst *bold*
     # Links
     text = re.sub(r'\[([^\]]+)\]\(([^)]+)\)', r'#link("\2")[\1]', text)
     return escape_typst(text)
+
+
+def split_role_org(heading: str) -> tuple[str, str]:
+    """Split a level-3 heading 'Role -- Org' into (role, org)."""
+    parts = heading.split(' -- ', 1)
+    role = process_inline_formatting(parts[0].strip())
+    org = process_inline_formatting(parts[1].strip()) if len(parts) > 1 else ''
+    return role, org
+
+
+def parse_meta(line: str) -> tuple[str, str]:
+    """Parse a '*Dates* | Location' meta line into (date, location)."""
+    segments = line.split('|')
+    date = segments[0].strip().strip('*').strip()
+    location = segments[1].strip() if len(segments) > 1 else ''
+    return process_inline_formatting(date), process_inline_formatting(location)
+
+
+def typst_field(value: str) -> str:
+    """Render a value as a Typst content block, or `none` when empty."""
+    return f'[{value}]' if value else 'none'
 
 
 def convert_md_to_typst(md_content: str) -> str:
@@ -38,6 +63,8 @@ def convert_md_to_typst(md_content: str) -> str:
                 break
 
     # Process markdown content
+    seen_section = False  # contact/intro lines appear before the first ## heading
+    first_in_section = False  # the next entry hugs its section heading
     i = frontmatter_end
     while i < len(lines):
         line = lines[i]
@@ -47,34 +74,43 @@ def convert_md_to_typst(md_content: str) -> str:
             i += 1
             continue
 
-        # Headings
+        # Section headings
         if line.startswith('## '):
+            seen_section = True
+            first_in_section = True
             heading = line[3:].strip()
             typst_lines.append(f'#heading(level: 2)[{heading}]')
             typst_lines.append('')
+        # Entries: role/school heading, optionally followed by a meta line
         elif line.startswith('### '):
-            heading = line[4:].strip()
-            typst_lines.append(f'#heading(level: 3)[{heading}]')
-            # Add the next line (usually job title/dates)
-            if i + 1 < len(lines):
-                i += 1
-                next_line = lines[i].strip()
+            role, org = split_role_org(line[4:].strip())
+            date, location = '', ''
+            peek = i + 1
+            while peek < len(lines) and not lines[peek].strip():
+                peek += 1
+            if peek < len(lines):
+                next_line = lines[peek].strip()
                 if next_line and not next_line.startswith('-') and not next_line.startswith('#'):
-                    # Format as: Company Name | Location/Dates
-                    formatted = process_inline_formatting(next_line)
-                    typst_lines.append(formatted)
-                    typst_lines.append('')
-                    i += 1
-                    continue
+                    date, location = parse_meta(next_line)
+                    i = peek  # consume the meta line
+            func = 'firstentry' if first_in_section else 'entry'
+            first_in_section = False
+            typst_lines.append(
+                f'#{func}([{role}], {typst_field(org)}, {typst_field(date)}, {typst_field(location)})'
+            )
+            typst_lines.append('')
         # List items
         elif line.startswith('- '):
-            item = line[2:].strip()
-            item = process_inline_formatting(item)
+            item = process_inline_formatting(line[2:].strip())
             typst_lines.append(f'- {item}')
         # Regular paragraph
         elif line.strip():
             text = process_inline_formatting(line)
-            typst_lines.append(text)
+            if seen_section:
+                typst_lines.append(text)
+            else:
+                # Contact/intro line: centered and muted under the masthead
+                typst_lines.append(f'#align(center)[#text(fill: rgb("#6b7280"), size: 9pt)[{text}]]')
         # Empty line
         else:
             if typst_lines and typst_lines[-1]:  # Avoid multiple empty lines
