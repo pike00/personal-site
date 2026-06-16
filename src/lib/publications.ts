@@ -132,6 +132,7 @@ export function buildSearchIndex(
     authors: p.authors.join(", "),
     journal: p.journal,
     year: p.pubDate ? p.pubDate.split("-")[0] : "",
+    date: p.pubDate,
     tags: p.researchArea,
   }));
 }

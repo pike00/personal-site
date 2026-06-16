@@ -9,7 +9,6 @@ const allLinks = [
   { href: "/cv", label: "CV" },
   { href: "/publications", label: "Publications" },
   { href: "/notes", label: "Notes" },
-  { href: "/prints", label: "3D Prints" },
   { href: "/topics", label: "Topics" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact", flag: "contact" as const },
@@ -71,7 +70,7 @@ const isActive = (href: string) =>
                   <a
                     href={link.href}
                     class:list={[
-                      "relative block px-3 py-2 transition",
+                      "relative block px-3 py-2 whitespace-nowrap transition",
                       isActive(link.href)
                         ? "text-violet-500 dark:text-violet-400"
                         : "hover:text-violet-500 dark:hover:text-violet-400",

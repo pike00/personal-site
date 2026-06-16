@@ -47,9 +47,11 @@ export default function SearchPublications({
     }
 
     results.sort((a, b) => {
-      const yearA = parseInt(a.year || "0", 10);
-      const yearB = parseInt(b.year || "0", 10);
-      return sortOrder === "newest" ? yearB - yearA : yearA - yearB;
+      const dateA = a.date || "0000-00-00";
+      const dateB = b.date || "0000-00-00";
+      return sortOrder === "newest"
+        ? dateB.localeCompare(dateA)
+        : dateA.localeCompare(dateB);
     });
 
     return results;
