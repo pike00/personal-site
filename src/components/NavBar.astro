@@ -71,7 +71,7 @@ const isActive = (href: string) =>
                   <a
                     href={link.href}
                     class:list={[
-                      "relative block px-3 py-2 transition",
+                      "relative block px-3 py-2 whitespace-nowrap transition",
                       isActive(link.href)
                         ? "text-violet-500 dark:text-violet-400"
                         : "hover:text-violet-500 dark:hover:text-violet-400",
