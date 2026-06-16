@@ -4,6 +4,8 @@ import tailwindcss from "@tailwindcss/vite";
 import sitemap from "@astrojs/sitemap";
 import react from "@astrojs/react";
 
+const isGitHubPages = process.env.GITHUB_PAGES === "true";
+
 const commitHash = (() => {
   if (process.env.COMMIT_HASH) return process.env.COMMIT_HASH;
   try {
@@ -14,7 +16,8 @@ const commitHash = (() => {
 })();
 
 export default defineConfig({
-  site: "https://pikemd.com",
+  site: isGitHubPages ? "https://pike00.github.io" : "https://pikemd.com",
+  base: isGitHubPages ? "/personal-site" : undefined,
   redirects: {
     "/blog": "/notes",
     "/blog/[slug]": "/notes/[slug]",
