@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import satori from "satori";
 import { Resvg } from "@resvg/resvg-js";
-import { getPosts, getProjects } from "../../lib/posts";
+import { getPosts, getProjects, getPrints } from "../../lib/posts";
 import { getPublications } from "../../lib/publications";
 
 interface Props {
@@ -24,8 +24,8 @@ export async function getStaticPaths() {
 
   for (const post of getPosts()) {
     paths.push({
-      params: { slug: `blog-${post.slug}` },
-      props: { title: post.title, description: post.description, label: "Blog" },
+      params: { slug: `note-${post.slug}` },
+      props: { title: post.title, description: post.description, label: "Note" },
     });
   }
 
@@ -42,6 +42,13 @@ export async function getStaticPaths() {
     paths.push({
       params: { slug: `pub-${pub.slug}` },
       props: { title: pub.title, description, label: "Publication" },
+    });
+  }
+
+  for (const print of getPrints()) {
+    paths.push({
+      params: { slug: `print-${print.slug}` },
+      props: { title: print.title, description: print.description, label: "Print" },
     });
   }
 
