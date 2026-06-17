@@ -41,6 +41,7 @@ ship:
 #
 # Credentials loaded from sops-encrypted build.env.sops; edit with `sopsx build.env.sops`.
 # Required keys: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_ZONE_ID.
+# Optional key: MATTERMOST_DEPLOY_WEBHOOK — incoming webhook for a post-deploy ping.
 # Refuses to deploy on a dirty tree to keep the deployed commit traceable.
 deploy:
     #!/usr/bin/env bash
@@ -61,11 +62,18 @@ deploy:
 _deploy:
     #!/usr/bin/env bash
     set -euo pipefail
+    # Deploy telemetry: emit start/complete to Loki (job=personal-site,
+    # script=deploy) and, when MATTERMOST_DEPLOY_WEBHOOK is set, post a one-line
+    # deploy ping. Both are fire-and-forget — loki.sh swallows errors and the
+    # curl is guarded — so neither can fail an otherwise-good deploy.
+    source scripts/loki.sh
+    start=$(date +%s)
+    sha=$(git rev-parse --short HEAD)
+    loki_emit deploy info started "sha=${sha}"
     echo "→ building CV PDF"
     pnpm build:cv
     echo "→ building site (Astro + postbuild CSP-hash sync)"
     pnpm build
-    sha=$(git rev-parse --short HEAD)
     echo "→ deploying dist/ at commit ${sha}"
     pnpm exec wrangler pages deploy dist \
         --project-name=personal-site \
@@ -76,6 +84,16 @@ _deploy:
       -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
       -H "Content-Type: application/json" \
       --data '{"purge_everything":true}' | jq -r '.success'
+    elapsed=$(( $(date +%s) - start ))
+    loki_emit deploy info complete "elapsed_s=${elapsed}" "sha=${sha}"
+    # Optional Mattermost deploy ping (no-op when the webhook env is unset).
+    if [ -n "${MATTERMOST_DEPLOY_WEBHOOK:-}" ]; then
+        curl -sf --max-time 5 -X POST "${MATTERMOST_DEPLOY_WEBHOOK}" \
+          -H "Content-Type: application/json" \
+          --data "$(jq -nc --arg sha "$sha" --arg s "$elapsed" \
+            '{username:"pikemd.com deploy", text:("🚀 Deployed `" + $sha + "` to pikemd.com in " + $s + "s")}')" \
+          >/dev/null 2>&1 || echo "warn: Mattermost deploy ping failed (non-fatal)" >&2
+    fi
     echo "✓ deployed personal-site @ ${sha}"
 
 # Run the Astro dev server bound to the tailnet (reachable from any tailnet
