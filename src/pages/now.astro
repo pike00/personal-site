@@ -1,0 +1,31 @@
+---
+export const prerender = true;
+import PageLayout from "../layouts/PageLayout.astro";
+import Container from "../components/Container.astro";
+import fs from "node:fs";
+import path from "node:path";
+import { marked } from "marked";
+
+// Same fs + gray-matter-free markdown path as about.astro: strip the
+// frontmatter block, then render the body with the shared `marked` instance.
+// (Single synchronous parse, no marked-footnote — the per-post fresh-Marked
+// gotcha in notes/[slug].astro does not apply here.)
+const nowPath = path.resolve("src/content/now.md");
+const raw = fs.readFileSync(nowPath, "utf-8");
+const body = raw.replace(/^---[\s\S]*?---\n/, "");
+const htmlContent = await marked.parse(body);
+---
+
+<PageLayout title="Now" description="What Will Pike is focused on right now.">
+  <Container variant="full" class="mt-16 sm:mt-32">
+    <div class="mx-auto max-w-2xl">
+      <h1 class="text-4xl font-bold tracking-tight text-zinc-800 sm:text-5xl dark:text-zinc-100">
+        What I'm doing now
+      </h1>
+      <article
+        class="prose mt-6 max-w-none dark:prose-invert"
+        set:html={htmlContent}
+      />
+    </div>
+  </Container>
+</PageLayout>
