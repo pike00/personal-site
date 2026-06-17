@@ -86,9 +86,9 @@ pnpm build:cv && pnpm build
 git submodule update --init --recursive
 ```
 
-### Blog markdown pipeline: shiki + marked-footnote
+### Notes (blog) markdown pipeline: shiki + marked-footnote
 
-[src/pages/blog/[slug].astro](src/pages/blog/[slug].astro) renders posts with `marked` + custom `walkTokens` that calls shiki's `codeToHtml` for syntax highlighting (theme: `github-dark`). Two non-obvious things:
+[src/pages/notes/[slug].astro](src/pages/notes/[slug].astro) renders posts (served at `/notes`; legacy `/blog/*` URLs 301-redirect there via `astro.config.mjs`) with `marked` + custom `walkTokens` that calls shiki's `codeToHtml` for syntax highlighting (theme: `github-dark`). Two non-obvious things:
 
 - A fresh `Marked` instance is created **per post** inside the `Promise.all`. `marked-footnote` keeps shared closure state (an `e.hasFootnotes` flag) that races and throws `Cannot read properties of undefined (reading 'filter')` when the same instance parses multiple posts concurrently.
 - Syntax highlighting goes through `walkTokens` + a custom `code` renderer, **not** via `marked-shiki` — the plugin conflicts with marked-footnote's tokenizer at `node_modules/marked-footnote/dist/index.js:54`.
@@ -122,7 +122,7 @@ just dev             # tailnet-bound, reachable from other devices
 
 ## Content layout
 
-- `src/content/` — Astro content collections: `cv/` (single doc), `projects/` (per-project markdown), `about.md`, `publication-tags.yaml`. Schemas in `src/content.config.ts`. There is no `blog` content collection in `src/content/` — blog posts live in the `blog-posts/` submodule and are loaded directly by `src/pages/blog/[slug].astro` via `fs` + `gray-matter`.
+- `src/content/` — Astro content collections: `cv/` (single doc), `projects/` (per-project markdown), `about.md`, `publication-tags.yaml`. Schemas in `src/content.config.ts`. There is no `blog` content collection in `src/content/` — blog posts live in the `blog-posts/` submodule and are loaded directly by `src/pages/notes/[slug].astro` (through the `src/lib/posts.ts` loader: `fs` + `gray-matter`) and served at `/notes`.
 - `publications/` (submodule) — publication PDFs + frontmatter, copied into `public/Publications/` by `scripts/copy-pdfs.sh`.
 - `blog-posts/` (submodule, `pike00/blog`) — blog markdown + assets, copied into `public/blog/` by `scripts/copy-blog-assets.sh`.
 
