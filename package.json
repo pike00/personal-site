@@ -15,7 +15,9 @@
     "build:cv": "bash scripts/build-cv.sh",
     "build:citations": "tsx scripts/generate-citations.ts",
     "build:check": "tsx scripts/check-assets.ts",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@astrojs/react": "^5.0.7",
@@ -47,6 +49,7 @@
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "typst": "^0.10.0-8",
+    "vitest": "^4.1.9",
     "wrangler": "^4.0.0"
   },
   "pnpm": {
