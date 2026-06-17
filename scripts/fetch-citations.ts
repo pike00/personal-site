@@ -28,7 +28,8 @@ import {
 import { lokiEmit } from "./loki";
 
 const t0 = Date.now();
-const TTL_DAYS = Number(process.env.SCHOLAR_TTL_DAYS ?? "7");
+const _ttl = Number(process.env.SCHOLAR_TTL_DAYS ?? "7");
+const TTL_DAYS = Number.isFinite(_ttl) && _ttl >= 0 ? _ttl : 7;
 const TTL_MS = TTL_DAYS * 24 * 60 * 60 * 1000;
 const FORCE = process.env.SCHOLAR_FORCE === "1";
 const SKIP = process.env.SCHOLAR_SKIP === "1";
