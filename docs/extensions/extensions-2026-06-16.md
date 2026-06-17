@@ -35,10 +35,7 @@ The build now emits structured `job=personal-site` logs to **Loki** from every s
 
 ## New features
 
-### Tag-driven "related content" to replace the one hardcoded pairing
-- **Effort:** M · **Impact:** med
-- **Anchor:** `src/lib/pairings.ts:17-22` — the entire cross-link system is a single hand-maintained `{project, post}` tuple
-- **Why:** every note, project, publication, and print already carries `tags`/`researchArea`; a `getRelated(slug, type)` that ranks other entries by tag overlap (reusing the `buildGlobalIndex()` corpus) gives automatic "see also" blocks across all sections without growing a manual table that goes stale the moment a fourth thing is worth linking.
+
 
 ### `/now` (and `/uses`) page
 - **Effort:** S · **Impact:** low
@@ -57,11 +54,6 @@ The build now emits structured `job=personal-site` logs to **Loki** from every s
 - **Anchor:** `src/lib/docsearch.ts` + the `https://*.algolia.net` / `algolianet.com` / `algolia.io` entries in `public/_headers` `connect-src` — search is now an external SaaS dependency
 - **Why:** a `search.khanpikehome.com` Meilisearch instance (single Rust binary, Traefik-routed like the rest of the homelab) indexed at build time from the same `buildGlobalIndex()` JSON removes the only third-party runtime besides Umami and aligns search with the `ai-train=no` posture. The ⌘K UI swaps the DocSearch client for the Meilisearch JS client; `flags.search` already abstracts the backend choice (`src/lib/flags.ts:13`).
 
-### Self-hosted comments (Comentario / Isso) for `/notes`
-- **Effort:** M · **Impact:** med
-- **Anchor:** `src/pages/notes/[slug].astro` renders the article body with no discussion affordance
-- **Why:** a privacy-respecting comment box at `comments.khanpikehome.com` fits the Traefik pattern; add its origin to `connect-src` in `scripts/sync-csp-hashes.mjs` (single-sourced into `_headers` + `Caddyfile`). Pairs with the empirical/investigative posts that tend to draw replies.
-
 ## Integrations
 
 ### Mattermost deploy ping + Loki deploy event → Grafana annotation
@@ -69,19 +61,7 @@ The build now emits structured `job=personal-site` logs to **Loki** from every s
 - **Anchor:** `justfile` `_deploy:79` ends at `echo "✓ deployed … @ ${sha}"`; `functions/api/contact.ts:114` already proves a Mattermost webhook reaches the CF edge / homelab
 - **Why:** one `curl` to a Mattermost incoming webhook ("deployed `<sha>` to pikemd.com") + the `loki_emit deploy` from the quick-win gives both a human ping and a Grafana annotation overlaying deploy times on the Umami traffic graph. Names **Mattermost**, **Loki**, **Grafana** — all already in the stack.
 
-### Contact submissions also land in kindred
-- **Effort:** M · **Impact:** med
-- **Anchor:** `functions/api/contact.ts:113-124` posts the validated message only to the Mattermost webhook
-- **Why:** a real inbound contact is a CRM event; after the Turnstile check, also POST to the **kindred** API (contact + interaction) so the person isn't just a chat message that scrolls away. Keep the key in a Pages secret (`KINDRED_API_KEY`), mirroring how `MATTERMOST_WEBHOOK_URL` is handled. Names **kindred** + **Mattermost**.
-
-### Gitea Actions build check + LiteLLM-drafted deploy summary
-- **Effort:** M · **Impact:** med
-- **Anchor:** no `.gitea/` or `.github/` directory exists (confirmed); project CLAUDE.md "Local-only, no CI"
-- **Why:** a pull-mirror + Gitea Actions job running `pnpm build` (submodules + CSP-hash sync + `build:check`) catches a broken build *before* a manual `just deploy`, without reintroducing the GitHub-Pages CI you deliberately retired. Pair it with a `deepseek-v4-pro-cloud` call (the `generate-citations.ts` script is the existing build-time-TS model) to draft a one-paragraph "what changed" from the commit range for the Mattermost ping. Names **Gitea** + **LiteLLM**.
-
-## Architectural improvements
-
-### Delete (or actually use) the dead `blog` content collection
+### Delete the dead `blog` content collection
 - **Effort:** S · **Impact:** med
 - **Anchor:** `src/content.config.ts:27-36` defines a `blog` collection that nothing queries — posts load via `getPosts()` reading `blog-posts/posts/` directly (`src/lib/posts.ts:77`); confirmed no `getCollection("blog")` anywhere
 - **Why:** the schema is now duplicated — `postFrontmatterSchema` in `posts.ts:15` is the real validator, while the collection definition is decorative. Either delete the `blog` collection or migrate notes onto the content layer and drop the hand-rolled loader. The `prints` collection (`:38-48`) has the same smell — prints validate via `posts.ts`, not `getCollection`.
@@ -95,24 +75,3 @@ The build now emits structured `job=personal-site` logs to **Loki** from every s
 - **Effort:** M · **Impact:** med
 - **Anchor:** `package.json` has no `test` script; no `vitest.config.*` / `playwright.config.*`; `functions/api/contact.ts` has no local exercise path at all
 - **Why:** several pure functions are now load-bearing and untested — `postFrontmatterSchema` parsing (`posts.ts:77`), `readingTimeMinutes()` (`posts.ts:103`), `buildGlobalIndex()`, and the CSP hash extraction in `sync-csp-hashes.mjs`. A small Vitest suite via the homelab `test` skill (test-kit) plus a `wrangler pages dev` smoke test for the contact function would catch the silent-empty-render class the schema work was meant to prevent.
-
-## Wild ideas / spin-offs
-
-### Public homelab status badge on pikemd.com
-- **Effort:** M · **Impact:** low
-- **Anchor:** the homelab already runs a status surface (memory `drawer_ha_mqtt_discovery_device_block_entity_id` — "built Homelab status page"); the site has no live homelab signal
-- **Why:** a build-time-fetched-or-edge-proxied "homelab uptime" badge/strip turns the self-hosting blog posts into a live demo ("the thing serving this search is up: N days"). On-brand differentiator; keep it read-only and cached so it can't become a load-bearing dependency of a static site.
-
-### "Currently reading" feed from Zotero
-- **Effort:** L · **Impact:** med
-- **Anchor:** zero surface for in-progress academic reading today; Zotero has a public API and the satori OG infra (`src/pages/og/[slug].png.ts`) already renders cards
-- **Why:** differentiates from every other physician portfolio. A small ingestor writes a JSON into the publications submodule; the existing card/OG pipeline renders it. Closest analog is the new `/notes` stream, pointed at others' work.
-
-### Extract the reusable bits into an `astro-homelab` starter
-- **Effort:** L · **Impact:** med
-- **Anchor:** this repo has solved several generic problems well: single-source CSP (`scripts/sync-csp-hashes.mjs`), build-time Loki logging (`scripts/loki.sh` / `loki.ts`), per-worktree Traefik previews (`preview-kit.toml`), and the satori OG service
-- **Why:** these four are copy-pasted into every new homelab-adjacent site by hand. A thin `pike00/astro-homelab` template (or a set of scripts published as a package) would seed the next site with the CSP/Loki/preview/OG plumbing already wired — the same instinct behind release-kit/preview-kit.
-
----
-
-Report at [/home/will/projects/personal-site/docs/extensions/extensions-2026-06-16.md](</home/will/projects/personal-site/docs/extensions/extensions-2026-06-16.md>). Want me to dig deeper on any of these?
