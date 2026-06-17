@@ -88,7 +88,7 @@ const dateDisplay = new Date(print.date + "T00:00:00").toLocaleDateString("en-US
 });
 ---
 
-<PageLayout title={print.title} description={print.description} image={print.image}>
+<PageLayout title={print.title} description={print.description} image={print.image ?? `/og/print-${Astro.params.slug}.png`}>
   <Container variant="full" class="mt-16 lg:mt-32">
     <div class="xl:relative">
       <div class="mx-auto max-w-2xl">

@@ -86,7 +86,7 @@ const dateDisplay = new Date(post.date + "T00:00:00").toLocaleDateString("en-US"
 const pairedProject = getPairedProject(Astro.params.slug as string);
 ---
 
-<PageLayout title={post.title} description={post.description} image={`/og/blog-${Astro.params.slug}.png`}>
+<PageLayout title={post.title} description={post.description} image={`/og/note-${Astro.params.slug}.png`}>
   <Container variant="full" class="mt-16 lg:mt-32">
     <div class="xl:relative">
       <div class="mx-auto max-w-2xl">
