@@ -8,12 +8,13 @@
   },
   "scripts": {
     "dev": "pnpm run build:pdfs && pnpm run build:blog-assets && astro dev",
-    "build": "pnpm run \"/^build:(pdfs|blog-assets|citations)$/\" && astro build && pnpm run build:check",
+    "build": "pnpm run \"/^build:(pdfs|blog-assets|citations|scholar)$/\" && astro build && pnpm run build:check",
     "postbuild": "node scripts/sync-csp-hashes.mjs",
     "build:pdfs": "bash scripts/copy-pdfs.sh",
     "build:blog-assets": "bash scripts/copy-blog-assets.sh",
     "build:cv": "bash scripts/build-cv.sh",
     "build:citations": "tsx scripts/generate-citations.ts",
+    "build:scholar": "tsx scripts/fetch-citations.ts",
     "build:check": "tsx scripts/check-assets.ts",
     "preview": "astro preview"
   },

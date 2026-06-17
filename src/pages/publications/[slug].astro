@@ -8,6 +8,7 @@ import type { Publication } from "../../lib/types";
 import { highlightAuthors } from "../../lib/authors";
 import { formatCitation, toBibTeX, toRIS } from "../../lib/citations";
 import { scholarlyArticleJsonLd } from "../../lib/jsonld";
+import { readCitationCache, citationInfo } from "../../lib/citation-counts";
 
 export function getStaticPaths() {
   const publications = getPublications();
@@ -22,6 +23,10 @@ interface Props {
 }
 
 const { publication: pub } = Astro.props;
+
+// Build-time Semantic Scholar citation count (from the build:scholar cache).
+// Renders nothing when the cache has no entry for this DOI.
+const citation = citationInfo(readCitationCache(), pub.doi);
 
 const pdfUrl = pub.pdfPath
   ? "/" + pub.pdfPath.split("/").map(encodeURIComponent).join("/")
@@ -79,6 +84,20 @@ const dateDisplay = pub.pubDate
         {pub.issue && `(${pub.issue})`}
         {pub.pages && `: ${pub.pages}`}
         {year && ` (${year})`}
+      </p>
+    )}
+
+    {citation && citation.count > 0 && (
+      <p class="-mt-2 mb-6">
+        <a
+          href={citation.url ?? `https://doi.org/${pub.doi}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-1.5 rounded-full bg-violet-50 px-3 py-1 text-xs font-medium text-violet-700 ring-1 ring-violet-200 transition hover:bg-violet-100 dark:bg-violet-500/10 dark:text-violet-300 dark:ring-violet-500/20 dark:hover:bg-violet-500/20"
+        >
+          Cited by {citation.count}
+          <span class="opacity-60">· Semantic Scholar</span>
+        </a>
       </p>
     )}
 
