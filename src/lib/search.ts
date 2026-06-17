@@ -1,7 +1,7 @@
-import { getPosts, getProjects } from "./posts";
+import { getPosts, getProjects, getPrints } from "./posts";
 import { getPublications } from "./publications";
 
-export type SearchDocType = "Note" | "Project" | "Publication";
+export type SearchDocType = "Note" | "Project" | "Publication" | "Print";
 
 export interface SearchDoc {
   type: SearchDocType;
@@ -12,10 +12,15 @@ export interface SearchDoc {
 }
 
 /**
- * One flat index over every searchable surface — notes, projects, and
- * publications — for the global ⌘K command palette. Built once at build time
- * and serialized into the page for the client-side Fuse search. Order:
- * publications first (largest corpus), then notes, then projects.
+ * One flat index over every searchable surface — publications, notes, projects,
+ * and 3D prints — for the global ⌘K command palette. Order: publications first
+ * (largest corpus), then notes, projects, and prints.
+ *
+ * This index powers the Fuse fallback ONLY. It is built and serialized into the
+ * page exclusively when `flags.search === "fuse"`; when DocSearch owns search
+ * (the current default) PageLayout passes `[]` and never calls this — see the
+ * gate in src/layouts/PageLayout.astro. DocSearch covers prints automatically
+ * by crawling the live /prints/* pages.
  */
 export function buildGlobalIndex(): SearchDoc[] {
   const docs: SearchDoc[] = [];
@@ -48,6 +53,16 @@ export function buildGlobalIndex(): SearchDoc[] {
       description: project.description,
       url: `/projects/${project.slug}`,
       tags: project.tags,
+    });
+  }
+
+  for (const print of getPrints()) {
+    docs.push({
+      type: "Print",
+      title: print.title,
+      description: print.description,
+      url: `/prints/${print.slug}`,
+      tags: print.tags,
     });
   }
 

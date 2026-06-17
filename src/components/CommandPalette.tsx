@@ -11,6 +11,8 @@ const TYPE_BADGE: Record<SearchDocType, string> = {
   Project: "bg-zinc-500/10 text-zinc-600 dark:bg-white/10 dark:text-zinc-200",
   Publication:
     "bg-violet-100/70 text-violet-700 dark:bg-violet-500/10 dark:text-violet-300",
+  Print:
+    "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-400/20 dark:text-emerald-300",
 };
 
 const MAX_RESULTS = 40;
@@ -138,7 +140,7 @@ export default function CommandPalette({ index }: Props) {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search notes, projects, and publications..."
+            placeholder="Search notes, projects, publications, and prints..."
             className="flex-1 bg-transparent py-3.5 text-sm text-zinc-800 placeholder:text-zinc-400 focus:outline-none dark:text-zinc-100"
           />
           <kbd className="shrink-0 rounded border border-zinc-200 px-1.5 py-0.5 text-[10px] text-zinc-400 dark:border-zinc-600">
