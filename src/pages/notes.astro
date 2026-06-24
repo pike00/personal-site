@@ -5,7 +5,7 @@ import SimpleLayout from "../components/SimpleLayout.astro";
 import FeedCard from "../components/FeedCard.astro";
 import fs from "node:fs";
 import path from "node:path";
-import matter from "gray-matter";
+import { matter } from "../lib/frontmatter";
 
 interface FeedEntry {
   type: "post" | "project" | "print";

@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import matter from "gray-matter";
+import { matter } from "./frontmatter";
 import { z } from "astro:content";
 
 const BLOG_DIR = path.resolve("blog-posts/posts");

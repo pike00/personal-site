@@ -7,7 +7,7 @@
 
 import fs from "node:fs";
 import path from "node:path";
-import matter from "gray-matter";
+import { matter } from "./frontmatter";
 
 interface Pairing {
   projectSlug: string;
