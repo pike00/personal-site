@@ -50,7 +50,7 @@
     "typescript": "^5.9.3",
     "typst": "^0.10.0-8",
     "vitest": "^4.1.9",
-    "wrangler": "^4.0.0"
+    "wrangler": "^4.104.0"
   },
   "pnpm": {
     "overrides": {
