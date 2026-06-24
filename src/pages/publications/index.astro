@@ -24,6 +24,26 @@ const allYears = [...new Set(
     title="Publications"
     intro={`${publications.length} peer-reviewed publications across multiple medical specialties.`}
   >
+    <div class="mb-8 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+      <span class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+        Download all citations
+      </span>
+      <a
+        href="/publications/all.bib"
+        download="pike-publications.bib"
+        class="text-violet-600 hover:underline dark:text-violet-400"
+      >
+        .bib
+      </a>
+      <a
+        href="/publications/all.ris"
+        download="pike-publications.ris"
+        class="text-violet-600 hover:underline dark:text-violet-400"
+      >
+        .ris
+      </a>
+    </div>
+
     <SearchPublications
       client:load
       publications={searchIndex}
