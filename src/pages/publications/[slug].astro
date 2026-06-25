@@ -68,6 +68,12 @@ const dateDisplay = pub.pubDate
         {pub.title}
       </h1>
 
+      {pub.hook && (
+        <p class="mt-4 text-lg font-medium leading-relaxed text-zinc-700 dark:text-zinc-200">
+          {pub.hook}
+        </p>
+      )}
+
       {pub.authors.length > 0 && (
         <p class="mt-4 text-sm text-zinc-600 dark:text-zinc-300" set:html={authorDisplay} />
       )}
@@ -107,6 +113,25 @@ const dateDisplay = pub.pubDate
           </svg>
         </a>
       </div>
+    )}
+
+    {pub.summary && (
+      <div class="border-t border-zinc-200 dark:border-zinc-700 pt-6 mb-8">
+        <h2 class="text-sm font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-3">Plain-language summary</h2>
+        <p class="text-base leading-relaxed text-zinc-700 dark:text-zinc-300">{pub.summary}</p>
+      </div>
+    )}
+
+    {pub.abstract && (
+      <details class="group border-t border-zinc-200 dark:border-zinc-700 pt-6 mb-8">
+        <summary class="flex cursor-pointer list-none items-center justify-between text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 [&::-webkit-details-marker]:hidden">
+          Abstract
+          <svg class="h-4 w-4 transition-transform duration-200 group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </summary>
+        <p class="mt-4 text-sm leading-relaxed whitespace-pre-line text-zinc-600 dark:text-zinc-400">{pub.abstract}</p>
+      </details>
     )}
 
     <div class="border-t border-zinc-200 dark:border-zinc-700 pt-6">

@@ -20,6 +20,9 @@ interface PublicationMetadata {
   pages?: string;
   journal_abbrev?: string;
   tags?: string[];
+  hook?: string;
+  summary?: string;
+  abstract?: string;
 }
 
 function slugify(folderName: string): string {
@@ -78,6 +81,9 @@ export function getPublications(): Publication[] {
           ? path.relative(SUBMODULE_DIR, pdfPath)
           : undefined,
         folderName: folder,
+        hook: data.hook,
+        summary: data.summary,
+        abstract: data.abstract,
       });
     } else if (pdfPath) {
       const titleFromFolder = folder.replace(/^\d+\s+/, "");

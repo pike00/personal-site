@@ -15,6 +15,9 @@ export interface Publication {
   researchArea: string[];
   pdfPath?: string;
   folderName: string;
+  hook?: string;
+  summary?: string;
+  abstract?: string;
 }
 
 export interface Abstract {
@@ -29,6 +32,9 @@ export interface Abstract {
   pubDate?: string;
   doi?: string;
   unpublished: boolean;
+  hook?: string;
+  summary?: string;
+  abstract?: string;
 }
 
 export interface Project {

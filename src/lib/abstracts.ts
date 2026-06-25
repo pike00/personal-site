@@ -15,6 +15,9 @@ interface AbstractMetadata {
   doi?: string;
   abstract_id?: string;
   pmid?: number;
+  hook?: string;
+  summary?: string;
+  abstract?: string;
 }
 
 function slugify(name: string): string {
@@ -63,6 +66,9 @@ export function getAbstracts(): Abstract[] {
           pubDate: data.date_published,
           doi: data.doi,
           unpublished: false,
+          hook: data.hook,
+          summary: data.summary,
+          abstract: data.abstract,
         });
       } else {
         const titleFromFolder = folder.replace(/^\d+\s+/, "");
