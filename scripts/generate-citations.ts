@@ -14,7 +14,6 @@ const stampPath = path.resolve("node_modules/.cache/citations.stamp");
 function hashSources(): string {
   const h = crypto.createHash("sha256");
   const pubsDir = path.resolve("publications/Publications");
-  const tagsFile = path.resolve("src/content/publication-tags.yaml");
   const files: string[] = [];
   if (fs.existsSync(pubsDir)) {
     for (const folder of fs.readdirSync(pubsDir).sort()) {
@@ -22,7 +21,6 @@ function hashSources(): string {
       if (fs.existsSync(meta)) files.push(meta);
     }
   }
-  if (fs.existsSync(tagsFile)) files.push(tagsFile);
   for (const f of files) {
     h.update(f);
     h.update(fs.readFileSync(f));
