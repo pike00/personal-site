@@ -43,7 +43,7 @@
     "output_dir": "site",
     "source_dir": "docs"
   },
-  "domain": "khanpikehome.com",
+  "domain": "",
   "language": "static",
   "managed_subsystems": [
     "preview",
@@ -54,7 +54,7 @@
     "compose_file": "compose.worktree.yml",
     "enabled": true,
     "health_path": "/",
-    "host_pattern": "{slug}.personal-site.khanpikehome.com",
+    "host_pattern": "{slug}.personal-site.{domain}",
     "ports": {},
     "project_prefix": "personal-site",
     "shell_service": "app",
@@ -62,11 +62,12 @@
     "test_service": "app"
   },
   "project_name": "personal-site",
+  "public": true,
   "refreshed_at": "2026-06-27",
   "release": {
     "enabled": true,
     "install_command": null,
-    "litellm_base_url": "https://pikellm.khanpikehome.com/v1",
+    "litellm_base_url": "",
     "litellm_model": "deepseek-v4-pro-cloud",
     "prod_homelab_env": "",
     "prod_source": "none"

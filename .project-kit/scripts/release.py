@@ -28,9 +28,10 @@ PROJECT_NAME = "personal-site"
 CLIFF_CONFIG = ".project-kit/cliff.toml"
 BRANCH = "main"
 LITELLM_MODEL = "deepseek-v4-pro-cloud"
-# OpenAI-compatible base URL, baked at scaffold time from .project-kit answers
-# (default: the homelab pikellm proxy). release.py appends /chat/completions.
-LITELLM_BASE_URL = "https://pikellm.khanpikehome.com/v1"
+# OpenAI-compatible base URL. Read from $LITELLM_BASE_URL at runtime, falling back
+# to the value baked from .project-kit answers (public repos bake nothing here, so
+# set the env var). release.py appends /chat/completions.
+LITELLM_BASE_URL = os.environ.get("LITELLM_BASE_URL") or ""
 INSTALL_COMMAND = None
 # `just version` prod-version resolution (baked from .project-kit answers).
 PROD_SOURCE = "none"
