@@ -31,7 +31,7 @@ const DIST_DIR = "dist";
 // Out-of-document origins, single-sourced so analytics/font changes stay in
 // sync across both target files. Reference these in CSP_DIRECTIVES below.
 const SHARED_ORIGINS = {
-  umami: "https://umami.khanpikehome.com", // Umami analytics (script + API)
+  matomo: "https://matomo.khanpikehome.com", // Matomo analytics (script + API)
   fonts: "https://rsms.me", // Inter web font (stylesheet + font files)
   turnstile: "https://challenges.cloudflare.com", // Turnstile (contact form): api.js + iframe + siteverify
   // Algolia DocSearch (⌘K palette): search-API + crawler-fed index endpoints.
@@ -44,8 +44,8 @@ const SHARED_ORIGINS = {
 // static. Order is preserved in the emitted policy string.
 const CSP_DIRECTIVES = [
   ["default-src", ["'self'"]],
-  ["script-src", ["'self'", "__HASHES__", SHARED_ORIGINS.umami, SHARED_ORIGINS.turnstile]],
-  ["connect-src", ["'self'", SHARED_ORIGINS.umami, SHARED_ORIGINS.turnstile, SHARED_ORIGINS.algolia]],
+  ["script-src", ["'self'", "__HASHES__", SHARED_ORIGINS.matomo, SHARED_ORIGINS.turnstile]],
+  ["connect-src", ["'self'", SHARED_ORIGINS.matomo, SHARED_ORIGINS.turnstile, SHARED_ORIGINS.algolia]],
   ["style-src", ["'self'", "'unsafe-inline'", SHARED_ORIGINS.fonts]],
   ["img-src", ["'self'", "data:"]],
   ["font-src", ["'self'", SHARED_ORIGINS.fonts]],
