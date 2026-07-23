@@ -19,6 +19,10 @@ const pairings: Pairing[] = [
     projectSlug: "yolo-datestamp-detector",
     postSlug: "teaching-a-neural-net-to-find-date-stamps",
   },
+  {
+    projectSlug: "coldkey",
+    postSlug: "coldkey-paper-backup-age-keys",
+  },
 ];
 
 const projectToPostMap = new Map(pairings.map((p) => [p.projectSlug, p.postSlug]));

@@ -1,0 +1,73 @@
+---
+export const prerender = true;
+import PageLayout from "../layouts/PageLayout.astro";
+import SimpleLayout from "../components/SimpleLayout.astro";
+
+interface Repo {
+  name: string;
+  description: string;
+  url: string;
+  stars: number;
+  language: string;
+  category: string;
+}
+
+const repos: Repo[] = [
+  { name: "coldkey", description: "Post-quantum age key generation and paper backup tool with QR codes", url: "https://github.com/pike00/coldkey", stars: 64, language: "Go", category: "Security" },
+  { name: "Kindred", description: "Self-hosted personal CRM — contacts, interactions, reminders, gifts, debts, journaling with CardDAV sync and full-text search", url: "https://github.com/pike00/Kindred", stars: 3, language: "Python", category: "Applications" },
+  { name: "drape", description: "Python project scaffolding CLI — generate new Python projects from templates", url: "https://github.com/pike00/drape", stars: 3, language: "Python", category: "Developer Tools" },
+  { name: "sops_open_decrypted", description: "VS Code extension that highlights when SOPS-encrypted files are open in plaintext", url: "https://github.com/pike00/sops_open_decrypted", stars: 0, language: "TypeScript", category: "Developer Tools" },
+  { name: "Onenote-Downloader", description: "Download and archive OneNote notebooks via Microsoft Graph API", url: "https://github.com/pike00/Onenote-Downloader", stars: 1, language: "JavaScript", category: "Utilities" },
+  { name: "personal-site", description: "Professional site for Will Pike, MD — built with Astro, deployed to Cloudflare Pages", url: "https://github.com/pike00/personal-site", stars: 0, language: "TypeScript", category: "Web" },
+  { name: "hass-tryfi", description: "Home Assistant integration for TryFi pet trackers", url: "https://github.com/pike00/hass-tryfi", stars: 0, language: "Python", category: "Home Assistant" },
+  { name: "pyopenweathermap", description: "Python library for the OpenWeatherMap API", url: "https://github.com/pike00/pyopenweathermap", stars: 0, language: "Python", category: "Home Assistant" },
+  { name: "python-ecobee-api", description: "Python API for controlling Ecobee thermostats", url: "https://github.com/pike00/python-ecobee-api", stars: 0, language: "Python", category: "Home Assistant" },
+  { name: "naps2", description: "Scan documents to PDF and more, as simply as possible", url: "https://github.com/pike00/naps2", stars: 0, language: "C#", category: "Utilities" },
+  { name: "livesync-bridge", description: "Bridge service for Obsidian LiveSync self-hosted sync", url: "https://github.com/pike00/livesync-bridge", stars: 0, language: "TypeScript", category: "Utilities" },
+  { name: "Publications", description: "Publication catalog and citation management", url: "https://github.com/pike00/Publications", stars: 0, language: "Python", category: "Academic" },
+];
+
+const categories = [...new Set(repos.map((r) => r.category))].sort();
+const totalStars = repos.reduce((s, r) => s + r.stars, 0);
+---
+
+<PageLayout title="Repos" description="Open-source projects from Will Pike.">
+  <SimpleLayout title="Repos" intro="Open-source projects I maintain. {totalStars} total stars across {repos.length} repositories.">
+    <div class="space-y-12">
+      {categories.map((cat) => {
+        const catRepos = repos.filter((r) => r.category === cat).sort((a, b) => b.stars - a.stars);
+        return (
+          <section>
+            <h2 class="text-sm font-semibold uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">{cat}</h2>
+            <div class="mt-4 divide-y divide-zinc-100 dark:divide-zinc-800">
+              {catRepos.map((repo) => (
+                <a
+                  href={repo.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="group block py-4 transition hover:opacity-80"
+                >
+                  <div class="flex items-start justify-between gap-4">
+                    <div class="min-w-0">
+                      <h3 class="text-base font-semibold text-zinc-800 group-hover:text-violet-600 dark:text-zinc-100 dark:group-hover:text-violet-400">
+                        {repo.name}
+                      </h3>
+                      <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400 line-clamp-2">{repo.description}</p>
+                      <div class="mt-2 flex items-center gap-3 text-xs text-zinc-400 dark:text-zinc-500">
+                        <span>{repo.language}</span>
+                      </div>
+                    </div>
+                    <div class="flex shrink-0 items-center gap-1 text-sm text-zinc-400 dark:text-zinc-500">
+                      <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                      <span>{repo.stars}</span>
+                    </div>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </section>
+        );
+      })}
+    </div>
+  </SimpleLayout>
+</PageLayout>
