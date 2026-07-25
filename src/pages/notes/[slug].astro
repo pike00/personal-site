@@ -130,7 +130,7 @@ const pairedProject = getPairedProject(Astro.params.slug as string);
           )}
 
           <article
-            class="prose mt-8 max-w-none dark:prose-invert prose-code:before:content-none prose-code:after:content-none"
+            class="prose mt-8 max-w-none dark:prose-invert prose-code:before:content-none prose-code:after:content-none prose-img:rounded-lg prose-img:shadow-md prose-img:cursor-zoom-in"
             set:html={post.bodyHtml}
           />
         </article>
@@ -138,4 +138,5 @@ const pairedProject = getPairedProject(Astro.params.slug as string);
     </div>
   </Container>
   <script is:inline src="/js/copy-code.js" defer></script>
+  <script is:inline src="/js/image-zoom.js" defer></script>
 </PageLayout>
