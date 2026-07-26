@@ -3,77 +3,9 @@ export const prerender = true;
 import PageLayout from "../layouts/PageLayout.astro";
 import SimpleLayout from "../components/SimpleLayout.astro";
 import FeedCard from "../components/FeedCard.astro";
-import fs from "node:fs";
-import path from "node:path";
-import { matter } from "../lib/frontmatter";
+import { getCombinedFeed, type FeedEntry } from "../lib/feed";
 
-interface FeedEntry {
-  type: "post" | "project" | "print";
-  slug: string;
-  title: string;
-  description: string;
-  date: string;
-  tags: string[];
-  draft?: boolean;
-}
-
-const blogDir = path.resolve("blog-posts/posts");
-const projectsDir = path.resolve("src/content/projects");
-const printsDir = path.resolve("src/content/prints");
-
-const posts: FeedEntry[] = (fs.existsSync(blogDir) ? fs.readdirSync(blogDir) : [])
-  .filter((f: string) => f.endsWith(".md"))
-  .map((file: string): FeedEntry => {
-    const slug = file.replace(/\.md$/, "");
-    const raw = fs.readFileSync(path.join(blogDir, file), "utf-8");
-    const { data } = matter(raw);
-    return {
-      type: "post",
-      slug,
-      title: data.title,
-      description: data.description,
-      date: data.date,
-      tags: data.tags ?? [],
-      draft: data.draft,
-    };
-  })
-  .filter((p: FeedEntry) => !p.draft);
-
-const projects: FeedEntry[] = (fs.existsSync(projectsDir) ? fs.readdirSync(projectsDir) : [])
-  .filter((f: string) => f.endsWith(".md"))
-  .map((file: string): FeedEntry => {
-    const slug = file.replace(/\.md$/, "");
-    const raw = fs.readFileSync(path.join(projectsDir, file), "utf-8");
-    const { data } = matter(raw);
-    return {
-      type: "project",
-      slug,
-      title: data.title,
-      description: data.description,
-      date: data.date,
-      tags: data.tags ?? [],
-    };
-  });
-
-const prints: FeedEntry[] = (fs.existsSync(printsDir) ? fs.readdirSync(printsDir) : [])
-  .filter((f: string) => f.endsWith(".md"))
-  .map((file: string): FeedEntry => {
-    const slug = file.replace(/\.md$/, "");
-    const raw = fs.readFileSync(path.join(printsDir, file), "utf-8");
-    const { data } = matter(raw);
-    return {
-      type: "print",
-      slug,
-      title: data.title,
-      description: data.description,
-      date: data.date,
-      tags: data.tags ?? [],
-    };
-  });
-
-const entries: FeedEntry[] = [...posts, ...projects, ...prints].sort(
-  (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-);
+const entries = getCombinedFeed();
 ---
 
 <PageLayout title="Notes" description="Writing and projects from Will Pike.">
