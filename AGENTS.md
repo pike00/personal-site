@@ -135,6 +135,7 @@ No Pagefind. No MDX integration. Search is in-browser via Fuse.js over a JSON bu
 Posts and projects can be paired to cross-link on detail pages and deduplicate in mixed feeds:
 
 - **Linking mechanisms**:
+  - Automatic matching: [src/lib/pairings.ts](src/lib/pairings.ts) automatically links unpaired projects with posts whose slug matches or starts with `<projectSlug>-` (e.g. `coldkey` <-> `coldkey-paper-backup-age-keys`).
   - Frontmatter in post: `project: "coldkey"` (or `projectSlug`)
   - Frontmatter in project: `post: "coldkey-paper-backup-age-keys"` (or `postSlug`)
   - Centralized map: `staticPairings` in [src/lib/pairings.ts](src/lib/pairings.ts)

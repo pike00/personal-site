@@ -80,6 +80,28 @@ function ensurePairingMaps() {
     }
   }
 
+  // 4. Automatic heuristic fallback: match unpaired projects with posts whose slug matches or starts with `<projectSlug>-`
+  const allProjectSlugs: string[] = fs.existsSync(projectsDir)
+    ? fs.readdirSync(projectsDir).filter((f) => f.endsWith(".md")).map((f) => f.replace(/\.md$/, ""))
+    : [];
+
+  const allPostSlugs: string[] = fs.existsSync(blogDir)
+    ? fs.readdirSync(blogDir).filter((f) => f.endsWith(".md")).map((f) => f.replace(/\.md$/, ""))
+    : [];
+
+  for (const projectSlug of allProjectSlugs) {
+    if (projToPost.has(projectSlug)) continue;
+
+    const match = allPostSlugs.find(
+      (postSlug) => postSlug === projectSlug || postSlug.startsWith(`${projectSlug}-`),
+    );
+
+    if (match && !postToProj.has(match)) {
+      projToPost.set(projectSlug, match);
+      postToProj.set(match, projectSlug);
+    }
+  }
+
   projectToPostMap = projToPost;
   postToProjectMap = postToProj;
 }
