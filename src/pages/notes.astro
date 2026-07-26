@@ -6,6 +6,12 @@ import FeedCard from "../components/FeedCard.astro";
 import { getCombinedFeed, type FeedEntry } from "../lib/feed";
 
 const entries = getCombinedFeed();
+const counts = {
+  all: entries.length,
+  post: entries.filter((e) => e.type === "post").length,
+  project: entries.filter((e) => e.type === "project").length,
+  print: entries.filter((e) => e.type === "print").length,
+};
 ---
 
 <PageLayout title="Notes" description="Writing and projects from Will Pike.">
@@ -13,20 +19,89 @@ const entries = getCombinedFeed();
     {entries.length === 0 ? (
       <p class="text-sm text-zinc-500 dark:text-zinc-400">Nothing here yet. Check back soon.</p>
     ) : (
-      <div class="md:border-l md:border-zinc-100 md:pl-6 md:dark:border-zinc-700/40">
-        <div class="flex max-w-3xl flex-col space-y-16">
-          {entries.map((entry: FeedEntry) => (
-            <FeedCard
-              type={entry.type}
-              slug={entry.slug}
-              title={entry.title}
-              description={entry.description}
-              date={entry.date}
-              tags={entry.tags}
-            />
-          ))}
+      <div>
+        <div class="mb-10 flex flex-wrap gap-2">
+          <button
+            type="button"
+            data-filter="all"
+            class="feed-filter-btn active-filter rounded-full px-3 py-1.5 text-xs font-medium transition-colors bg-violet-600 text-white shadow-sm dark:bg-violet-500"
+          >
+            All ({counts.all})
+          </button>
+          {counts.post > 0 && (
+            <button
+              type="button"
+              data-filter="post"
+              class="feed-filter-btn rounded-full px-3 py-1.5 text-xs font-medium transition-colors bg-zinc-100 text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700"
+            >
+              Notes ({counts.post})
+            </button>
+          )}
+          {counts.project > 0 && (
+            <button
+              type="button"
+              data-filter="project"
+              class="feed-filter-btn rounded-full px-3 py-1.5 text-xs font-medium transition-colors bg-zinc-100 text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700"
+            >
+              Projects ({counts.project})
+            </button>
+          )}
+          {counts.print > 0 && (
+            <button
+              type="button"
+              data-filter="print"
+              class="feed-filter-btn rounded-full px-3 py-1.5 text-xs font-medium transition-colors bg-zinc-100 text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700"
+            >
+              3D Prints ({counts.print})
+            </button>
+          )}
+        </div>
+
+        <div class="md:border-l md:border-zinc-100 md:pl-6 md:dark:border-zinc-700/40">
+          <div class="flex max-w-3xl flex-col space-y-16" id="feed-container">
+            {entries.map((entry: FeedEntry) => (
+              <FeedCard
+                type={entry.type}
+                slug={entry.slug}
+                title={entry.title}
+                description={entry.description}
+                date={entry.date}
+                tags={entry.tags}
+                projectSlug={entry.projectSlug}
+                postSlug={entry.postSlug}
+              />
+            ))}
+          </div>
         </div>
       </div>
     )}
   </SimpleLayout>
 </PageLayout>
+
+<script is:inline>
+  (function () {
+    const buttons = document.querySelectorAll(".feed-filter-btn");
+    const cards = document.querySelectorAll("[data-feed-card]");
+
+    const activeClass = "feed-filter-btn rounded-full px-3 py-1.5 text-xs font-medium transition-colors bg-violet-600 text-white shadow-sm dark:bg-violet-500";
+    const inactiveClass = "feed-filter-btn rounded-full px-3 py-1.5 text-xs font-medium transition-colors bg-zinc-100 text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700";
+
+    buttons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const filter = btn.getAttribute("data-filter");
+        buttons.forEach((b) => {
+          b.className = b === btn ? activeClass : inactiveClass;
+        });
+
+        cards.forEach((card) => {
+          const type = card.getAttribute("data-type");
+          if (filter === "all" || type === filter) {
+            card.style.display = "";
+          } else {
+            card.style.display = "none";
+          }
+        });
+      });
+    });
+  })();
+</script>

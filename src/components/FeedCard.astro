@@ -10,9 +10,11 @@ interface Props {
   description: string;
   date: string;
   tags: string[];
+  projectSlug?: string;
+  postSlug?: string;
 }
 
-const { type, slug, title, description, date, tags } = Astro.props;
+const { type, slug, title, description, date, tags, projectSlug, postSlug } = Astro.props;
 
 const href =
   type === "post"
@@ -33,11 +35,11 @@ const ctaLabel =
   type === "post" ? "post" : type === "print" ? "print" : "project";
 ---
 
-<article class="group relative flex flex-col items-start">
+<article class="group relative flex flex-col items-start" data-feed-card data-type={type}>
   {/* hover panel */}
   <div class="absolute -inset-x-4 -inset-y-6 z-0 scale-95 bg-zinc-50 opacity-0 transition group-hover:scale-100 group-hover:opacity-100 sm:-inset-x-6 sm:rounded-2xl dark:bg-zinc-800/50"></div>
 
-  <p class="relative z-10 order-first mb-3 flex items-center gap-3 pl-3.5 text-sm text-zinc-400 dark:text-zinc-500">
+  <p class="relative z-10 order-first mb-3 flex flex-wrap items-center gap-2 pl-3.5 text-sm text-zinc-400 dark:text-zinc-500">
     <span class="absolute inset-y-0 left-0 flex items-center" aria-hidden="true">
       <span class="h-4 w-0.5 rounded-full bg-zinc-200 dark:bg-zinc-500"></span>
     </span>
@@ -45,6 +47,22 @@ const ctaLabel =
     <span class="rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
       {typeLabel}
     </span>
+    {type === "post" && projectSlug && (
+      <span class="inline-flex items-center gap-1 rounded-full bg-violet-50 px-2 py-0.5 text-[10px] font-semibold text-violet-700 ring-1 ring-violet-500/20 dark:bg-violet-950/60 dark:text-violet-300 dark:ring-violet-400/30">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" class="h-3 w-3">
+          <path d="M4.75 4.75 2.75 8l2 3.25M11.25 4.75l2 3.25-2 3.25M9.25 3.75l-2.5 8.5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        Includes Code
+      </span>
+    )}
+    {type === "project" && postSlug && (
+      <span class="inline-flex items-center gap-1 rounded-full bg-violet-50 px-2 py-0.5 text-[10px] font-semibold text-violet-700 ring-1 ring-violet-500/20 dark:bg-violet-950/60 dark:text-violet-300 dark:ring-violet-400/30">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" class="h-3 w-3">
+          <path d="M3.75 2.75h8.5v10.5h-8.5zM6 6h4M6 8.5h4M6 11h2.5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        Includes Note
+      </span>
+    )}
   </p>
 
   <h2 class="relative z-10 text-base font-semibold tracking-tight text-zinc-800 dark:text-zinc-100">

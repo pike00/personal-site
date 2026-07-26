@@ -9,9 +9,43 @@ import { codeToHtml } from "shiki";
 import { getPairedProject } from "../../lib/pairings";
 import { getPosts, readingTimeMinutes, type PostFrontmatter } from "../../lib/posts";
 
+export interface TocItem {
+  id: string;
+  text: string;
+  depth: number;
+}
+
+export function extractToc(content: string): TocItem[] {
+  const items: TocItem[] = [];
+  const lines = content.split("\n");
+  let inCode = false;
+
+  for (const line of lines) {
+    if (line.trim().startsWith("```")) {
+      inCode = !inCode;
+      continue;
+    }
+    if (inCode) continue;
+
+    const match = line.match(/^(#{2,3})\s+(.+)$/);
+    if (match) {
+      const depth = match[1].length;
+      const rawText = match[2].trim().replace(/\[([^\]]+)\]\([^)]+\)/g, "$1");
+      const id = rawText
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "");
+      items.push({ id, text: rawText, depth });
+    }
+  }
+
+  return items;
+}
+
 interface PostData extends PostFrontmatter {
   bodyHtml: string;
   readingMinutes: number;
+  toc: TocItem[];
 }
 
 interface StaticPath {
@@ -36,6 +70,14 @@ export async function getStaticPaths(): Promise<StaticPath[]> {
     })
       .use({
         renderer: {
+          heading(token) {
+            const rawText = token.text.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1");
+            const id = rawText
+              .toLowerCase()
+              .replace(/[^a-z0-9]+/g, "-")
+              .replace(/^-|-$/g, "");
+            return `<h${token.depth} id="${id}">${token.text}</h${token.depth}>`;
+          },
           code(token) {
             return (
               (token as { html?: string }).html ||
@@ -58,6 +100,7 @@ export async function getStaticPaths(): Promise<StaticPath[]> {
   const paths = await Promise.all(
     getPosts().map(async (post): Promise<StaticPath> => {
       const bodyHtml = await makeMarked().parse(post.content);
+      const toc = extractToc(post.content);
       return {
         params: { slug: post.slug },
         props: {
@@ -69,6 +112,7 @@ export async function getStaticPaths(): Promise<StaticPath[]> {
             draft: post.draft,
             bodyHtml,
             readingMinutes: readingTimeMinutes(post.content),
+            toc,
           },
         },
       };
@@ -133,6 +177,26 @@ const pairedProject = getPairedProject(Astro.params.slug as string);
               </a>
               <p class="mt-1 text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">{pairedProject.description}</p>
             </aside>
+          )}
+
+          {post.toc.length >= 2 && (
+            <nav class="mt-8 rounded-2xl border border-zinc-100 bg-zinc-50/50 p-5 dark:border-zinc-800 dark:bg-zinc-800/40">
+              <h2 class="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                Table of Contents
+              </h2>
+              <ol class="space-y-1.5 text-sm">
+                {post.toc.map((item) => (
+                  <li class={item.depth === 3 ? "pl-4 text-xs" : ""}>
+                    <a
+                      href={`#${item.id}`}
+                      class="text-zinc-600 transition-colors hover:text-violet-600 dark:text-zinc-400 dark:hover:text-violet-400"
+                    >
+                      {item.text}
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            </nav>
           )}
 
           <article
