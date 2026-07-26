@@ -49,6 +49,7 @@ _deploy:
     echo "→ deploying dist/ at commit ${sha}"
     pnpm exec wrangler pages deploy dist \
         --project-name=personal-site \
+        --branch=main \
         --commit-hash="$(git rev-parse HEAD)"
     echo "→ purging Cloudflare cache..."
     curl -sf -X POST \
