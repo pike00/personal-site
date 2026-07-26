@@ -10,6 +10,7 @@ interface Repo {
   stars: number;
   language: string;
   category: string;
+  isFork?: boolean;
 }
 
 const repos: Repo[] = [
@@ -19,11 +20,11 @@ const repos: Repo[] = [
   { name: "sops_open_decrypted", description: "VS Code extension that highlights when SOPS-encrypted files are open in plaintext", url: "https://github.com/pike00/sops_open_decrypted", stars: 0, language: "TypeScript", category: "Developer Tools" },
   { name: "Onenote-Downloader", description: "Download and archive OneNote notebooks via Microsoft Graph API", url: "https://github.com/pike00/Onenote-Downloader", stars: 1, language: "JavaScript", category: "Utilities" },
   { name: "personal-site", description: "Professional site for Will Pike, MD — built with Astro, deployed to Cloudflare Pages", url: "https://github.com/pike00/personal-site", stars: 0, language: "TypeScript", category: "Web" },
-  { name: "hass-tryfi", description: "Home Assistant integration for TryFi pet trackers", url: "https://github.com/pike00/hass-tryfi", stars: 0, language: "Python", category: "Home Assistant" },
-  { name: "pyopenweathermap", description: "Python library for the OpenWeatherMap API", url: "https://github.com/pike00/pyopenweathermap", stars: 0, language: "Python", category: "Home Assistant" },
-  { name: "python-ecobee-api", description: "Python API for controlling Ecobee thermostats", url: "https://github.com/pike00/python-ecobee-api", stars: 0, language: "Python", category: "Home Assistant" },
-  { name: "naps2", description: "Scan documents to PDF and more, as simply as possible", url: "https://github.com/pike00/naps2", stars: 0, language: "C#", category: "Utilities" },
-  { name: "livesync-bridge", description: "Bridge service for Obsidian LiveSync self-hosted sync", url: "https://github.com/pike00/livesync-bridge", stars: 0, language: "TypeScript", category: "Utilities" },
+  { name: "hass-tryfi", description: "Home Assistant integration for TryFi pet trackers", url: "https://github.com/pike00/hass-tryfi", stars: 0, language: "Python", category: "Home Assistant", isFork: true },
+  { name: "pyopenweathermap", description: "Python library for the OpenWeatherMap API", url: "https://github.com/pike00/pyopenweathermap", stars: 0, language: "Python", category: "Home Assistant", isFork: true },
+  { name: "python-ecobee-api", description: "Python API for controlling Ecobee thermostats", url: "https://github.com/pike00/python-ecobee-api", stars: 0, language: "Python", category: "Home Assistant", isFork: true },
+  { name: "naps2", description: "Scan documents to PDF and more, as simply as possible", url: "https://github.com/pike00/naps2", stars: 0, language: "C#", category: "Utilities", isFork: true },
+  { name: "livesync-bridge", description: "Bridge service for Obsidian LiveSync self-hosted sync", url: "https://github.com/pike00/livesync-bridge", stars: 0, language: "TypeScript", category: "Utilities", isFork: true },
   { name: "Publications", description: "Publication catalog and citation management", url: "https://github.com/pike00/Publications", stars: 0, language: "Python", category: "Academic" },
 ];
 
@@ -55,6 +56,7 @@ const totalStars = repos.reduce((s, r) => s + r.stars, 0);
                       <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400 line-clamp-2">{repo.description}</p>
                       <div class="mt-2 flex items-center gap-3 text-xs text-zinc-400 dark:text-zinc-500">
                         <span>{repo.language}</span>
+                        {repo.isFork && <span class="rounded-full border border-zinc-300 dark:border-zinc-600 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">contributor</span>}
                       </div>
                     </div>
                     <div class="flex shrink-0 items-center gap-1 text-sm text-zinc-400 dark:text-zinc-500">
