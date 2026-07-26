@@ -6,6 +6,7 @@ tags: ["Security", "Go", "CLI", "Cryptography"]
 date: "2026-07-22"
 status: active
 stack: ["Go", "Docker", "GitHub Actions"]
+post: "coldkey-paper-backup-age-keys"
 ---
 
 Paper backup for age encryption keys. Generates post-quantum (ML-KEM-768 + X25519) age key pairs and produces a single-page printable HTML document with QR codes. Print it, laminate it, store it in a fireproof safe. Your secrets survive even if every digital copy is gone.
