@@ -20,7 +20,6 @@ export function personJsonLd(): Record<string, unknown> {
     alumniOf: [
       { "@type": "CollegeOrUniversity", name: "Georgetown University School of Medicine" },
       { "@type": "CollegeOrUniversity", name: "University of Virginia" },
-      { "@type": "CollegeOrUniversity", name: "Georgia Institute of Technology" },
     ],
     knowsAbout: [
       "Real-world evidence",

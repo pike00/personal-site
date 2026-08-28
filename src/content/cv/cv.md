@@ -11,10 +11,6 @@ Physician-Clinical Informatician specializing in real-world evidence. Builds sca
 
 ## Education
 
-### Georgia Institute of Technology -- MS in Analytics
-
-*2024 - present* | Remote
-
 ### Georgetown University School of Medicine -- Doctor of Medicine (MD)
 
 *2018 - 2022* | Washington, DC
