@@ -56,8 +56,8 @@ See all publications at [pikemd.com/publications/](https://pikemd.com/publicatio
 
 ## Skills
 
-**Technical:** Python, R, SQL, Git, Linux, Machine Learning, Statistical Analysis, Data Visualization
+**Technical:** Python, R, SQL, Git, Linux, Statistical Analysis, Data Visualization
 
-**LLMs:** Claude / Claude Code, Gemini, OpenAI, Agentic Systems, Evaluations/PromptFoo, Prompt Engineering and Skill Development, LLM Evaluation, Tool/Function Calling
+**Machine Learning and LLM Systems:** Machine Learning, Large Language Models, Agent Skills and Harnesses, Evaluations and PromptFoo, Prompt Engineering, Tool/Function Calling
 
 **Clinical Informatics:** EHR/EMR Systems, Claims Data, Semantic Normalization, Clinical Vocabularies (ICD-10, SNOMED CT, LOINC, RxNorm, CPT), Data Quality, Cohort Definition, Computable Phenotyping
