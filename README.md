@@ -14,18 +14,18 @@ Personal site and academic portfolio built with [Astro](https://astro.build), de
 
 ```
 src/
-├── pages/          # Routes: index, about, blog (posts + projects), publications, cv, contact
+├── pages/          # Routes: index, about, notes (posts + projects + prints), publications, cv, contact, repos, topics
 ├── components/     # Astro + React components
 ├── layouts/        # Base and page layouts
-├── content/        # Content collections (cv, projects, publication tags)
-├── lib/            # Utilities (publications, abstracts, citations, pairings)
+├── content/        # Content collections (cv, projects, prints)
+├── lib/            # Utilities (publications, abstracts, citations, pairings, feed)
 └── styles/         # Global CSS
 scripts/            # Build utilities (Bash + Tsx)
 publications/       # Git submodule
 blog-posts/         # Git submodule
 ```
 
-Blog posts and projects are merged into one chronological feed at `/blog`. Project detail pages still live at `/projects/[slug]`; `/projects` redirects to `/blog`.
+Blog posts, projects, and 3D prints are merged into a unified chronological feed at `/notes` with automatic deduplication for paired post & project items (preferring the post entry) and optional on-demand `hideFromFeed: true` frontmatter support. Project detail pages live at `/projects/[slug]`.
 
 ## Development
 

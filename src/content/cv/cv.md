@@ -3,7 +3,7 @@ name: Will Pike, MD
 title: Physician-Clinical Informatician
 ---
 
-<willpike00@gmail.com> | [pikemd.com](https://pikemd.com) | [LinkedIn](https://linkedin.com/in/pike00) | [GitHub](https://github.com/pike00) | Remote/Chicago, IL
+[pikemd.com](https://pikemd.com) | [LinkedIn](https://linkedin.com/in/pike00) | [GitHub](https://github.com/pike00) | Remote/Chicago, IL
 
 ## Summary
 

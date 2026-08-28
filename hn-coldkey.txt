@@ -1,0 +1,15 @@
+Show HN: Coldkey – Paper backup for post-quantum age encryption keys
+
+I use age and SOPS to encrypt secrets in git. The weak link is the private key: lose it and everything encrypted to it is gone forever. Digital backups share the same failure domain as the original.
+
+Coldkey generates post-quantum (ML-KEM-768 + X25519) age keys and produces a single-page printable HTML backup with QR codes. Print it, laminate it, put it in a fireproof safe. Recovery is scanning the QR codes back.
+
+Key design decisions:
+- The 32-byte seed fits in one version-40 QR code (~2KB). Larger keys auto-split with a framing protocol + SHA-256 checksum.
+- mlockall prevents key material from swapping to disk
+- Docker hardened mode: distroless/static:nonroot, --network none, --read-only, --cap-drop ALL
+- Homebrew tap, Go install, or ghcr.io container
+
+I wrote it because the standard advice is "back up your keys" but nobody specifies how in a way that survives a house fire. A paper backup breaks the trust chain: the key lives in a different physical domain from the secrets it protects.
+
+https://github.com/pike00/coldkey

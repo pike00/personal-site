@@ -4,6 +4,7 @@ import PageLayout from "../../layouts/PageLayout.astro";
 import SimpleLayout from "../../components/SimpleLayout.astro";
 import PublicationCard from "../../components/PublicationCard.astro";
 import FeedCard from "../../components/FeedCard.astro";
+import { getPairedPostSlug } from "../../lib/pairings";
 import { getAllTopics, type TopicData } from "../../lib/tags";
 
 export function getStaticPaths() {
@@ -18,8 +19,22 @@ interface Props {
 }
 
 const { topic } = Astro.props;
-const total =
-  topic.publications.length + topic.posts.length + topic.projects.length;
+
+const feedPosts = topic.posts.filter((post) => !post.hideFromFeed);
+const activePostSlugs = new Set(feedPosts.map((p) => p.slug));
+const feedProjects = topic.projects.filter((proj) => {
+  if (proj.hideFromFeed) return false;
+  const pairedPostSlug = getPairedPostSlug(proj.slug);
+  if (pairedPostSlug && activePostSlugs.has(pairedPostSlug)) return false;
+  return true;
+});
+
+const feedEntries = [
+  ...feedPosts.map((p) => ({ type: "post" as const, ...p })),
+  ...feedProjects.map((p) => ({ type: "project" as const, ...p })),
+].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+const total = topic.publications.length + feedEntries.length;
 const noun = total === 1 ? "item" : "items";
 ---
 
@@ -41,31 +56,21 @@ const noun = total === 1 ? "item" : "items";
       </section>
     )}
 
-    {(topic.posts.length > 0 || topic.projects.length > 0) && (
+    {feedEntries.length > 0 && (
       <section>
         <h2 class="mb-6 text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
           Notes &amp; Projects
         </h2>
         <div class="md:border-l md:border-zinc-100 md:pl-6 md:dark:border-zinc-700/40">
           <div class="flex max-w-3xl flex-col space-y-16">
-            {topic.posts.map((post) => (
+            {feedEntries.map((entry) => (
               <FeedCard
-                type="post"
-                slug={post.slug}
-                title={post.title}
-                description={post.description}
-                date={post.date}
-                tags={post.tags}
-              />
-            ))}
-            {topic.projects.map((project) => (
-              <FeedCard
-                type="project"
-                slug={project.slug}
-                title={project.title}
-                description={project.description}
-                date={project.date}
-                tags={project.tags}
+                type={entry.type}
+                slug={entry.slug}
+                title={entry.title}
+                description={entry.description}
+                date={entry.date}
+                tags={entry.tags}
               />
             ))}
           </div>

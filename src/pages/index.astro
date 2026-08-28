@@ -10,18 +10,9 @@ import TopicPill from "../components/TopicPill.astro";
 import { getPublications } from "../lib/publications";
 import { getAbstracts } from "../lib/abstracts";
 import { getPosts, getProjects, getPrints } from "../lib/posts";
+import { getCombinedFeed, type FeedEntry } from "../lib/feed";
 import { highlightAuthors } from "../lib/authors";
 import { personJsonLd } from "../lib/jsonld";
-
-interface FeedEntry {
-  type: "post" | "project" | "print";
-  slug: string;
-  title: string;
-  description: string;
-  date: string;
-  tags: string[];
-  draft?: boolean;
-}
 
 const publications = getPublications();
 const abstracts = getAbstracts();
@@ -29,44 +20,17 @@ const recentPubs = publications.slice(0, 4);
 
 const allTags = [...new Set(publications.flatMap((p) => p.researchArea))].sort();
 
-const posts: FeedEntry[] = getPosts().map((p) => ({
-  type: "post",
-  slug: p.slug,
-  title: p.title,
-  description: p.description,
-  date: p.date,
-  tags: p.tags,
-  draft: p.draft,
-}));
-
-const projects: FeedEntry[] = getProjects().map((p) => ({
-  type: "project",
-  slug: p.slug,
-  title: p.title,
-  description: p.description,
-  date: p.date,
-  tags: p.tags,
-}));
-
-const prints: FeedEntry[] = getPrints().map((p) => ({
-  type: "print",
-  slug: p.slug,
-  title: p.title,
-  description: p.description,
-  date: p.date,
-  tags: p.tags,
-}));
-
-const feed: FeedEntry[] = [...posts, ...projects, ...prints].sort(
-  (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-);
-
+const feed = getCombinedFeed();
 const recentFeed = feed.slice(0, 4);
 
+const postsCount = getPosts().length;
+const printsCount = getPrints().length;
+const projectsCount = getProjects().length;
+
 const stats = [
-  { value: posts.length, label: "Posts" },
-  { value: prints.length, label: "3D Prints" },
-  { value: projects.length, label: "Projects" },
+  { value: postsCount, label: "Posts" },
+  { value: printsCount, label: "3D Prints" },
+  { value: projectsCount, label: "Projects" },
   { value: publications.length, label: "Publications" },
   { value: abstracts.length, label: "Abstracts" },
 ];
@@ -144,6 +108,8 @@ const stats = [
               description={entry.description}
               date={entry.date}
               tags={entry.tags}
+              projectSlug={entry.projectSlug}
+              postSlug={entry.postSlug}
             />
           ))
         )}

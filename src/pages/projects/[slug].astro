@@ -5,7 +5,7 @@ import Container from "../../components/Container.astro";
 import TopicPill from "../../components/TopicPill.astro";
 import fs from "node:fs";
 import path from "node:path";
-import matter from "gray-matter";
+import { matter } from "../../lib/frontmatter";
 import { Marked } from "marked";
 import { getPairedPost } from "../../lib/pairings";
 

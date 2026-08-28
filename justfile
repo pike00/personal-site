@@ -1,15 +1,19 @@
 set shell := ["bash", "-uc"]
-
 # `release` / `version` / changelog recipes come from release.just (shared).
 # `dev` / `down` / `down-clean` / `logs` / `ps` / `shell` / `pytest` /
 # `worktree` / `worktree-rm` / `pr` come from preview.just. preview-kit
 # threads GIT_HASH + APP_VERSION as build args.
 
-import 'release.just'
-import 'preview.just'
-
 default:
     @just --list
+
+# BEGIN PROJECT-KIT — generated, do not edit by hand
+import '.project-kit/_lib.just'
+import '.project-kit/preview.just'
+import '.project-kit/release.just'
+# END PROJECT-KIT
+
+# --- repo-specific ---
 
 # Decrypt the Cloudflare deploy secrets in build.env.sops to stdout as dotenv,
 # for `just deploy` to source. Prefers the `sopsx` wrapper; falls back to raw
@@ -26,38 +30,6 @@ _decrypt:
     else
         sops --config .sops.yaml --decrypt --input-type dotenv --output-type dotenv build.env.sops
     fi
-
-# Build the site bundle only (Astro + CV PDF + postbuild CSP-hash sync). Does not deploy.
-build:
-    pnpm build:cv
-    pnpm build
-
-# Alias for `deploy` — build and push to Cloudflare Pages.
-ship:
-    @just deploy
-
-# Build the site and deploy to Cloudflare Pages. Replaces the old GHA
-# deploy.yml — all build + deploy steps run locally now.
-#
-# Credentials loaded from sops-encrypted build.env.sops; edit with `sopsx build.env.sops`.
-# Required keys: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_ZONE_ID.
-# Optional key: MATTERMOST_DEPLOY_WEBHOOK — incoming webhook for a post-deploy ping.
-# Refuses to deploy on a dirty tree to keep the deployed commit traceable.
-deploy:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    if ! git diff --quiet || ! git diff --cached --quiet; then
-        echo "error: uncommitted changes — commit or stash before deploying" >&2
-        exit 1
-    fi
-    # Decrypt build.env.sops (via `just _decrypt` → sopsx) and source into this
-    # shell with set -a so the vars export into the `just _deploy` child.
-    # Process substitution keeps plaintext off disk. `sops exec-env` can't be
-    # used: no --input-type, mis-detects .sops as JSON (sops #717).
-    set -a
-    . <(just _decrypt)
-    set +a
-    just _deploy
 
 _deploy:
     #!/usr/bin/env bash
@@ -77,6 +49,7 @@ _deploy:
     echo "→ deploying dist/ at commit ${sha}"
     pnpm exec wrangler pages deploy dist \
         --project-name=personal-site \
+        --branch=main \
         --commit-hash="$(git rev-parse HEAD)"
     echo "→ purging Cloudflare cache..."
     curl -sf -X POST \
@@ -107,6 +80,34 @@ astro-dev port='4321':
     pnpm build:pdfs
     pnpm build:blog-assets
     VITE_ALLOWED_HOSTS="$TS_HOST" pnpm exec astro dev --host="$TS_IP" --port={{port}}
+
+# Build the site bundle only (Astro + CV PDF + postbuild CSP-hash sync). Does not deploy.
+build:
+    pnpm build:cv
+    pnpm build
+
+# Build the site and deploy to Cloudflare Pages. Replaces the old GHA
+# deploy.yml — all build + deploy steps run locally now.
+#
+# Credentials loaded from sops-encrypted build.env.sops; edit with `sopsx build.env.sops`.
+# Required keys: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_ZONE_ID.
+# Optional key: MATTERMOST_DEPLOY_WEBHOOK — incoming webhook for a post-deploy ping.
+# Refuses to deploy on a dirty tree to keep the deployed commit traceable.
+deploy:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if ! git diff --quiet || ! git diff --cached --quiet; then
+        echo "error: uncommitted changes — commit or stash before deploying" >&2
+        exit 1
+    fi
+    # Decrypt build.env.sops (via `just _decrypt` → sopsx) and source into this
+    # shell with set -a so the vars export into the `just _deploy` child.
+    # Process substitution keeps plaintext off disk. `sops exec-env` can't be
+    # used: no --input-type, mis-detects .sops as JSON (sops #717).
+    set -a
+    . <(just _decrypt)
+    set +a
+    just _deploy
 
 # Scaffold a new blog post in the blog-posts submodule.
 # Creates blog-posts/posts/<slug>.md with default frontmatter (draft: true)
@@ -143,22 +144,6 @@ new-post slug title="":
     ${EDITOR:-vim} "$POST"
     echo ""
     echo "When ready to publish:  just publish {{slug}}"
-
-# Update publications submodule to latest and commit the pointer
-update-pubs:
-    git -C publications fetch origin
-    git submodule update --remote publications
-    bash scripts/copy-pdfs.sh
-    git add publications
-    git diff --cached --quiet publications || git commit -m "chore: update publications submodule"
-
-# Update blog submodule to latest and commit the pointer
-update-blog:
-    git -C blog-posts fetch origin
-    git submodule update --remote blog-posts
-    bash scripts/copy-blog-assets.sh
-    git add blog-posts
-    git diff --cached --quiet blog-posts || git commit -m "chore: update blog-posts submodule"
 
 # Publish a blog post end-to-end: flip draft:false in blog-posts, push it,
 # bump the submodule pointer in personal-site, push that, then deploy.
@@ -215,3 +200,23 @@ publish slug:
     else
         echo "✓ nothing changed; site already serving this content"
     fi
+
+# Alias for `deploy` — build and push to Cloudflare Pages.
+ship:
+    @just deploy
+
+# Update blog submodule to latest and commit the pointer
+update-blog:
+    git -C blog-posts fetch origin
+    git submodule update --remote blog-posts
+    bash scripts/copy-blog-assets.sh
+    git add blog-posts
+    git diff --cached --quiet blog-posts || git commit -m "chore: update blog-posts submodule"
+
+# Update publications submodule to latest and commit the pointer
+update-pubs:
+    git -C publications fetch origin
+    git submodule update --remote publications
+    bash scripts/copy-pdfs.sh
+    git add publications
+    git diff --cached --quiet publications || git commit -m "chore: update publications submodule"

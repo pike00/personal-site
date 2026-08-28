@@ -1,191 +1,1236 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<title>Dog Food Safety — One Pager</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dog Food Safety Guide — Bleu & Sammy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  @page { size: letter portrait; margin: 0.4in; }
-  * { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; }
-  body {
-    font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    color: #1a1a1a;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-    font-size: 10px;
+  :root {
+    --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --slate-900: #0f172a;
+    --slate-800: #1e293b;
+    --slate-700: #334155;
+    --slate-600: #475569;
+    --slate-500: #64748b;
+    --slate-400: #94a3b8;
+    --slate-200: #e2e8f0;
+    --slate-100: #f1f5f9;
+    --slate-50:  #f8fafc;
+
+    --never-main: #dc2626;
+    --never-bg:   #fef2f2;
+    --never-chip: #fee2e2;
+    --never-text: #991b1b;
+    --never-border: #fca5a5;
+
+    --cautious-main: #d97706;
+    --cautious-bg:   #fffbeb;
+    --cautious-chip: #fef3c7;
+    --cautious-text: #92400e;
+    --cautious-border: #fcd34d;
+
+    --safe-main: #16a34a;
+    --safe-bg:   #f0fdf4;
+    --safe-chip: #dcfce7;
+    --safe-text: #166534;
+    --safe-border: #86efac;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    height: 100%;
+    width: 100%;
+    font-family: var(--font-sans);
+    color: var(--slate-800);
+    background: #f8fafc;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  /* Header Card */
+  .header-card {
+    background: #ffffff;
+    border: 1px solid var(--slate-200);
+    border-radius: 12px;
+    padding: 14px 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+
+  .top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--slate-200);
+    margin-bottom: 12px;
+  }
+
+  .brand-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .brand-icon {
+    width: 42px;
+    height: 42px;
+    background: linear-gradient(135deg, #0f172a, #334155);
+    color: #fff;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  .title-group h1 {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--slate-900);
+    letter-spacing: -0.02em;
     line-height: 1.2;
   }
-  .page { max-width: 7.7in; margin: 0 auto; padding: 4px 2px; }
 
-  h1 { text-align: center; font-size: 21px; margin: 0 0 2px; letter-spacing: 0.5px; }
-  .tagline { text-align: center; color: #666; font-size: 9.5px; margin: 0 0 8px; }
-
-  .section-bar {
-    color: #fff; font-weight: 700; font-size: 13px;
-    padding: 4px 10px; border-radius: 5px; margin: 10px 0 6px;
-    display: flex; justify-content: space-between; align-items: center;
+  .title-group .dog-pills {
+    display: flex;
+    gap: 6px;
+    margin-top: 3px;
   }
-  .danger-bar { background: #c0392b; }
-  .safe-bar   { background: #2e7d32; }
-  .section-bar .hint { font-weight: 500; font-size: 9.5px; opacity: 0.92; }
 
-  /* ---- two tables side by side ---- */
-  .table-2up { display: flex; gap: 12px; align-items: flex-start; }
-  .table-2up > table { flex: 1; }
-
-  table { width: 100%; border-collapse: collapse; }
-  thead th {
-    color: #fff; font-size: 8.5px; text-transform: uppercase; letter-spacing: 0.3px;
-    text-align: left; padding: 3px 5px;
+  .dog-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--slate-700);
+    background: var(--slate-100);
+    padding: 2px 8px;
+    border-radius: 99px;
+    border: 1px solid var(--slate-200);
   }
-  .danger-bar-head th { background: #c0392b; }
-  .safe-bar-head   th { background: #2e7d32; }
-  tbody td { padding: 2.5px 5px; border-bottom: 1px solid #ececec; font-size: 10px; vertical-align: middle; }
-  tbody tr:nth-child(even) td { background: #fafafa; }
 
-  .food { white-space: nowrap; font-weight: 600; }
-  .food .icon { font-size: 14px; margin-right: 3px; }
-  .food .note { color: #999; font-weight: 400; font-size: 8.5px; }
-  .why { color: #b03a2e; font-size: 9px; }
-  .ref { color: #6b7785; font-size: 8px; text-align: right; white-space: nowrap; width: 1%; }
-
-  /* status badges */
-  .badge { display: inline-block; font-size: 8px; font-weight: 700; padding: 1px 5px;
-           border-radius: 9px; color: #fff; text-transform: uppercase; letter-spacing: 0.3px; }
-  .b-safe { background: #2e7d32; }
-  .b-mod  { background: #e08e0b; }
-  .b-rare { background: #8e9aa3; }
-
-  .legend { display: flex; gap: 14px; font-size: 9px; margin: 1px 0 6px; align-items: center; }
-  .legend .badge { margin-right: 4px; }
-
-  /* references */
-  .refs {
-    margin-top: 10px; border: 1px solid #d6d6d6; border-radius: 5px;
-    padding: 6px 9px; background: #fbfbfb;
+  /* Emergency Contacts Grid */
+  .emergency-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 16px;
   }
-  .refs h3 { margin: 0 0 4px; font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.4px; color: #444; }
-  .refs ol { margin: 0; padding: 0; list-style: none; column-count: 2; column-gap: 18px; font-size: 8.3px; }
-  .refs li { break-inside: avoid; margin-bottom: 2px; color: #333; }
-  .refs li b { color: #1a1a1a; }
-  .refs a { color: #2455a4; text-decoration: none; word-break: break-all; }
 
+  .vet-section, .hotline-section {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--slate-500);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .vet-list {
+    display: flex;
+    gap: 12px;
+  }
+
+  .vet-card {
+    flex: 1;
+    background: var(--slate-50);
+    border: 1px solid var(--slate-200);
+    border-left: 3px solid var(--never-main);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 11px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .vet-info strong {
+    color: var(--slate-900);
+    font-size: 12px;
+  }
+
+  .vet-tag {
+    font-size: 9px;
+    font-weight: 700;
+    background: var(--never-chip);
+    color: var(--never-text);
+    padding: 1px 5px;
+    border-radius: 4px;
+    margin-left: 4px;
+  }
+
+  .vet-sub {
+    color: var(--slate-500);
+    font-size: 10px;
+    margin-top: 1px;
+  }
+
+  .vet-phone {
+    font-weight: 700;
+    color: var(--slate-900);
+    text-decoration: none;
+    font-size: 12px;
+    background: #fff;
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--slate-200);
+    white-space: nowrap;
+    transition: all 0.15s ease;
+  }
+  .vet-phone:hover {
+    border-color: var(--slate-400);
+    background: var(--slate-100);
+  }
+
+  .hotline-list {
+    display: flex;
+    gap: 8px;
+  }
+
+  .hotline-chip {
+    flex: 1;
+    background: var(--slate-50);
+    border: 1px solid var(--slate-200);
+    border-radius: 8px;
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .hotline-name {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--slate-600);
+  }
+
+  .hotline-phone {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--slate-900);
+    text-decoration: none;
+  }
+
+  /* Interactive Bar */
+  .control-bar {
+    background: #fff;
+    border: 1px solid var(--slate-200);
+    border-radius: 10px;
+    padding: 8px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+  }
+
+  .search-box {
+    position: relative;
+    flex: 1;
+    max-width: 380px;
+  }
+
+  .search-box input {
+    width: 100%;
+    padding: 6px 12px 6px 32px;
+    font-family: var(--font-sans);
+    font-size: 12px;
+    border: 1px solid var(--slate-200);
+    border-radius: 6px;
+    background: var(--slate-50);
+    color: var(--slate-800);
+    outline: none;
+    transition: all 0.15s ease;
+  }
+  .search-box input:focus {
+    background: #fff;
+    border-color: var(--slate-400);
+    box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.15);
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 13px;
+    color: var(--slate-400);
+  }
+
+  .filter-pills {
+    display: flex;
+    gap: 6px;
+  }
+
+  .filter-btn {
+    border: 1px solid var(--slate-200);
+    background: #fff;
+    color: var(--slate-700);
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.15s ease;
+  }
+
+  .filter-btn:hover { background: var(--slate-100); }
+  .filter-btn.active {
+    background: var(--slate-900);
+    color: #fff;
+    border-color: var(--slate-900);
+  }
+
+  .filter-btn .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+  }
+  .filter-btn .dot.never { background: var(--never-main); }
+  .filter-btn .dot.cautious { background: var(--cautious-main); }
+  .filter-btn .dot.safe { background: var(--safe-main); }
+
+  /* Food Grid (3 Columns) */
+  .food-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  .food-column {
+    background: #fff;
+    border: 1px solid var(--slate-200);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .food-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+  }
+
+  .food-table th {
+    background: var(--slate-50);
+    color: var(--slate-500);
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--slate-200);
+    text-align: left;
+  }
+
+  .food-table td {
+    padding: 4px 10px;
+    border-bottom: 1px solid var(--slate-100);
+    vertical-align: middle;
+    line-height: 1.2;
+  }
+
+  .food-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .food-table tr:nth-child(even) {
+    background: #fdfdfd;
+  }
+
+  .food-table tr:hover {
+    background: var(--slate-50);
+  }
+
+  .food-name {
+    font-weight: 700;
+    color: var(--slate-900);
+    white-space: nowrap;
+    font-size: 11px;
+  }
+
+  .tier-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  .tier-badge.never {
+    background: var(--never-chip);
+    color: var(--never-text);
+    border: 1px solid var(--never-border);
+  }
+  .tier-badge.cautious {
+    background: var(--cautious-chip);
+    color: var(--cautious-text);
+    border: 1px solid var(--cautious-border);
+  }
+  .tier-badge.safe {
+    background: var(--safe-chip);
+    color: var(--safe-text);
+    border: 1px solid var(--safe-border);
+  }
+
+  .food-note {
+    color: var(--slate-500);
+    font-size: 10px;
+  }
+
+  /* Footer */
   .footer {
-    margin-top: 8px; border-top: 2px solid #c0392b; padding-top: 5px;
-    font-size: 9px; color: #444;
-    display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    text-align: center;
+    font-size: 10px;
+    color: var(--slate-500);
+    padding: 8px;
+    border-top: 1px solid var(--slate-200);
+    margin-top: 4px;
   }
-  .footer .poison { font-weight: 700; color: #c0392b; }
+
+  /* Print Stylesheet (Letter Landscape 1-Page Optimization) */
+  @media print {
+    @page {
+      size: letter landscape;
+      margin: 0.15in 0.2in;
+    }
+
+    html, body {
+      background: #fff;
+      font-size: 8pt;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .container {
+      max-width: 100%;
+      padding: 0;
+      gap: 4px;
+    }
+
+    .no-print {
+      display: none !important;
+    }
+
+    .header-card {
+      border: 1px solid #cbd5e1;
+      padding: 5px 10px;
+      box-shadow: none;
+      border-radius: 6px;
+    }
+
+    .top-row {
+      padding-bottom: 4px;
+      margin-bottom: 4px;
+    }
+
+    .brand-icon {
+      width: 26px;
+      height: 26px;
+      font-size: 14px;
+    }
+
+    .title-group h1 {
+      font-size: 13px;
+    }
+
+    .vet-card, .hotline-chip {
+      padding: 3px 6px;
+    }
+
+    .vet-phone {
+      font-size: 9px;
+      padding: 1px 4px;
+    }
+
+    .food-grid {
+      gap: 6px;
+    }
+
+    .food-column {
+      border-radius: 4px;
+      box-shadow: none;
+      border: 1px solid #cbd5e1;
+    }
+
+    .food-table th {
+      padding: 2px 5px;
+      font-size: 7pt;
+    }
+
+    .food-table td {
+      padding: 1.5px 5px;
+      font-size: 7pt;
+      line-height: 1.1;
+    }
+
+    .food-name {
+      font-size: 7.5pt;
+    }
+
+    .tier-badge {
+      font-size: 6pt;
+      padding: 0 3px;
+    }
+
+    .footer {
+      font-size: 7pt;
+      padding: 1px;
+      margin-top: 1px;
+    }
+  }
 </style>
 </head>
 <body>
-<div class="page">
 
-  <h1>🐾 Dog Food Safety</h1>
-  <p class="tagline">Alphabetical quick reference with sources. Not exhaustive &mdash; when in doubt, ask your vet. Superscripts map to the References below.</p>
+<div class="container">
 
-  <!-- ============ DANGEROUS ============ -->
-  <div class="section-bar danger-bar">
-    <span>🚫 NEVER FEED &mdash; TOXIC</span>
-    <span class="hint">even small amounts can harm</span>
+  <!-- Header Card -->
+  <div class="header-card">
+    <div class="top-row">
+      <div class="brand-area">
+        <div class="brand-icon">🐾</div>
+        <div class="title-group">
+          <h1>Dog Food Safety Guide</h1>
+          <div class="dog-pills">
+            <span class="dog-badge">🐕 Bleu (30 lb)</span>
+            <span class="dog-badge">🐶 Sammy (50 lb)</span>
+          </div>
+        </div>
+      </div>
+      <div style="text-align: right;" class="no-print">
+        <div style="font-size: 11px; font-weight: 700; color: var(--slate-700);">Quick Reference Poster</div>
+        <div style="font-size: 10px; color: var(--slate-400);">89 Master Items Listed</div>
+      </div>
+    </div>
+
+    <!-- Emergency Contacts Grid -->
+    <div class="emergency-grid">
+      <div class="vet-section">
+        <div class="section-label">🚨 Emergency Veterinary Hospitals</div>
+        <div class="vet-list">
+          
+          <div class="vet-card">
+            <div class="vet-info">
+              <strong>VEG South Loop</strong><span class="vet-tag">CLOSEST</span>
+              <div class="vet-sub">Open 24/7 · ~15 min &middot; 1114 S Clinton St, Chicago 60607</div>
+            </div>
+            <a href="tel:8727105226" class="vet-phone">📞 (872) 710-5226</a>
+          </div>
+          
+          <div class="vet-card">
+            <div class="vet-info">
+              <strong>MedVet Chicago</strong>
+              <div class="vet-sub">Open 24/7 · ~25 min &middot; 3305 N California Ave, Chicago 60618</div>
+            </div>
+            <a href="tel:7732817110" class="vet-phone">📞 (773) 281-7110</a>
+          </div>
+          
+        </div>
+      </div>
+
+      <div class="hotline-section">
+        <div class="section-label">📞 Poison Hotlines & Support</div>
+        <div class="hotline-list">
+          
+          
+          <div class="hotline-chip">
+            <div class="hotline-name">ASPCA</div>
+            <a href="tel:8884264435" class="hotline-phone">(888) 426-4435</a>
+          </div>
+          
+          <div class="hotline-chip">
+            <div class="hotline-name">Pet Poison Helpline</div>
+            <a href="tel:8557647661" class="hotline-phone">(855) 764-7661</a>
+          </div>
+          
+          
+          
+          <div class="hotline-chip">
+            <div class="hotline-name">Spot VetAccess™</div>
+            <a href="tel:7372129481" class="hotline-phone">(737) 212-9481</a>
+          </div>
+          
+          
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div class="table-2up">
-    <table>
-      <thead class="danger-bar-head"><tr><th>Food</th><th>Why</th><th>Src</th></tr></thead>
-      <tbody>
-        <tr><td class="food"><span class="icon">🍺</span>Alcohol</td><td class="why">organ failure, coma</td><td class="ref">1,4</td></tr>
-        <tr><td class="food"><span class="icon">🥑</span>Avocado</td><td class="why">persin; pit hazard</td><td class="ref">1,3</td></tr>
-        <tr><td class="food"><span class="icon">☕</span>Caffeine <span class="note">coffee/tea</span></td><td class="why">methylxanthines</td><td class="ref">1,4</td></tr>
-        <tr><td class="food"><span class="icon">🍒</span>Cherries</td><td class="why">pits = cyanide</td><td class="ref">3</td></tr>
-        <tr><td class="food"><span class="icon">🍫</span>Chocolate</td><td class="why">theobromine</td><td class="ref">1,2,4</td></tr>
-        <tr><td class="food"><span class="icon">🧄</span>Garlic</td><td class="why">destroys red cells</td><td class="ref">1,2</td></tr>
-      </tbody>
-    </table>
-    <table>
-      <thead class="danger-bar-head"><tr><th>Food</th><th>Why</th><th>Src</th></tr></thead>
-      <tbody>
-        <tr><td class="food"><span class="icon">🍇</span>Grapes / Raisins</td><td class="why">kidney failure</td><td class="ref">1,3,4</td></tr>
-        <tr><td class="food"><span class="icon">🌰</span>Macadamia Nuts</td><td class="why">tremors, weakness</td><td class="ref">1,2,4</td></tr>
-        <tr><td class="food"><span class="icon">🧅</span>Onions</td><td class="why">destroys red cells</td><td class="ref">1,3</td></tr>
-        <tr><td class="food"><span class="icon">🍞</span>Raw Yeast Dough</td><td class="why">bloat; makes alcohol</td><td class="ref">1</td></tr>
-        <tr><td class="food"><span class="icon">🍄</span>Wild Mushrooms</td><td class="why">can be fatal</td><td class="ref">3</td></tr>
-        <tr><td class="food"><span class="icon">🍬</span>Xylitol <span class="note">sweetener</span></td><td class="why">sugar crash, liver</td><td class="ref">1,4</td></tr>
-      </tbody>
-    </table>
+  <!-- Interactive Control & Search Bar -->
+  <div class="control-bar no-print">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="Search food (e.g. apple, chocolate, bacon)..." onkeyup="filterFoods()">
+    </div>
+    <div class="filter-pills">
+      <button class="filter-btn active" onclick="setFilter('all', this)">
+        All <span style="opacity:0.6;">(89)</span>
+      </button>
+      <button class="filter-btn" onclick="setFilter('never', this)">
+        <span class="dot never"></span> Never <span style="opacity:0.6;">(27)</span>
+      </button>
+      <button class="filter-btn" onclick="setFilter('cautious', this)">
+        <span class="dot cautious"></span> Cautious <span style="opacity:0.6;">(16)</span>
+      </button>
+      <button class="filter-btn" onclick="setFilter('safe', this)">
+        <span class="dot safe"></span> Safe <span style="opacity:0.6;">(46)</span>
+      </button>
+    </div>
   </div>
 
-  <!-- ============ SAFE ============ -->
-  <div class="section-bar safe-bar">
-    <span>✅ SAFE TO SHARE</span>
-    <span class="hint">plain, cooked, unseasoned &mdash; no skin, seeds, pits, or bones</span>
+  <!-- 3-Column Food Table Grid -->
+  <div class="food-grid">
+    <div class="food-column">
+      <table class="food-table">
+        <thead>
+          <tr>
+            <th style="width:30%;">Food</th>
+            <th style="width:20%;">Safety</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr class="food-row" data-name="alcohol" data-tier="never" data-note="ethanol — stumbling, vomiting, slow breathing">
+            <td class="food-name">Alcohol</td>
+            <td><span class="tier-badge never">never</span></td>
+            <td class="food-note">Ethanol — stumbling, vomiting, slow breathing</td>
+          </tr>
+          
+          <tr class="food-row" data-name="apple" data-tier="safe" data-note="no seeds">
+            <td class="food-name">Apple</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note">no seeds</td>
+          </tr>
+          
+          <tr class="food-row" data-name="apple seeds" data-tier="never" data-note="cyanide — panting, drooling (lots)">
+            <td class="food-name">Apple seeds</td>
+            <td><span class="tier-badge never">never</span></td>
+            <td class="food-note">Cyanide — panting, drooling (lots)</td>
+          </tr>
+          
+          <tr class="food-row" data-name="asparagus" data-tier="safe" data-note="cooked">
+            <td class="food-name">Asparagus</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note">cooked</td>
+          </tr>
+          
+          <tr class="food-row" data-name="avocado" data-tier="cautious" data-note="gi upset; pit risk">
+            <td class="food-name">Avocado</td>
+            <td><span class="tier-badge cautious">cautious</span></td>
+            <td class="food-note">GI upset; pit risk</td>
+          </tr>
+          
+          <tr class="food-row" data-name="bacon" data-tier="cautious" data-note="fatty, salty">
+            <td class="food-name">Bacon</td>
+            <td><span class="tier-badge cautious">cautious</span></td>
+            <td class="food-note">fatty, salty</td>
+          </tr>
+          
+          <tr class="food-row" data-name="banana" data-tier="safe" data-note="">
+            <td class="food-name">Banana</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note"></td>
+          </tr>
+          
+          <tr class="food-row" data-name="bell pepper" data-tier="safe" data-note="">
+            <td class="food-name">Bell pepper</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note"></td>
+          </tr>
+          
+          <tr class="food-row" data-name="blueberries" data-tier="safe" data-note="">
+            <td class="food-name">Blueberries</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note"></td>
+          </tr>
+          
+          <tr class="food-row" data-name="bone broth" data-tier="safe" data-note="unsalted">
+            <td class="food-name">Bone broth</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note">unsalted</td>
+          </tr>
+          
+          <tr class="food-row" data-name="bread" data-tier="cautious" data-note="empty calories">
+            <td class="food-name">Bread</td>
+            <td><span class="tier-badge cautious">cautious</span></td>
+            <td class="food-note">empty calories</td>
+          </tr>
+          
+          <tr class="food-row" data-name="broccoli" data-tier="safe" data-note="&lt;10% of diet">
+            <td class="food-name">Broccoli</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note">&lt;10% of diet</td>
+          </tr>
+          
+          <tr class="food-row" data-name="brussels sprouts" data-tier="safe" data-note="">
+            <td class="food-name">Brussels sprouts</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note"></td>
+          </tr>
+          
+          <tr class="food-row" data-name="butter" data-tier="cautious" data-note="pure fat">
+            <td class="food-name">Butter</td>
+            <td><span class="tier-badge cautious">cautious</span></td>
+            <td class="food-note">pure fat</td>
+          </tr>
+          
+          <tr class="food-row" data-name="caffeine (coffee, tea)" data-tier="never" data-note="caffeine — restless, racing heart">
+            <td class="food-name">Caffeine (coffee, tea)</td>
+            <td><span class="tier-badge never">never</span></td>
+            <td class="food-note">Caffeine — restless, racing heart</td>
+          </tr>
+          
+          <tr class="food-row" data-name="cannabis edibles" data-tier="never" data-note="thc — wobbly, dazed, dribbling urine">
+            <td class="food-name">Cannabis edibles</td>
+            <td><span class="tier-badge never">never</span></td>
+            <td class="food-note">THC — wobbly, dazed, dribbling urine</td>
+          </tr>
+          
+          <tr class="food-row" data-name="cantaloupe" data-tier="safe" data-note="no rind">
+            <td class="food-name">Cantaloupe</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note">no rind</td>
+          </tr>
+          
+          <tr class="food-row" data-name="carrot" data-tier="safe" data-note="">
+            <td class="food-name">Carrot</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note"></td>
+          </tr>
+          
+          <tr class="food-row" data-name="cashews" data-tier="cautious" data-note="fatty (a few ok)">
+            <td class="food-name">Cashews</td>
+            <td><span class="tier-badge cautious">cautious</span></td>
+            <td class="food-note">fatty (a few ok)</td>
+          </tr>
+          
+          <tr class="food-row" data-name="celery" data-tier="safe" data-note="">
+            <td class="food-name">Celery</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note"></td>
+          </tr>
+          
+          <tr class="food-row" data-name="cheese" data-tier="cautious" data-note="fat + lactose">
+            <td class="food-name">Cheese</td>
+            <td><span class="tier-badge cautious">cautious</span></td>
+            <td class="food-note">fat + lactose</td>
+          </tr>
+          
+          <tr class="food-row" data-name="chicken" data-tier="safe" data-note="cooked, plain">
+            <td class="food-name">Chicken</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note">cooked, plain</td>
+          </tr>
+          
+          <tr class="food-row" data-name="chives &amp; leeks" data-tier="never" data-note="organosulfur — pale gums, anemia">
+            <td class="food-name">Chives &amp; leeks</td>
+            <td><span class="tier-badge never">never</span></td>
+            <td class="food-note">Organosulfur — pale gums, anemia</td>
+          </tr>
+          
+          <tr class="food-row" data-name="chocolate" data-tier="never" data-note="theobromine — vomiting, racing heart, seizures">
+            <td class="food-name">Chocolate</td>
+            <td><span class="tier-badge never">never</span></td>
+            <td class="food-note">Theobromine — vomiting, racing heart, seizures</td>
+          </tr>
+          
+          <tr class="food-row" data-name="cooked bones" data-tier="never" data-note="splinter, puncture gut">
+            <td class="food-name">Cooked bones</td>
+            <td><span class="tier-badge never">never</span></td>
+            <td class="food-note">splinter, puncture gut</td>
+          </tr>
+          
+          <tr class="food-row" data-name="cookies &amp; cake" data-tier="cautious" data-note="sugar">
+            <td class="food-name">Cookies &amp; cake</td>
+            <td><span class="tier-badge cautious">cautious</span></td>
+            <td class="food-note">sugar</td>
+          </tr>
+          
+          <tr class="food-row" data-name="corn" data-tier="safe" data-note="off the cob">
+            <td class="food-name">Corn</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note">off the cob</td>
+          </tr>
+          
+          <tr class="food-row" data-name="corn cobs" data-tier="never" data-note="blockage — er">
+            <td class="food-name">Corn cobs</td>
+            <td><span class="tier-badge never">never</span></td>
+            <td class="food-note">blockage — ER</td>
+          </tr>
+          
+          <tr class="food-row" data-name="cottage cheese" data-tier="safe" data-note="low-fat">
+            <td class="food-name">Cottage cheese</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note">low-fat</td>
+          </tr>
+          
+          <tr class="food-row" data-name="cucumber" data-tier="safe" data-note="">
+            <td class="food-name">Cucumber</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note"></td>
+          </tr>
+          
+        </tbody>
+      </table>
+    </div>
+
+    <div class="food-column">
+      <table class="food-table">
+        <thead>
+          <tr>
+            <th style="width:30%;">Food</th>
+            <th style="width:20%;">Safety</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr class="food-row" data-name="deli meat" data-tier="cautious" data-note="salt + nitrates">
+            <td class="food-name">Deli meat</td>
+            <td><span class="tier-badge cautious">cautious</span></td>
+            <td class="food-note">salt + nitrates</td>
+          </tr>
+          
+          <tr class="food-row" data-name="egg" data-tier="safe" data-note="cooked">
+            <td class="food-name">Egg</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note">cooked</td>
+          </tr>
+          
+          <tr class="food-row" data-name="fat &amp; gristle" data-tier="never" data-note="pancreatitis">
+            <td class="food-name">Fat &amp; gristle</td>
+            <td><span class="tier-badge never">never</span></td>
+            <td class="food-note">pancreatitis</td>
+          </tr>
+          
+          <tr class="food-row" data-name="french fries" data-tier="cautious" data-note="fat + salt">
+            <td class="food-name">French fries</td>
+            <td><span class="tier-badge cautious">cautious</span></td>
+            <td class="food-note">fat + salt</td>
+          </tr>
+          
+          <tr class="food-row" data-name="grapes &amp; raisins" data-tier="never" data-note="tartaric acid — vomiting, then kidney failure">
+            <td class="food-name">Grapes &amp; raisins</td>
+            <td><span class="tier-badge never">never</span></td>
+            <td class="food-note">Tartaric acid — vomiting, then kidney failure</td>
+          </tr>
+          
+          <tr class="food-row" data-name="green beans" data-tier="safe" data-note="">
+            <td class="food-name">Green beans</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note"></td>
+          </tr>
+          
+          <tr class="food-row" data-name="ham" data-tier="cautious" data-note="very salty">
+            <td class="food-name">Ham</td>
+            <td><span class="tier-badge cautious">cautious</span></td>
+            <td class="food-note">very salty</td>
+          </tr>
+          
+          <tr class="food-row" data-name="hops (brewing)" data-tier="never" data-note="unknown — high fever, panting, racing heart">
+            <td class="food-name">Hops (brewing)</td>
+            <td><span class="tier-badge never">never</span></td>
+            <td class="food-note">Unknown — high fever, panting, racing heart</td>
+          </tr>
+          
+          <tr class="food-row" data-name="hot dogs" data-tier="cautious" data-note="fat, salt, nitrates">
+            <td class="food-name">Hot dogs</td>
+            <td><span class="tier-badge cautious">cautious</span></td>
+            <td class="food-note">fat, salt, nitrates</td>
+          </tr>
+          
+          <tr class="food-row" data-name="ice cream" data-tier="cautious" data-note="sugar + lactose">
+            <td class="food-name">Ice cream</td>
+            <td><span class="tier-badge cautious">cautious</span></td>
+            <td class="food-note">sugar + lactose</td>
+          </tr>
+          
+          <tr class="food-row" data-name="large dog chews" data-tier="never" data-note="blockage">
+            <td class="food-name">Large dog chews</td>
+            <td><span class="tier-badge never">never</span></td>
+            <td class="food-note">blockage</td>
+          </tr>
+          
+          <tr class="food-row" data-name="lean beef" data-tier="safe" data-note="cooked">
+            <td class="food-name">Lean beef</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note">cooked</td>
+          </tr>
+          
+          <tr class="food-row" data-name="lettuce" data-tier="safe" data-note="leafy greens">
+            <td class="food-name">Lettuce</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note">leafy greens</td>
+          </tr>
+          
+          <tr class="food-row" data-name="liver" data-tier="safe" data-note="cooked, small">
+            <td class="food-name">Liver</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note">cooked, small</td>
+          </tr>
+          
+          <tr class="food-row" data-name="macadamia nuts" data-tier="never" data-note="unknown — wobbly legs, tremors, fever">
+            <td class="food-name">Macadamia nuts</td>
+            <td><span class="tier-badge never">never</span></td>
+            <td class="food-note">Unknown — wobbly legs, tremors, fever</td>
+          </tr>
+          
+          <tr class="food-row" data-name="mango" data-tier="safe" data-note="no pit">
+            <td class="food-name">Mango</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note">no pit</td>
+          </tr>
+          
+          <tr class="food-row" data-name="milk" data-tier="cautious" data-note="lactose">
+            <td class="food-name">Milk</td>
+            <td><span class="tier-badge cautious">cautious</span></td>
+            <td class="food-note">lactose</td>
+          </tr>
+          
+          <tr class="food-row" data-name="moldy food / compost" data-tier="never" data-note="mycotoxins — tremors, seizures">
+            <td class="food-name">Moldy food / compost</td>
+            <td><span class="tier-badge never">never</span></td>
+            <td class="food-note">Mycotoxins — tremors, seizures</td>
+          </tr>
+          
+          <tr class="food-row" data-name="mushrooms" data-tier="safe" data-note="store-bought only">
+            <td class="food-name">Mushrooms</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note">store-bought only</td>
+          </tr>
+          
+          <tr class="food-row" data-name="nut shells" data-tier="never" data-note="blockage">
+            <td class="food-name">Nut shells</td>
+            <td><span class="tier-badge never">never</span></td>
+            <td class="food-note">blockage</td>
+          </tr>
+          
+          <tr class="food-row" data-name="nutmeg" data-tier="never" data-note="myristicin — disorientation, racing heart">
+            <td class="food-name">Nutmeg</td>
+            <td><span class="tier-badge never">never</span></td>
+            <td class="food-note">Myristicin — disorientation, racing heart</td>
+          </tr>
+          
+          <tr class="food-row" data-name="oatmeal" data-tier="safe" data-note="plain">
+            <td class="food-name">Oatmeal</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note">plain</td>
+          </tr>
+          
+          <tr class="food-row" data-name="onion &amp; garlic" data-tier="never" data-note="organosulfur — pale gums, weakness, anemia">
+            <td class="food-name">Onion &amp; garlic</td>
+            <td><span class="tier-badge never">never</span></td>
+            <td class="food-note">Organosulfur — pale gums, weakness, anemia</td>
+          </tr>
+          
+          <tr class="food-row" data-name="orange" data-tier="safe" data-note="small, peeled">
+            <td class="food-name">Orange</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note">small, peeled</td>
+          </tr>
+          
+          <tr class="food-row" data-name="pasta" data-tier="safe" data-note="plain">
+            <td class="food-name">Pasta</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note">plain</td>
+          </tr>
+          
+          <tr class="food-row" data-name="peach" data-tier="safe" data-note="no pit">
+            <td class="food-name">Peach</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note">no pit</td>
+          </tr>
+          
+          <tr class="food-row" data-name="peanut butter" data-tier="safe" data-note="xylitol-free">
+            <td class="food-name">Peanut butter</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note">xylitol-free</td>
+          </tr>
+          
+          <tr class="food-row" data-name="pear" data-tier="safe" data-note="no seeds">
+            <td class="food-name">Pear</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note">no seeds</td>
+          </tr>
+          
+          <tr class="food-row" data-name="peas" data-tier="safe" data-note="fresh or frozen">
+            <td class="food-name">Peas</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note">fresh or frozen</td>
+          </tr>
+          
+        </tbody>
+      </table>
+    </div>
+
+    <div class="food-column">
+      <table class="food-table">
+        <thead>
+          <tr>
+            <th style="width:30%;">Food</th>
+            <th style="width:20%;">Safety</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr class="food-row" data-name="pineapple" data-tier="safe" data-note="">
+            <td class="food-name">Pineapple</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note"></td>
+          </tr>
+          
+          <tr class="food-row" data-name="pizza" data-tier="cautious" data-note="fat + onion/garlic">
+            <td class="food-name">Pizza</td>
+            <td><span class="tier-badge cautious">cautious</span></td>
+            <td class="food-note">fat + onion/garlic</td>
+          </tr>
+          
+          <tr class="food-row" data-name="popcorn" data-tier="safe" data-note="plain, air-popped">
+            <td class="food-name">Popcorn</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note">plain, air-popped</td>
+          </tr>
+          
+          <tr class="food-row" data-name="potato" data-tier="safe" data-note="cooked only">
+            <td class="food-name">Potato</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note">cooked only</td>
+          </tr>
+          
+          <tr class="food-row" data-name="pumpkin" data-tier="safe" data-note="plain">
+            <td class="food-name">Pumpkin</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note">plain</td>
+          </tr>
+          
+          <tr class="food-row" data-name="raspberries" data-tier="safe" data-note="">
+            <td class="food-name">Raspberries</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note"></td>
+          </tr>
+          
+          <tr class="food-row" data-name="raw yeast dough" data-tier="never" data-note="ethanol + gas — bloated belly, drunkenness">
+            <td class="food-name">Raw yeast dough</td>
+            <td><span class="tier-badge never">never</span></td>
+            <td class="food-note">Ethanol + gas — bloated belly, drunkenness</td>
+          </tr>
+          
+          <tr class="food-row" data-name="raw/green potato" data-tier="never" data-note="solanine — gi upset, lethargy">
+            <td class="food-name">Raw/green potato</td>
+            <td><span class="tier-badge never">never</span></td>
+            <td class="food-note">Solanine — GI upset, lethargy</td>
+          </tr>
+          
+          <tr class="food-row" data-name="rawhide" data-tier="never" data-note="swells in gut">
+            <td class="food-name">Rawhide</td>
+            <td><span class="tier-badge never">never</span></td>
+            <td class="food-note">swells in gut</td>
+          </tr>
+          
+          <tr class="food-row" data-name="rhubarb leaves" data-tier="never" data-note="oxalates — drooling, tremors, kidney">
+            <td class="food-name">Rhubarb leaves</td>
+            <td><span class="tier-badge never">never</span></td>
+            <td class="food-note">Oxalates — drooling, tremors, kidney</td>
+          </tr>
+          
+          <tr class="food-row" data-name="rice" data-tier="safe" data-note="plain, cooked">
+            <td class="food-name">Rice</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note">plain, cooked</td>
+          </tr>
+          
+          <tr class="food-row" data-name="salmon" data-tier="safe" data-note="cooked, boneless">
+            <td class="food-name">Salmon</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note">cooked, boneless</td>
+          </tr>
+          
+          <tr class="food-row" data-name="salty snacks (excess)" data-tier="never" data-note="sodium — vomiting, tremors, seizures">
+            <td class="food-name">Salty snacks (excess)</td>
+            <td><span class="tier-badge never">never</span></td>
+            <td class="food-note">Sodium — vomiting, tremors, seizures</td>
+          </tr>
+          
+          <tr class="food-row" data-name="sardines" data-tier="safe" data-note="in water">
+            <td class="food-name">Sardines</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note">in water</td>
+          </tr>
+          
+          <tr class="food-row" data-name="sausage" data-tier="cautious" data-note="fat + salt">
+            <td class="food-name">Sausage</td>
+            <td><span class="tier-badge cautious">cautious</span></td>
+            <td class="food-note">fat + salt</td>
+          </tr>
+          
+          <tr class="food-row" data-name="spinach" data-tier="safe" data-note="oxalates; limit">
+            <td class="food-name">Spinach</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note">oxalates; limit</td>
+          </tr>
+          
+          <tr class="food-row" data-name="stone-fruit pits" data-tier="never" data-note="cyanide — red gums, panting, collapse">
+            <td class="food-name">Stone-fruit pits</td>
+            <td><span class="tier-badge never">never</span></td>
+            <td class="food-note">Cyanide — red gums, panting, collapse</td>
+          </tr>
+          
+          <tr class="food-row" data-name="strawberries" data-tier="safe" data-note="">
+            <td class="food-name">Strawberries</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note"></td>
+          </tr>
+          
+          <tr class="food-row" data-name="sweet potato" data-tier="safe" data-note="cooked">
+            <td class="food-name">Sweet potato</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note">cooked</td>
+          </tr>
+          
+          <tr class="food-row" data-name="tomato" data-tier="safe" data-note="ripe only; no stems">
+            <td class="food-name">Tomato</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note">ripe only; no stems</td>
+          </tr>
+          
+          <tr class="food-row" data-name="toothpicks in food" data-tier="never" data-note="punctures gut">
+            <td class="food-name">Toothpicks in food</td>
+            <td><span class="tier-badge never">never</span></td>
+            <td class="food-note">punctures gut</td>
+          </tr>
+          
+          <tr class="food-row" data-name="turkey" data-tier="safe" data-note="cooked, plain">
+            <td class="food-name">Turkey</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note">cooked, plain</td>
+          </tr>
+          
+          <tr class="food-row" data-name="watermelon" data-tier="safe" data-note="no seeds or rind">
+            <td class="food-name">Watermelon</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note">no seeds or rind</td>
+          </tr>
+          
+          <tr class="food-row" data-name="whipped cream" data-tier="cautious" data-note="fat + sugar">
+            <td class="food-name">Whipped cream</td>
+            <td><span class="tier-badge cautious">cautious</span></td>
+            <td class="food-note">fat + sugar</td>
+          </tr>
+          
+          <tr class="food-row" data-name="whitefish" data-tier="safe" data-note="cooked, boneless">
+            <td class="food-name">Whitefish</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note">cooked, boneless</td>
+          </tr>
+          
+          <tr class="food-row" data-name="whole fruit pits" data-tier="never" data-note="blockage">
+            <td class="food-name">Whole fruit pits</td>
+            <td><span class="tier-badge never">never</span></td>
+            <td class="food-note">blockage</td>
+          </tr>
+          
+          <tr class="food-row" data-name="wild mushrooms" data-tier="never" data-note="amatoxins — drooling, vomiting, liver failure">
+            <td class="food-name">Wild mushrooms</td>
+            <td><span class="tier-badge never">never</span></td>
+            <td class="food-note">Amatoxins — drooling, vomiting, liver failure</td>
+          </tr>
+          
+          <tr class="food-row" data-name="xylitol (gum, candy)" data-tier="never" data-note="xylitol — collapse, liver failure">
+            <td class="food-name">Xylitol (gum, candy)</td>
+            <td><span class="tier-badge never">never</span></td>
+            <td class="food-note">Xylitol — collapse, liver failure</td>
+          </tr>
+          
+          <tr class="food-row" data-name="yogurt" data-tier="safe" data-note="plain">
+            <td class="food-name">Yogurt</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note">plain</td>
+          </tr>
+          
+          <tr class="food-row" data-name="zucchini" data-tier="safe" data-note="">
+            <td class="food-name">Zucchini</td>
+            <td><span class="tier-badge safe">safe</span></td>
+            <td class="food-note"></td>
+          </tr>
+          
+        </tbody>
+      </table>
+    </div>
   </div>
 
-  <div class="legend">
-    <span><span class="badge b-safe">Safe</span>fine as a regular treat</span>
-    <span><span class="badge b-mod">Mod</span>small amounts, occasionally</span>
-    <span><span class="badge b-rare">Rare</span>tiny bits only</span>
-  </div>
-
-  <div class="table-2up">
-    <table>
-      <thead class="safe-bar-head"><tr><th>Food</th><th>OK?</th><th>Src</th></tr></thead>
-      <tbody>
-        <tr><td class="food"><span class="icon">🍎</span>Apple <span class="note">no seeds</span></td><td><span class="badge b-safe">Safe</span></td><td class="ref">3</td></tr>
-        <tr><td class="food"><span class="icon">🍌</span>Banana</td><td><span class="badge b-mod">Mod</span></td><td class="ref">3</td></tr>
-        <tr><td class="food"><span class="icon">🫐</span>Blueberries</td><td><span class="badge b-safe">Safe</span></td><td class="ref">3</td></tr>
-        <tr><td class="food"><span class="icon">🍞</span>Bread <span class="note">plain</span></td><td><span class="badge b-mod">Mod</span></td><td class="ref">2</td></tr>
-        <tr><td class="food"><span class="icon">🥦</span>Broccoli</td><td><span class="badge b-mod">Mod</span></td><td class="ref">3</td></tr>
-        <tr><td class="food"><span class="icon">🥕</span>Carrots</td><td><span class="badge b-safe">Safe</span></td><td class="ref">3</td></tr>
-        <tr><td class="food"><span class="icon">🧀</span>Cheese</td><td><span class="badge b-mod">Mod</span></td><td class="ref">2</td></tr>
-        <tr><td class="food"><span class="icon">🍗</span>Chicken <span class="note">cooked</span></td><td><span class="badge b-safe">Safe</span></td><td class="ref">5</td></tr>
-        <tr><td class="food"><span class="icon">🌽</span>Corn <span class="note">off cob</span></td><td><span class="badge b-mod">Mod</span></td><td class="ref">2</td></tr>
-        <tr><td class="food"><span class="icon">🥒</span>Cucumber</td><td><span class="badge b-safe">Safe</span></td><td class="ref">3</td></tr>
-        <tr><td class="food"><span class="icon">🥚</span>Egg <span class="note">cooked</span></td><td><span class="badge b-safe">Safe</span></td><td class="ref">2</td></tr>
-        <tr><td class="food"><span class="icon">🫛</span>Green Beans</td><td><span class="badge b-safe">Safe</span></td><td class="ref">3</td></tr>
-        <tr><td class="food"><span class="icon">🥭</span>Mango <span class="note">no pit</span></td><td><span class="badge b-mod">Mod</span></td><td class="ref">3</td></tr>
-      </tbody>
-    </table>
-    <table>
-      <thead class="safe-bar-head"><tr><th>Food</th><th>OK?</th><th>Src</th></tr></thead>
-      <tbody>
-        <tr><td class="food"><span class="icon">🥣</span>Oatmeal <span class="note">plain</span></td><td><span class="badge b-mod">Mod</span></td><td class="ref">8</td></tr>
-        <tr><td class="food"><span class="icon">🥜</span>Peanut Butter <span class="note">no xylitol</span></td><td><span class="badge b-mod">Mod</span></td><td class="ref">2</td></tr>
-        <tr><td class="food"><span class="icon">🟢</span>Peas</td><td><span class="badge b-safe">Safe</span></td><td class="ref">3</td></tr>
-        <tr><td class="food"><span class="icon">🍍</span>Pineapple</td><td><span class="badge b-mod">Mod</span></td><td class="ref">3</td></tr>
-        <tr><td class="food"><span class="icon">🎃</span>Pumpkin <span class="note">plain</span></td><td><span class="badge b-safe">Safe</span></td><td class="ref">3</td></tr>
-        <tr><td class="food"><span class="icon">🍚</span>Rice <span class="note">white, plain</span></td><td><span class="badge b-safe">Safe</span></td><td class="ref">6</td></tr>
-        <tr><td class="food"><span class="icon">🐟</span>Salmon <span class="note">cooked</span></td><td><span class="badge b-safe">Safe</span></td><td class="ref">2</td></tr>
-        <tr><td class="food"><span class="icon">🥬</span>Spinach</td><td><span class="badge b-rare">Rare</span></td><td class="ref">3</td></tr>
-        <tr><td class="food"><span class="icon">🍓</span>Strawberries</td><td><span class="badge b-mod">Mod</span></td><td class="ref">3</td></tr>
-        <tr><td class="food"><span class="icon">🍠</span>Sweet Potato <span class="note">cooked</span></td><td><span class="badge b-safe">Safe</span></td><td class="ref">7</td></tr>
-        <tr><td class="food"><span class="icon">🦃</span>Turkey <span class="note">plain</span></td><td><span class="badge b-safe">Safe</span></td><td class="ref">2</td></tr>
-        <tr><td class="food"><span class="icon">🍉</span>Watermelon <span class="note">no seeds</span></td><td><span class="badge b-safe">Safe</span></td><td class="ref">3</td></tr>
-        <tr><td class="food"><span class="icon">🥛</span>Yogurt <span class="note">plain</span></td><td><span class="badge b-mod">Mod</span></td><td class="ref">2</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- ============ REFERENCES ============ -->
-  <div class="refs">
-    <h3>References — official sources</h3>
-    <ol>
-      <li><b>1. ASPCA</b> — People Foods to Avoid Feeding Your Pets — <a href="https://www.aspca.org/pet-care/aspca-poison-control/people-foods-avoid-feeding-your-pets">aspca.org/pet-care/aspca-poison-control/people-foods-avoid-feeding-your-pets</a></li>
-      <li><b>2. AKC</b> — People Foods Dogs Can and Can't Eat — <a href="https://www.akc.org/expert-advice/nutrition/human-foods-dogs-can-and-cant-eat/">akc.org/expert-advice/nutrition/human-foods-dogs-can-and-cant-eat</a></li>
-      <li><b>3. AKC</b> — Fruits &amp; Vegetables Dogs Can or Can't Eat — <a href="https://www.akc.org/expert-advice/nutrition/fruits-vegetables-dogs-can-and-cant-eat/">akc.org/expert-advice/nutrition/fruits-vegetables-dogs-can-and-cant-eat</a></li>
-      <li><b>4. FDA</b> — Potentially Dangerous Items for Your Pet — <a href="https://www.fda.gov/animal-veterinary/animal-health-literacy/potentially-dangerous-items-your-pet">fda.gov/animal-veterinary/animal-health-literacy/potentially-dangerous-items-your-pet</a></li>
-      <li><b>5. AKC</b> — Can Dogs Eat Chicken? — <a href="https://www.akc.org/expert-advice/nutrition/can-dogs-eat-chicken/">akc.org/expert-advice/nutrition/can-dogs-eat-chicken</a></li>
-      <li><b>6. AKC</b> — Can Dogs Eat Rice? — <a href="https://www.akc.org/expert-advice/nutrition/can-dogs-eat-rice/">akc.org/expert-advice/nutrition/can-dogs-eat-rice</a></li>
-      <li><b>7. AKC</b> — Can Dogs Eat Sweet Potatoes? — <a href="https://www.akc.org/expert-advice/nutrition/can-dogs-eat-sweet-potatoes/">akc.org/expert-advice/nutrition/can-dogs-eat-sweet-potatoes</a></li>
-      <li><b>8. AKC</b> — Can Dogs Eat Oatmeal? — <a href="https://www.akc.org/expert-advice/nutrition/can-dogs-eat-oatmeal/">akc.org/expert-advice/nutrition/can-dogs-eat-oatmeal</a></li>
-    </ol>
-  </div>
-
+  <!-- Footer -->
   <div class="footer">
-    <span>Treats &lt;10% of daily calories. Introduce new foods slowly. Sources current as of 2026-06-09.</span>
-    <span class="poison">Ate something toxic? ASPCA Poison Control: (888) 426-4435</span>
+    <strong>Sources:</strong> Merck Veterinary Manual &middot; ASPCA APCC &middot; Pet Poison Helpline &middot; FDA.<br>
+    <em>When in doubt, immediately contact your veterinarian or emergency animal poison hotline.</em>
   </div>
 
 </div>
+
+<script>
+  let currentTier = 'all';
+
+  function setFilter(tier, btn) {
+    currentTier = tier;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    filterFoods();
+  }
+
+  function filterFoods() {
+    const query = document.getElementById('searchInput').value.toLowerCase().trim();
+    const rows = document.querySelectorAll('.food-row');
+
+    rows.forEach(row => {
+      const name = row.getAttribute('data-name');
+      const tier = row.getAttribute('data-tier');
+      const note = row.getAttribute('data-note');
+
+      const matchesSearch = !query || name.includes(query) || note.includes(query);
+      const matchesTier = currentTier === 'all' || tier === currentTier;
+
+      if (matchesSearch && matchesTier) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  }
+</script>
+
 </body>
 </html>

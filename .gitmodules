@@ -1,7 +1,7 @@
 [submodule "publications"]
 	path = publications
 	url = https://github.com/pike00/Publications.git
-	branch = master
+	branch = main
 [submodule "blog-posts"]
 	path = blog-posts
 	url = https://github.com/pike00/blog.git

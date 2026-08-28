@@ -130,6 +130,21 @@ just dev             # tailnet-bound, reachable from other devices
 
 No Pagefind. No MDX integration. Search is in-browser via Fuse.js over a JSON bundle generated at build time.
 
+## Post & Project Linking and Feed Deduplication
+
+Posts and projects can be paired to cross-link on detail pages and deduplicate in mixed feeds:
+
+- **Linking mechanisms**:
+  - Automatic matching: [src/lib/pairings.ts](src/lib/pairings.ts) automatically links unpaired projects with posts whose slug matches or starts with `<projectSlug>-` (e.g. `coldkey` <-> `coldkey-paper-backup-age-keys`).
+  - Frontmatter in post: `project: "coldkey"` (or `projectSlug`)
+  - Frontmatter in project: `post: "coldkey-paper-backup-age-keys"` (or `postSlug`)
+  - Centralized map: `staticPairings` in [src/lib/pairings.ts](src/lib/pairings.ts)
+- **Feed deduplication**:
+  - Call sites (`index.astro`, `notes.astro`, `rss.xml.ts`, `topics/[tag].astro`) load combined feeds via `getCombinedFeed()` in [src/lib/feed.ts](src/lib/feed.ts).
+  - When a Post and Project are paired, mixed feeds prefer displaying the **Post** entry and suppress the duplicate **Project** card. Detail pages (`/projects/[slug]` and `/notes/[slug]`) still cross-link via callout banners.
+- **On-demand feed hiding (`hideFromFeed`)**:
+  - Any post, project, or 3D print can set `hideFromFeed: true` (or `hide_from_feed: true`) in YAML frontmatter to hide it from chronological mixed feeds while keeping its direct URL and dedicated page accessible.
+
 ## Writing posts
 
 Blog posts here are empirical, investigative technical pieces (see the neural-net date-stamp and tailnet-deploy posts), not marketing copy. **Before drafting a new post in `blog-posts/posts/` from scratch, or substantially rewriting an existing one, invoke the `measured-voice` skill first** — it owns the voice rules (hedged-but-committed claims, evidence accumulation, flat-affect tone, first-person investigation, peer-to-peer register) plus a review checklist. Don't hand-write or hand-edit post prose without it loaded; the skill is the source of truth for voice, not this file. `article-writing` is the umbrella long-form skill and `measured-voice` is its empirical preset — reach for `measured-voice` by default on this blog. New posts making empirical or factual claims should be fact-checked against primary sources before publish.

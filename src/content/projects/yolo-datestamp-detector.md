@@ -6,6 +6,7 @@ tags: ["YOLOv8", "Python", "Computer Vision", "PyTorch"]
 date: "2026-04-15"
 stack: ["Ultralytics YOLO", "PyTorch", "Python", "Docker", "Claude Haiku (OCR)"]
 image: "/blog/teaching-neural-net/golden-gate-stamp.jpg"
+post: "teaching-a-neural-net-to-find-date-stamps"
 ---
 
 A single-class object detector trained on ~3,000 hand-labeled scans to find the orange LED date stamps that 1980s–2000s consumer cameras burned into the lower-right corner. Once the stamp region is localized, a separate OCR stage reads the digits and writes the recovered date back to the photo's EXIF metadata.

@@ -2,7 +2,7 @@
   "name": "personal-site",
   "type": "module",
   "version": "0.0.1",
-  "packageManager": "pnpm@9.15.9",
+  "packageManager": "pnpm@11.18.0",
   "engines": {
     "node": ">=22.12.0"
   },
@@ -20,8 +20,8 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@astrojs/react": "^5.0.7",
-    "@astrojs/rss": "^4.0.18",
+    "@astrojs/react": "^6.0.2",
+    "@astrojs/rss": "^4.0.19",
     "@astrojs/sitemap": "^3.7.2",
     "@docsearch/css": "^4",
     "@docsearch/react": "^4",
@@ -31,16 +31,15 @@
     "@tailwindcss/vite": "^4.3.1",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "astro": "^6.4.7",
+    "astro": "^7.1.6",
     "fast-xml-parser": "^5.7.0",
     "fuse.js": "^7.3.0",
-    "gray-matter": "^4.0.3",
     "marked": "^18.0.2",
     "marked-footnote": "^1.4.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "satori": "^0.26.0",
-    "sharp": "^0.34.5",
+    "sharp": "^0.35.3",
     "shiki": "^4.0.2",
     "tailwindcss": "^4.2.4",
     "yaml": "^2.8.3"
@@ -50,12 +49,6 @@
     "typescript": "^5.9.3",
     "typst": "^0.10.0-8",
     "vitest": "^4.1.9",
-    "wrangler": "^4.0.0"
-  },
-  "pnpm": {
-    "overrides": {
-      "esbuild": ">=0.28.1",
-      "ws": ">=8.21.0"
-    }
+    "wrangler": "^4.118.0"
   }
 }

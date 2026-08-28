@@ -5,7 +5,6 @@ import type { Publication, SearchablePublication } from "./types";
 
 const SUBMODULE_DIR = path.resolve("publications");
 const PUBLICATIONS_DIR = path.resolve("publications/Publications");
-const TAGS_FILE = path.resolve("src/content/publication-tags.yaml");
 
 interface PublicationMetadata {
   title: string;
@@ -20,6 +19,10 @@ interface PublicationMetadata {
   issue?: string;
   pages?: string;
   journal_abbrev?: string;
+  tags?: string[];
+  hook?: string;
+  summary?: string;
+  abstract?: string;
 }
 
 function slugify(folderName: string): string {
@@ -41,21 +44,9 @@ function findPdf(dirPath: string): string | undefined {
   return pdf ? path.join(dirPath, pdf) : undefined;
 }
 
-function loadTags(): Record<string, string[]> {
-  if (!fs.existsSync(TAGS_FILE)) return {};
-  const content = fs.readFileSync(TAGS_FILE, "utf-8");
-  const parsed = yaml.parse(content) as Record<string, { tags: string[] }>;
-  const result: Record<string, string[]> = {};
-  for (const [key, value] of Object.entries(parsed)) {
-    result[key] = value.tags;
-  }
-  return result;
-}
-
 export function getPublications(): Publication[] {
   if (!fs.existsSync(PUBLICATIONS_DIR)) return [];
 
-  const tags = loadTags();
   const folders = fs.readdirSync(PUBLICATIONS_DIR).filter((f) => {
     return fs.statSync(path.join(PUBLICATIONS_DIR, f)).isDirectory();
   });
@@ -85,11 +76,14 @@ export function getPublications(): Publication[] {
         doi: data.doi ?? "",
         pmcId: data.pmc,
         pubType: data.pub_type ?? "Journal Article",
-        researchArea: tags[folder] ?? [],
+        researchArea: data.tags ?? [],
         pdfPath: pdfPath
           ? path.relative(SUBMODULE_DIR, pdfPath)
           : undefined,
         folderName: folder,
+        hook: data.hook,
+        summary: data.summary,
+        abstract: data.abstract,
       });
     } else if (pdfPath) {
       const titleFromFolder = folder.replace(/^\d+\s+/, "");
@@ -106,7 +100,7 @@ export function getPublications(): Publication[] {
         pubDate: "",
         doi: "",
         pubType: "Journal Article",
-        researchArea: tags[folder] ?? [],
+        researchArea: [],
         pdfPath: path.relative(SUBMODULE_DIR, pdfPath),
         folderName: folder,
       });

@@ -21,6 +21,10 @@ const projects = defineCollection({
     period: z.string().optional(),
     stack: z.array(z.string()).optional(),
     image: z.string().optional(),
+    post: z.string().optional(),
+    postSlug: z.string().optional(),
+    hideFromFeed: z.boolean().optional(),
+    hide_from_feed: z.boolean().optional(),
   }),
 });
 
@@ -33,6 +37,8 @@ const prints = defineCollection({
     tags: z.array(z.string()),
     image: z.string().optional(),
     repo: z.string().optional(),
+    hideFromFeed: z.boolean().optional(),
+    hide_from_feed: z.boolean().optional(),
   }),
 });
 

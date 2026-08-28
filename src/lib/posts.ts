@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import matter from "gray-matter";
+import { matter } from "./frontmatter";
 import { z } from "astro:content";
 
 const BLOG_DIR = path.resolve("blog-posts/posts");
@@ -20,12 +20,18 @@ export const postFrontmatterSchema = z.object({
     .regex(/^\d{4}-\d{2}-\d{2}$/, "must be an ISO date in YYYY-MM-DD form"),
   tags: z.array(z.string()).default([]),
   draft: z.boolean().optional(),
+  project: z.string().optional(),
+  projectSlug: z.string().optional(),
+  hideFromFeed: z.boolean().optional(),
+  hide_from_feed: z.boolean().optional(),
 });
 
 export type PostFrontmatter = z.infer<typeof postFrontmatterSchema>;
 
 export interface Post extends PostFrontmatter {
   slug: string;
+  hideFromFeed?: boolean;
+  project?: string;
   /** Raw markdown body (frontmatter stripped). */
   content: string;
 }
@@ -37,10 +43,16 @@ export interface ProjectFrontmatter {
   tags: string[];
   url?: string;
   repo?: string;
+  post?: string;
+  postSlug?: string;
+  hideFromFeed?: boolean;
+  hide_from_feed?: boolean;
 }
 
 export interface ProjectEntry extends ProjectFrontmatter {
   slug: string;
+  hideFromFeed?: boolean;
+  post?: string;
   /** Raw markdown body (frontmatter stripped). */
   content: string;
 }
@@ -86,7 +98,9 @@ export function getPosts(opts: { includeDrafts?: boolean } = {}): Post[] {
           `Invalid blog frontmatter in blog-posts/posts/${slug}.md:\n${issues}`,
         );
       }
-      return { slug, ...parsed.data, content };
+      const hideFromFeed = Boolean(parsed.data.hideFromFeed ?? parsed.data.hide_from_feed);
+      const project = parsed.data.project || parsed.data.projectSlug;
+      return { slug, ...parsed.data, hideFromFeed, project, content };
     })
     .filter((p) => opts.includeDrafts || !p.draft);
 }
@@ -124,6 +138,8 @@ export function getProjects(): ProjectEntry[] {
       tags: (data.tags as string[]) ?? [],
       url: data.url as string | undefined,
       repo: data.repo as string | undefined,
+      post: (data.post || data.postSlug) as string | undefined,
+      hideFromFeed: Boolean(data.hideFromFeed ?? data.hide_from_feed),
       content,
     }),
   );
@@ -138,6 +154,7 @@ export interface PrintEntry {
   /** Hero image for the gallery card (path under /public). */
   image?: string;
   repo?: string;
+  hideFromFeed?: boolean;
   /** Raw markdown body (frontmatter stripped). */
   content: string;
 }
@@ -156,6 +173,7 @@ export function getPrints(): PrintEntry[] {
       tags: (data.tags as string[]) ?? [],
       image: data.image as string | undefined,
       repo: data.repo as string | undefined,
+      hideFromFeed: Boolean(data.hideFromFeed ?? data.hide_from_feed),
       content,
     }),
   );
