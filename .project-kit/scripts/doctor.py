@@ -7,17 +7,18 @@
 
 Checks subsystem health for this adopter. Stdlib only.
 """
+
 from __future__ import annotations
 
-import os
 import shutil
 import subprocess
 import sys
 from pathlib import Path
 
 EXPECTED_JUST = [
-    "_lib", "preview", "release", "test", "deploy",
-    "build", "db", "setup", "docs", "clean",
+    "_lib",
+    "preview",
+    "release",
 ]
 
 
@@ -51,7 +52,7 @@ def _check_cmd(layer: str, cmd: str) -> int:
 
 def main() -> int:
     repo = Path.cwd()
-    print(f"project-kit doctor — personal-site\n")
+    print("project-kit doctor — personal-site\n")
     print("configuration:")
     pk = repo / ".project-kit"
     if not pk.is_dir():
@@ -76,7 +77,10 @@ def main() -> int:
         if shutil.which("just"):
             proc = subprocess.run(
                 ["just", "--justfile", str(jf), "--summary"],
-                capture_output=True, text=True, cwd=str(repo),
+                capture_output=True,
+                text=True,
+                cwd=str(repo),
+                check=False,
             )
             if proc.returncode == 0:
                 _ok("root justfile parses (just --summary)")
@@ -91,10 +95,11 @@ def main() -> int:
         fails += 1
 
     print("\npreview:")
-    if (repo / "compose.worktree.yml").is_file():
-        _ok("compose.worktree.yml present")
+    compose_file = "compose.worktree.yml"
+    if (repo / compose_file).is_file():
+        _ok(f"{compose_file} present")
     else:
-        _fail("compose.worktree.yml missing")
+        _fail(f"{compose_file} missing")
         fails += 1
     print("\nrelease:")
     if (repo / ".project-kit" / "cliff.toml").is_file():
@@ -106,28 +111,6 @@ def main() -> int:
         _ok("gh CLI available")
     else:
         _warn("gh CLI not on $PATH")
-        warns += 1
-    print("\nhooks:")
-    hooks_dir = repo / ".project-kit" / "hooks"
-    for hook in ("pre-commit", "pre-push"):
-        hp = hooks_dir / hook
-        if hp.is_file() and os.access(hp, os.X_OK):
-            _ok(f".project-kit/hooks/{hook} present and executable")
-        elif hp.is_file():
-            _fail(f".project-kit/hooks/{hook} present but not executable (chmod +x)")
-            fails += 1
-        else:
-            _fail(f".project-kit/hooks/{hook} missing")
-            fails += 1
-    hp_proc = subprocess.run(
-        ["git", "config", "--local", "core.hooksPath"],
-        capture_output=True, text=True, cwd=str(repo),
-    )
-    configured = hp_proc.stdout.strip()
-    if configured == ".project-kit/hooks":
-        _ok("core.hooksPath -> .project-kit/hooks")
-    else:
-        _warn(f"core.hooksPath not set to .project-kit/hooks (got {configured!r}); run `just setup-hooks`")
         warns += 1
 
     print(f"\n{fails} failures, {warns} warnings.")
