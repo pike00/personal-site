@@ -3,7 +3,7 @@
 <!-- BEGIN PROJECT-KIT — generated, do not edit by hand -->
 ## Project-kit recipes
 
-This repo is managed by project-kit (skill version: 0.2.0, last refreshed: 2026-09-21).
+This repo is managed by project-kit (skill version: 0.2.1, last refreshed: 2026-09-26).
 Project-kit-managed operations go through `just`.
 
 ### Execution context
