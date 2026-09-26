@@ -73,7 +73,7 @@
   },
   "project_name": "personal-site",
   "public": true,
-  "refreshed_at": "2026-09-21",
+  "refreshed_at": "2026-09-26",
   "release": {
     "dedicated_llm_key": false,
     "enabled": true,
@@ -91,7 +91,7 @@
     "hooks": true,
     "precommit": false
   },
-  "skill_version": "0.2.0",
+  "skill_version": "0.2.1",
   "test": {
     "backend": {
       "cmd": null,
