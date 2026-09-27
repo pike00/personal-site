@@ -3,7 +3,7 @@
 <!-- BEGIN PROJECT-KIT — generated, do not edit by hand -->
 ## Project-kit recipes
 
-This repo is managed by project-kit (skill version: 0.2.0, last refreshed: 2026-09-21).
+This repo is managed by project-kit (skill version: 0.3.0, last refreshed: 2026-09-27).
 Project-kit-managed operations go through `just`.
 
 ### Execution context
@@ -25,19 +25,23 @@ an action runs.
 | Prepare release PR | `just release-prepare patch` |
 | Publish merged release | `just release-publish vX.Y.Z` |
 | Update CHANGELOG | `just changelog` |
+| Show delivery status | `just delivery-status` |
+| Show delivery status (json) | `just delivery-status-json` |
+| Show delivery plan | `just delivery-plan <tag>` |
 | Health check | `uv run .project-kit/scripts/doctor.py` |
 
 ### Subsystem status
 
 - preview: enabled
 - release: enabled
+- delivery: enabled
 
 ### Where things live
 
-- Managed recipe imports: 3 (`_lib.just` plus 2 managed subsystems)
+- Managed recipe imports: 4 (`_lib.just` plus 3 managed subsystems)
 - `.project-kit/scripts/` — uv-scripts for non-trivial recipes
 - `.project-kit/cliff.toml` — git-cliff config (centralized; passed via `--config`, no root copy)
-- `justfile` (root) — imports 3 managed recipe files plus repo-specific recipes
+- `justfile` (root) — imports 4 managed recipe files plus repo-specific recipes
 
 ### How to refresh
 

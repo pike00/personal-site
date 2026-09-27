@@ -11,6 +11,7 @@ default:
 import '.project-kit/_lib.just'
 import '.project-kit/preview.just'
 import '.project-kit/release.just'
+import '.project-kit/delivery.just'
 # END PROJECT-KIT
 
 # --- repo-specific ---
