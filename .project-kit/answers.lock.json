@@ -26,10 +26,13 @@
     "backend": "none",
     "enabled": false
   },
+  "defaults_hash": "158ed062baedc71c034fce6561a378dfd2e7835bb19eacf0caa35f6faf950bf2",
   "delete_recipes": [],
   "deploy": {
     "allow_legacy_apply": false,
+    "allow_shell": false,
     "cf_worker": null,
+    "command": [],
     "custom_command": null,
     "enabled": false,
     "homelab_app": null,
@@ -37,6 +40,7 @@
     "host": null,
     "pypi_package": null,
     "remote_compose_root": null,
+    "shell_command": null,
     "ssh_alias": null,
     "sync_checkout": false,
     "target": "none"
@@ -53,6 +57,17 @@
   "domain": "",
   "execution": {
     "targets": {}
+  },
+  "generated_files": {
+    ".project-kit/_lib.just": "a88aa682c97a2e4a63dc3664db8821f28082da5a12baf757fcbcf23df116dd73",
+    ".project-kit/cliff.toml": "5ed3d4afa2fb29ce74e3848e4d372c5d6d9361687050d29fb516a667ca9431ec",
+    ".project-kit/delivery.just": "d3a7c9ff08ea6baf9b48ca11d5c98c5514f2e0c93469de97e22b245336c5440e",
+    ".project-kit/preview.just": "7237711ff2e91ff9529e9e5d0ab3752638592ed24e219a2f91da528e154176fa",
+    ".project-kit/release.just": "cc0c660df94f903c6165e1e2192352f90946d52704bbf95705e4ec5b36467eb9",
+    ".project-kit/scripts/_runtime.py": "600f658ea913fc24efce29cde79b20ee27f39a2dd25e4857ccf1e60582af4a80",
+    ".project-kit/scripts/delivery.py": "cb03f1aa4e71cbf20d557c923197174ed4a4a46a9c0c542196d4c4b16d0876a8",
+    ".project-kit/scripts/doctor.py": "bf47d6ebc412e28304f6a339db7100007cf58bf09f8d42b97df241c5e0f399a6",
+    ".project-kit/scripts/release.py": "834cf242e3c6164c0b8d384563d98f8871e3833edd9ad7709c2180e25eda3401"
   },
   "language": "static",
   "managed_subsystems": [
@@ -71,12 +86,14 @@
     "test_command": "npm test",
     "test_service": "app"
   },
+  "project_kit_commit": "4468f7e8fa8f",
   "project_name": "personal-site",
   "public": true,
-  "refreshed_at": "2026-09-26",
+  "refreshed_at": "2026-09-27",
   "release": {
     "dedicated_llm_key": false,
     "enabled": true,
+    "git_cliff_version": "2.14.2",
     "install_command": null,
     "litellm_base_url": "",
     "litellm_model": "deepseek-v4-pro-cloud",
@@ -84,6 +101,7 @@
     "prod_pypi_package": "",
     "prod_source": "none"
   },
+  "schema_version": 2,
   "setup": {
     "backend": null,
     "enabled": false,
@@ -91,7 +109,8 @@
     "hooks": true,
     "precommit": false
   },
-  "skill_version": "0.2.1",
+  "skill_version": "0.3.0",
+  "template_hash": "e3480bdc6fb710cf8b1074e9717ccc8fc4fc29e029472f9188dabc61e2136b12",
   "test": {
     "backend": {
       "cmd": null,
