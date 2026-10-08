@@ -34,7 +34,10 @@
     ],
     align(right + top)[
       #if date != none [ #text(size: 9pt, weight: 500, fill: ink)[#date] ]
-      #if loc != none [ #linebreak() #text(size: 8.5pt, fill: muted)[#loc] ]
+      #if loc != none [
+        #if date != none [#linebreak()]
+        #text(size: 8.5pt, fill: muted)[#loc]
+      ]
     ],
   )
 )

@@ -13,13 +13,13 @@ Physician and Clinical AI Informaticist at Suki AI, with experience in clinical 
 
 ### Georgetown University School of Medicine -- Doctor of Medicine (MD)
 
-*2018 - 2022* | Washington, DC
+| Washington, DC
 
 - Magna Cum Laude
 
 ### University of Virginia -- BA with Distinction in Biology
 
-*2014 - 2017* | Charlottesville, VA
+| Charlottesville, VA
 
 - GPA: 4.0/4.0; graduated in 3 years
 
