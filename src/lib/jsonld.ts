@@ -15,8 +15,8 @@ export function personJsonLd(): Record<string, unknown> {
     alternateName: "Conner William Pike",
     honorificSuffix: "MD",
     url: SITE,
-    jobTitle: "Director of Medical Informatics and Innovation",
-    worksFor: { "@type": "Organization", name: "Atropos Health" },
+    jobTitle: "Clinical AI Informaticist",
+    worksFor: { "@type": "Organization", name: "Suki AI" },
     alumniOf: [
       { "@type": "CollegeOrUniversity", name: "Georgetown University School of Medicine" },
       { "@type": "CollegeOrUniversity", name: "University of Virginia" },

@@ -1,13 +1,13 @@
 ---
 name: Will Pike, MD
-title: Physician working in AI and clinical informatics
+title: Physician and Clinical AI Informaticist
 ---
 
 [pikemd.com](https://pikemd.com) | [LinkedIn](https://linkedin.com/in/pike00) | [GitHub](https://github.com/pike00) | Remote/Chicago, IL
 
 ## Summary
 
-Physician working in AI, with experience in clinical informatics, real-world evidence, and software development. Builds tools that turn complex clinical data into research-grade evidence.
+Physician and Clinical AI Informaticist at Suki AI, with experience in clinical informatics, real-world evidence, and software development. Builds tools that turn complex clinical data into research-grade evidence.
 
 ## Education
 
@@ -25,15 +25,19 @@ Physician working in AI, with experience in clinical informatics, real-world evi
 
 ## Experience
 
+### Clinical AI Informaticist -- Suki AI
+
+*August 2026 - present*
+
 ### Director of Medical Informatics and Innovation -- Atropos Health
 
-*July 2023 - present* | Remote
+*July 2023 - July 2026* | Remote
 
-- Lead clinical informatics strategy for an RWE company, designing scalable workflows for data transformation and semantic normalization across EHR, claims, and structured/unstructured clinical data sources
-- Build automated tools (Python, SQL) for data quality checks, concept identification, cohort definition, and clinical vocabulary mapping to improve research delivery
-- Develop and deploy scalable, production-grade full-stack applications (Python backend, React frontend) in daily use by the informatics team
-- Serve as clinical SME translating complex medical concepts into computable phenotypes and standardized data representations for cross-functional engineering and data science teams
-- Drive knowledge management, process automation, and documentation across clinical evidence pipelines
+- Led clinical informatics strategy for an RWE company, designing scalable workflows for data transformation and semantic normalization across EHR, claims, and structured/unstructured clinical data sources
+- Built automated tools (Python, SQL) for data quality checks, concept identification, cohort definition, and clinical vocabulary mapping to improve research delivery
+- Developed and deployed scalable, production-grade full-stack applications (Python backend, React frontend) in daily use by the informatics team
+- Served as clinical SME translating complex medical concepts into computable phenotypes and standardized data representations for cross-functional engineering and data science teams
+- Drove knowledge management, process automation, and documentation across clinical evidence pipelines
 
 ### Emergency Medicine Resident -- Johns Hopkins University
 
