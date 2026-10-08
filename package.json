@@ -23,8 +23,8 @@
     "@astrojs/react": "^6.0.2",
     "@astrojs/rss": "^4.0.19",
     "@astrojs/sitemap": "^3.7.2",
-    "@docsearch/css": "^4",
-    "@docsearch/react": "^4",
+    "@docsearch/css": "^4.6.3",
+    "@docsearch/react": "^4.6.3",
     "@fontsource/inter": "^5.2.8",
     "@resvg/resvg-js": "^2.6.2",
     "@tailwindcss/typography": "^0.5.19",
@@ -32,14 +32,14 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "astro": "^7.3.5",
-    "fast-xml-parser": "^5.7.0",
+    "fast-xml-parser": "^5.7.2",
     "fuse.js": "^7.3.0",
     "marked": "^18.0.2",
     "marked-footnote": "^1.4.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "satori": "^0.26.0",
-    "sharp": "^0.35.4",
+    "sharp": "^0.35.5",
     "shiki": "^4.0.2",
     "tailwindcss": "^4.2.4",
     "yaml": "^2.8.3"
@@ -47,7 +47,7 @@
   "devDependencies": {
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
-    "typst": "^0.10.0-8",
+    "typst": "0.10.0-8",
     "vitest": "^4.1.11",
     "wrangler": "^4.118.0"
   }

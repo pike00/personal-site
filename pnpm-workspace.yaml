@@ -5,6 +5,11 @@ allowBuilds:
   esbuild: true
   workerd: true
 
+minimumReleaseAgeExclude:
+  - smol-toml@1.8.1
+  - source-map-js@1.2.2
+  - postcss-selector-parser@7.1.6
+
 overrides:
   baseline-browser-mapping: ">=2.11.0 <3"
   browserslist: ">=4.28.7 <5"
