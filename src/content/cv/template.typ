@@ -45,7 +45,7 @@
 #align(center)[
   #text(size: 21pt, weight: 700, tracking: 0.2pt, fill: ink)[Will Pike, MD]
   #v(-3pt)
-  #text(size: 10.5pt, weight: 500, tracking: 0.8pt, fill: muted)[Physician-Clinical Informatician]
+  #text(size: 10.5pt, weight: 500, tracking: 0.8pt, fill: muted)[Physician working in AI and clinical informatics]
 ]
 
 #v(5pt)

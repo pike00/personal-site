@@ -1,13 +1,13 @@
 ---
 name: Will Pike, MD
-title: Physician-Clinical Informatician
+title: Physician working in AI and clinical informatics
 ---
 
 [pikemd.com](https://pikemd.com) | [LinkedIn](https://linkedin.com/in/pike00) | [GitHub](https://github.com/pike00) | Remote/Chicago, IL
 
 ## Summary
 
-Physician-Clinical Informatician specializing in real-world evidence. Builds scalable tools and processes that transform clinical data into research-grade evidence.
+Physician working in AI, with experience in clinical informatics, real-world evidence, and software development. Builds tools that turn complex clinical data into research-grade evidence.
 
 ## Education
 
@@ -44,12 +44,12 @@ Physician-Clinical Informatician specializing in real-world evidence. Builds sca
 
 ## Selected Publications
 
-24 published, 4 accepted, and 21 in preparation/submission. 6 conference abstracts. Topics span RWE, clinical outcomes, and health informatics.
+26 publications and 14 conference abstracts, posters, and presentations. Topics span AI, real-world evidence, clinical outcomes, and health informatics.
 
+- Nikzad N, Dimopoulos-Verma C, Gedallovich SM, ..., **Pike CW**, et al. Gender-affirming hormone therapy and liver diseases: a cohort study. *Front Gastroenterol*, 2026.
 - Furukawa D, **Pike CW**, Hui G, et al. Comorbidities Affect the Racial Disparities in the Incidence of Periprosthetic Joint Infection after Total Knee Arthroplasty. *J Arthroplasty*, 2026.
 - Gougol A, Kwo P, **Pike W**, et al. Real-World Alcohol Use Disorder Outcomes in Patients With Concurrent Metabolic Dysfunction: GLP-1 Receptor Agonists Versus FDA-Approved AUD Medications. *Aliment Pharmacol Ther*, 2026.
 - Dimopoulos-Verma A, Kulkarni C, **Pike CW**, et al. Statin use is associated with lower rates of stricture development in patients with Crohn's disease: a propensity score-matched study of two nationwide population databases. *J Crohns Colitis*, 2026.
-- Ihara K, **Pike CW**, Hui G, et al. Estrogen exposure from modern contraceptives and vascular risk in women with migraine: A nationwide electronic medical record database study. *Cephalalgia*, 2025.
 - Low YS, Jackson ML, Hyde RJ, ..., **Pike CW**, et al. Answering real-world clinical questions using large language model, retrieval-augmented generation, and agentic systems. *Digit Health*, 2025.
 
 See all publications at [pikemd.com/publications/](https://pikemd.com/publications/).

@@ -22,6 +22,8 @@ export function personJsonLd(): Record<string, unknown> {
       { "@type": "CollegeOrUniversity", name: "University of Virginia" },
     ],
     knowsAbout: [
+      "Artificial intelligence",
+      "Large language models",
       "Real-world evidence",
       "Clinical informatics",
       "Health outcomes research",
