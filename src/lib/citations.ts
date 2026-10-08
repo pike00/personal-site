@@ -117,7 +117,7 @@ export function generateCitationCff(publications: Publication[]): string {
   ];
 
   for (const pub of publications) {
-    if (!pub.id) continue;
+    if (!pub.id && !pub.doi) continue;
 
     lines.push("  - type: article");
     lines.push(`    title: "${pub.title.replace(/"/g, '\\"')}"`);

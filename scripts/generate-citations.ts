@@ -50,7 +50,7 @@ fs.mkdirSync(path.dirname(stampPath), { recursive: true });
 fs.writeFileSync(outputPath, cff);
 fs.writeFileSync(stampPath, hash + "\n");
 
-const refCount = publications.filter((p) => p.id).length;
+const refCount = publications.filter((p) => p.id || p.doi).length;
 await lokiEmit("generate-citations", "info", "complete", {
   elapsed_s: (Date.now() - t0) / 1000,
   result: "generated",

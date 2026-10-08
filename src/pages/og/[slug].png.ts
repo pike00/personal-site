@@ -57,7 +57,7 @@ export async function getStaticPaths() {
     params: { slug: "home" },
     props: {
       title: "Will Pike, MD",
-      description: "Physician and researcher. Publications, CV, and projects.",
+      description: "Physician and Clinical AI Informaticist at Suki AI. Research, software, and real-world evidence.",
       label: "pikemd.com",
     },
   });
@@ -66,7 +66,7 @@ export async function getStaticPaths() {
     props: {
       title: "Will Pike, MD",
       description:
-        "Curriculum vitae — physician-clinical informatician specializing in real-world evidence.",
+        "Clinical AI Informaticist at Suki AI. Research and software development.",
       label: "Curriculum Vitae",
     },
   });

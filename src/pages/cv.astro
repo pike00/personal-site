@@ -3,6 +3,12 @@ export const prerender = true;
 import PageLayout from "../layouts/PageLayout.astro";
 import Container from "../components/Container.astro";
 import { personJsonLd } from "../lib/jsonld";
+import { getAbstracts } from "../lib/abstracts";
+import { getPublications } from "../lib/publications";
+
+const publications = getPublications();
+const abstractCount = getAbstracts().filter((abstract) => !abstract.unpublished).length;
+const recentPublications = publications.slice(0, 5);
 
 const levelLabel = (level: number) =>
   ["", "Beginner", "Intermediate", "Proficient", "Advanced", "Expert"][level] ?? "";
@@ -25,7 +31,7 @@ const llmPlatforms = [
 
 <PageLayout
   title="CV"
-  description="Curriculum vitae for Will Pike, MD -- physician-clinical informatician specializing in real-world evidence."
+  description="Curriculum vitae for Will Pike, MD, a physician and clinical AI informaticist at Suki AI."
   image="/og/cv.png"
   jsonLd={personJsonLd()}
 >
@@ -40,7 +46,7 @@ const llmPlatforms = [
           Will Pike, MD
         </h1>
         <p class="mt-3 text-lg text-zinc-600 dark:text-zinc-400">
-          Physician-Clinical Informatician
+          Physician and Clinical AI Informaticist
         </p>
         <div class="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm text-zinc-500 dark:text-zinc-400">
           <a href="https://linkedin.com/in/pike00" class="flex items-center gap-1.5 transition hover:text-violet-600 dark:hover:text-violet-400">
@@ -83,8 +89,8 @@ const llmPlatforms = [
     <!-- Summary -->
     <section>
       <p class="text-lg text-zinc-600 dark:text-zinc-300 leading-relaxed border-l-4 border-accent pl-5">
-        Physician-Clinical Informatician specializing in real-world evidence. Builds scalable tools
-        and processes that transform clinical data into research-grade evidence.
+        Physician and Clinical AI Informaticist at Suki AI, with experience in clinical informatics,
+        real-world evidence, and software development. Builds tools that turn complex clinical data into research-grade evidence.
       </p>
     </section>
 
@@ -92,6 +98,19 @@ const llmPlatforms = [
     <section>
       <h2 class="text-xs uppercase tracking-[3px] text-accent font-semibold mb-6">Experience</h2>
       <div class="space-y-6">
+        <!-- Suki AI -->
+        <div class="rounded-2xl border border-zinc-100 dark:border-zinc-700/40 p-6 transition hover:bg-zinc-50/60 dark:hover:bg-zinc-800/40">
+          <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1">
+            <div>
+              <h3 class="text-lg font-bold text-primary dark:text-white">Clinical AI Informaticist</h3>
+              <p class="text-accent font-semibold text-sm">Suki AI</p>
+            </div>
+            <div class="text-sm text-zinc-500 dark:text-zinc-400 sm:text-right shrink-0">
+              <p>August 2026 - present</p>
+            </div>
+          </div>
+        </div>
+
         <!-- Atropos Health -->
         <div class="rounded-2xl border border-zinc-100 dark:border-zinc-700/40 p-6 transition hover:bg-zinc-50/60 dark:hover:bg-zinc-800/40">
           <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1 mb-3">
@@ -100,26 +119,26 @@ const llmPlatforms = [
               <p class="text-accent font-semibold text-sm">Atropos Health</p>
             </div>
             <div class="text-sm text-zinc-500 dark:text-zinc-400 sm:text-right shrink-0">
-              <p>July 2023 - present</p>
+              <p>July 2023 - July 2026</p>
               <p>Remote</p>
             </div>
           </div>
           <ul class="space-y-2 text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed">
             <li class="flex gap-2">
               <span class="text-accent mt-1 shrink-0">&#8226;</span>
-              Lead clinical informatics strategy for an RWE company, designing scalable workflows for data transformation and semantic normalization across EHR, claims, and structured/unstructured clinical data sources
+              Led clinical informatics strategy for an RWE company, designing scalable workflows for data transformation and semantic normalization across EHR, claims, and structured/unstructured clinical data sources
             </li>
             <li class="flex gap-2">
               <span class="text-accent mt-1 shrink-0">&#8226;</span>
-              Build automated tools (Python, SQL) for data quality checks, concept identification, cohort definition, and clinical vocabulary mapping to improve research delivery
+              Built automated tools (Python, SQL) for data quality checks, concept identification, cohort definition, and clinical vocabulary mapping to improve research delivery
             </li>
             <li class="flex gap-2">
               <span class="text-accent mt-1 shrink-0">&#8226;</span>
-              Serve as clinical SME translating complex medical concepts into computable phenotypes and standardized data representations for cross-functional engineering and data science teams
+              Served as clinical SME translating complex medical concepts into computable phenotypes and standardized data representations for cross-functional engineering and data science teams
             </li>
             <li class="flex gap-2">
               <span class="text-accent mt-1 shrink-0">&#8226;</span>
-              Drive knowledge management, process automation, and documentation across clinical evidence pipelines
+              Drove knowledge management, process automation, and documentation across clinical evidence pipelines
             </li>
           </ul>
         </div>
@@ -163,7 +182,6 @@ const llmPlatforms = [
               <p class="text-sm text-accent font-medium mt-1">Magna Cum Laude</p>
             </div>
             <div class="text-sm text-zinc-500 dark:text-zinc-400 sm:text-right shrink-0">
-              <p>2018 - 2022</p>
               <p>Washington, DC</p>
             </div>
           </div>
@@ -178,7 +196,6 @@ const llmPlatforms = [
               <p class="text-sm text-accent font-medium mt-1">GPA: 4.0/4.0 -- graduated in 3 years</p>
             </div>
             <div class="text-sm text-zinc-500 dark:text-zinc-400 sm:text-right shrink-0">
-              <p>2014 - 2017</p>
               <p>Charlottesville, VA</p>
             </div>
           </div>
@@ -189,24 +206,37 @@ const llmPlatforms = [
     <!-- Publications -->
     <section>
       <h2 class="text-xs uppercase tracking-[3px] text-accent font-semibold mb-6">Publications</h2>
-      <a
-        href="/publications"
-        class="group block rounded-2xl border border-zinc-100 dark:border-zinc-700/40 p-6 transition hover:border-zinc-200 hover:bg-zinc-50/60 dark:hover:border-zinc-700 dark:hover:bg-zinc-800/40"
-      >
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed">
-              Peer-reviewed publications spanning RWE, clinical outcomes, and health informatics
-            </p>
-            <p class="text-sm text-accent font-medium mt-2">
-              View full publication list &rarr;
-            </p>
-          </div>
-          <svg class="w-5 h-5 text-zinc-400 group-hover:text-accent transition-colors shrink-0 ml-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+      <div class="rounded-2xl border border-zinc-100 p-6 dark:border-zinc-700/40">
+        <p class="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed">
+          {publications.length} peer-reviewed publications and {abstractCount} conference abstracts, posters, and presentations across AI, real-world evidence, clinical outcomes, and health informatics.
+        </p>
+        <ul class="mt-5 space-y-4">
+          {recentPublications.map((publication) => (
+            <li>
+              <a
+                href={`/publications/${publication.slug}`}
+                class="group block"
+              >
+                <span class="text-sm font-medium leading-snug text-primary transition group-hover:text-accent dark:text-white">
+                  {publication.title}
+                </span>
+                <span class="mt-1 block text-xs text-zinc-500 dark:text-zinc-400">
+                  {[publication.journalAbbrev, publication.pubDate?.split("-")[0]].filter(Boolean).join(", ")}
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+        <a
+          href="/publications"
+          class="mt-5 inline-flex items-center gap-2 text-sm font-medium text-accent transition hover:underline"
+        >
+          View full publication list
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 16 16" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <path d="M4 8h8m-3-3 3 3-3 3" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
-        </div>
-      </a>
+        </a>
+      </div>
     </section>
 
     <!-- Skills -->
