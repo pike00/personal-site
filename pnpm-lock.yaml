@@ -13,6 +13,7 @@ overrides:
   js-yaml: '>=4.3.2 <5'
   nanoid: 3.3.18
   postcss: '>=8.5.23 <9'
+  postcss-selector-parser@<7.1.6: ^7.1.6
   sharp: '>=0.35.0'
   svgo: '>=4.1.0 <5'
   undici: ^7.29.0
@@ -2010,8 +2011,8 @@ packages:
     resolution: {integrity: sha512-RvwwcruNjI1ncT5xRakeyS9Lf8lcItv34KD+aif+VH9kduAyfYBipGh12274xtenIPZ119/R9BdTBa8gAwSh0A==}
     engines: {node: '>=12'}
 
-  postcss-selector-parser@6.0.10:
-    resolution: {integrity: sha512-IQ7TZdoaqbT+LCpShg46jnZVlhWD2w6iQYAcYXfHARZ7X1t/UGhhceQDs5X0cGqKvYlHNOuv7Oa1xmb0oQuA3w==}
+  postcss-selector-parser@7.1.6:
+    resolution: {integrity: sha512-7qASPzhKF2l2KLboRZux8CCTRMdGiV08vWmyKzPz22qZ7ZjQBOeY7rNzNoCLSUiftJ7HUq0GERHmxw/t0dCdMw==}
     engines: {node: '>=4'}
 
   postcss-value-parser@4.2.0:
@@ -3469,7 +3470,7 @@ snapshots:
 
   '@tailwindcss/typography@0.5.19(tailwindcss@4.2.4)':
     dependencies:
-      postcss-selector-parser: 6.0.10
+      postcss-selector-parser: 7.1.6
       tailwindcss: 4.2.4
 
   '@tailwindcss/vite@4.3.1(vite@8.1.5(@types/node@24.12.2)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.21.0)(yaml@2.8.3))':
@@ -4314,7 +4315,7 @@ snapshots:
 
   picomatch@4.0.5: {}
 
-  postcss-selector-parser@6.0.10:
+  postcss-selector-parser@7.1.6:
     dependencies:
       cssesc: 3.0.0
       util-deprecate: 1.0.2
