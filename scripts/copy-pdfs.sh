@@ -22,10 +22,14 @@ copy_pdfs() {
   done
 }
 
+# Keep PDF assets outside /publications/, which is an Astro route. On
+# case-insensitive filesystems, "Publications" and "publications" collide.
+rm -rf "$PUBLIC_DIR/Publications"
+
 if [ -d "$PUBS_DIR/Publications" ]; then
   for dir in "$PUBS_DIR/Publications"/*/; do
-    relpath="${dir#$PUBS_DIR/}"
-    copy_pdfs "$dir" "$PUBLIC_DIR/$relpath"
+    relpath="${dir#$PUBS_DIR/Publications/}"
+    copy_pdfs "$dir" "$PUBLIC_DIR/publication-files/$relpath"
   done
 fi
 

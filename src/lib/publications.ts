@@ -3,7 +3,6 @@ import path from "node:path";
 import yaml from "yaml";
 import type { Publication, SearchablePublication } from "./types";
 
-const SUBMODULE_DIR = path.resolve("publications");
 const PUBLICATIONS_DIR = path.resolve("publications/Publications");
 
 interface PublicationMetadata {
@@ -44,6 +43,15 @@ function findPdf(dirPath: string): string | undefined {
   return pdf ? path.join(dirPath, pdf) : undefined;
 }
 
+function getPublicPdfPath(pdfPath: string | undefined): string | undefined {
+  if (!pdfPath) return undefined;
+  const relativePath = path.relative(PUBLICATIONS_DIR, pdfPath);
+  return path.posix.join(
+    "publication-files",
+    relativePath.split(path.sep).join("/"),
+  );
+}
+
 export function getPublications(): Publication[] {
   if (!fs.existsSync(PUBLICATIONS_DIR)) return [];
 
@@ -77,9 +85,7 @@ export function getPublications(): Publication[] {
         pmcId: data.pmc,
         pubType: data.pub_type ?? "Journal Article",
         researchArea: data.tags ?? [],
-        pdfPath: pdfPath
-          ? path.relative(SUBMODULE_DIR, pdfPath)
-          : undefined,
+        pdfPath: getPublicPdfPath(pdfPath),
         folderName: folder,
         hook: data.hook,
         summary: data.summary,
@@ -101,7 +107,7 @@ export function getPublications(): Publication[] {
         doi: "",
         pubType: "Journal Article",
         researchArea: [],
-        pdfPath: path.relative(SUBMODULE_DIR, pdfPath),
+        pdfPath: getPublicPdfPath(pdfPath),
         folderName: folder,
       });
     }

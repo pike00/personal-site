@@ -28,6 +28,7 @@ pnpm-debug.log*
 public/cv.pdf
 public/CITATION.cff
 public/Publications/
+public/publication-files/
 public/Abstracts/
 public/Unpublished/
 public/blog/
