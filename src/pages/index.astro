@@ -13,7 +13,7 @@ import { getCombinedFeed } from "../lib/feed";
 import { personJsonLd } from "../lib/jsonld";
 
 const allProjects = getProjects();
-const featuredProjects = ["medpeds", "just-sidebar"]
+const featuredProjects = ["medpeds", "just-sidebar", "coldkey"]
   .map((slug) => allProjects.find((project) => project.slug === slug))
   .filter((project) => project !== undefined);
 
