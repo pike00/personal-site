@@ -1,10 +1,7 @@
 ---
 import Container from "./Container.astro";
 
-/**
- * Spotlight SimpleLayout — the standard page header used by every list page
- * (big title, muted intro, then the page body in a `<slot/>`).
- */
+/** Shared heading and content frame for list pages. */
 interface Props {
   title: string;
   intro?: string;
@@ -13,16 +10,16 @@ interface Props {
 const { title, intro } = Astro.props;
 ---
 
-<Container variant="full" class="mt-16 sm:mt-32">
-  <header class="max-w-2xl">
-    <h1 class="text-4xl font-bold tracking-tight text-zinc-800 sm:text-5xl dark:text-zinc-100">
+<Container variant="full" class="mt-14 sm:mt-20">
+  <header class="max-w-3xl">
+    <h1 class="font-display text-5xl font-normal leading-tight tracking-tight text-zinc-900 sm:text-6xl dark:text-zinc-100">
       {title}
     </h1>
     {intro && (
-      <p class="mt-6 text-base text-zinc-600 dark:text-zinc-400">{intro}</p>
+      <p class="mt-5 max-w-2xl text-lg leading-relaxed text-zinc-600 dark:text-zinc-300">{intro}</p>
     )}
   </header>
-  <div class="mt-16 sm:mt-20">
+  <div class="mt-12 sm:mt-16">
     <slot />
   </div>
 </Container>

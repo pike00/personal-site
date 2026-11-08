@@ -58,7 +58,7 @@ export default function SearchPublications({
   }, [query, selectedTag, selectedYear, sortOrder, fuse, publications]);
 
   const selectClass =
-    "rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-800 focus:outline-none focus:ring-2 focus:ring-violet-500/40 dark:border-zinc-700 dark:bg-zinc-800/60 dark:text-zinc-200";
+    "rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-800 focus:outline-none focus:ring-2 focus:ring-brand-500/40 dark:border-zinc-700 dark:bg-zinc-800/60 dark:text-zinc-200";
 
   return (
     <div>
@@ -68,7 +68,7 @@ export default function SearchPublications({
           placeholder="Search publications..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="w-full rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-800 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-violet-500/40 dark:border-zinc-700 dark:bg-zinc-800/60 dark:text-zinc-200"
+          className="w-full rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-800 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-brand-500/40 dark:border-zinc-700 dark:bg-zinc-800/60 dark:text-zinc-200"
         />
       </div>
 
@@ -107,7 +107,7 @@ export default function SearchPublications({
         {(selectedTag || selectedYear || query) && (
           <button
             onClick={() => { setQuery(""); setSelectedTag(""); setSelectedYear(""); }}
-            className="px-3 py-2 text-sm font-medium text-violet-600 hover:text-violet-700 dark:text-violet-400 dark:hover:text-violet-300"
+            className="px-3 py-2 text-sm font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300"
           >
             Clear filters
           </button>
@@ -121,9 +121,9 @@ export default function SearchPublications({
       <div className="flex flex-col gap-3">
         {filtered.map((pub) => (
           <a key={pub.slug} href={`/publications/${pub.slug}`} className="group block">
-            <div className="rounded-2xl border border-l-[3px] border-zinc-100 border-l-violet-500 p-5 transition hover:border-zinc-200 hover:bg-zinc-50/60 dark:border-zinc-700/40 dark:border-l-violet-400 dark:hover:border-zinc-700 dark:hover:bg-zinc-800/40">
+            <div className="rounded-2xl border border-l-[3px] border-zinc-100 border-l-brand-500 p-5 transition hover:border-zinc-200 hover:bg-zinc-50/60 dark:border-zinc-700/40 dark:border-l-brand-400 dark:hover:border-zinc-700 dark:hover:bg-zinc-800/40">
               <div className="space-y-2">
-                <h3 className="text-sm font-semibold leading-snug text-zinc-800 transition-colors group-hover:text-violet-600 dark:text-zinc-100 dark:group-hover:text-violet-400">
+                <h3 className="text-sm font-semibold leading-snug text-zinc-800 transition-colors group-hover:text-brand-600 dark:text-zinc-100 dark:group-hover:text-brand-400">
                   {pub.title}
                 </h3>
                 {pub.authors && (
@@ -142,7 +142,7 @@ export default function SearchPublications({
                     {pub.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="rounded-full bg-violet-100/70 px-2.5 py-0.5 text-xs font-medium text-violet-700 ring-1 ring-violet-200/60 dark:bg-violet-500/10 dark:text-violet-300 dark:ring-violet-400/20"
+                        className="rounded-full bg-brand-100/70 px-2.5 py-0.5 text-xs font-medium text-brand-700 ring-1 ring-brand-200/60 dark:bg-brand-500/10 dark:text-brand-300 dark:ring-brand-400/20"
                       >
                         {tag}
                       </span>
