@@ -2,6 +2,7 @@
 /Publications /publications/ 301
 /Publications/ /publications/ 301
 /Publications/:slug /publications/:slug 301
+/Publications/:slug/ /publications/:slug/ 301
 /Publications/:slug/index.html /publications/:slug/ 301
 /Publications/* /publication-files/:splat 301
 /sitemap.xml  /sitemap-index.xml  301
