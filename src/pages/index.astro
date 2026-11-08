@@ -2,7 +2,7 @@
 export const prerender = true;
 
 import { Image } from "astro:assets";
-import headshot from "../assets/headshot.jpg";
+import headshot from "../assets/headshot.png";
 import PageLayout from "../layouts/PageLayout.astro";
 import Container from "../components/Container.astro";
 import Button from "../components/Button.astro";
@@ -64,7 +64,7 @@ const formatDate = (date: string) =>
             src={headshot}
             alt="Portrait of Will Pike"
             width={600}
-            height={600}
+            height={750}
             class="aspect-[4/5] w-full rounded-lg object-cover object-[center_38%]"
           />
         </div>
