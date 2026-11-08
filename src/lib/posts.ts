@@ -43,6 +43,10 @@ export interface ProjectFrontmatter {
   tags: string[];
   url?: string;
   repo?: string;
+  image?: string;
+  status?: "active" | "shipped" | "archived";
+  period?: string;
+  stack?: string[];
   post?: string;
   postSlug?: string;
   hideFromFeed?: boolean;
@@ -138,6 +142,10 @@ export function getProjects(): ProjectEntry[] {
       tags: (data.tags as string[]) ?? [],
       url: data.url as string | undefined,
       repo: data.repo as string | undefined,
+      image: data.image as string | undefined,
+      status: data.status as ProjectFrontmatter["status"],
+      period: data.period as string | undefined,
+      stack: data.stack as string[] | undefined,
       post: (data.post || data.postSlug) as string | undefined,
       hideFromFeed: Boolean(data.hideFromFeed ?? data.hide_from_feed),
       content,

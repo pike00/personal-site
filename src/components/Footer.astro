@@ -1,38 +1,43 @@
 ---
 import Container from "./Container.astro";
+import { flags } from "../lib/flags";
 
 const year = new Date().getFullYear();
 const commitHash = import.meta.env.COMMIT_HASH ?? "dev";
 const repoUrl = "https://github.com/pike00/personal-site";
 
 const navLinks = [
-  { href: "/cv", label: "CV" },
-  { href: "/publications", label: "Publications" },
-  { href: "/notes", label: "Notes" },
-  { href: "/topics", label: "Topics" },
-  { href: "/about", label: "About" },
+  { href: "/projects/", label: "Work" },
+  { href: "/publications/", label: "Publications" },
+  { href: "/notes/", label: "Notes" },
+  { href: "/cv/", label: "CV" },
+  { href: "/about/", label: "About" },
+  { href: "/repos/", label: "Repos" },
+  { href: "/topics/", label: "Topics" },
+  { href: "/prints/", label: "Prints" },
+  ...(flags.contact ? [{ href: "/contact/", label: "Contact" }] : []),
 ];
 ---
 
-<footer class="mt-32 flex-none">
+<footer class="mt-24 flex-none">
   <Container variant="outer">
     <div class="border-t border-zinc-100 pb-16 pt-10 dark:border-zinc-700/40">
       <Container variant="inner">
-        <div class="flex flex-col items-center justify-between gap-6 md:flex-row">
-          <div class="flex flex-wrap justify-center gap-x-6 gap-y-1 text-sm font-medium text-zinc-800 dark:text-zinc-200">
+        <div class="flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
+          <nav aria-label="Footer" class="flex flex-wrap gap-x-5 gap-y-2 text-sm font-medium text-zinc-700 dark:text-zinc-200">
             {navLinks.map((link) => (
-              <a href={link.href} class="transition hover:text-violet-500 dark:hover:text-violet-400">
+              <a href={link.href} class="transition-colors hover:text-brand-700 dark:hover:text-brand-300">
                 {link.label}
               </a>
             ))}
-          </div>
-          <div class="flex items-center gap-4 text-sm text-zinc-400 dark:text-zinc-500">
+          </nav>
+          <div class="flex items-center gap-4 text-sm text-zinc-500 dark:text-zinc-400">
             <p>&copy; {year} Will Pike.</p>
             <a
               href={`${repoUrl}/commit/${commitHash}`}
               target="_blank"
               rel="noopener noreferrer"
-              class="font-mono transition hover:text-violet-500 dark:hover:text-violet-400"
+              class="font-mono transition-colors hover:text-brand-700 dark:hover:text-brand-300"
             >
               {commitHash}
             </a>

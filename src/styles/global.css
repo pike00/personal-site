@@ -3,27 +3,29 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* ---------------------------------------------------------------------------
-   Spotlight design system (melded)
-
-   Foundation:  zinc, ported from the Tailwind Plus "Spotlight" template.
-   Accent:      violet — Will's existing brand hue — substituted everywhere the
-                stock template used teal. Structure/feel is Spotlight; the
-                accent is his.
-   Text scale:  the Spotlight type ramp.
-
-   Legacy token bridge:  the old palette tokens (--color-primary,
-   --color-surface-*, --color-accent*) are kept but REMAPPED onto the zinc/
-   violet system, so pages still on `text-primary` / `bg-surface-card-dark`
-   immediately render Spotlight-correct while they are migrated to native
-   zinc/violet utilities.
---------------------------------------------------------------------------- */
+/* Site palette and typography */
 
 @theme {
-  /* Accent = violet (replaces Spotlight teal) */
-  --color-accent: var(--color-violet-500);
-  --color-accent-dark: var(--color-violet-600);
-  --color-accent-light: var(--color-violet-400);
+  --color-brand-50: #fbf4ef;
+  --color-brand-100: #f4e6dc;
+  --color-brand-200: #e9ccb8;
+  --color-brand-300: #d8a58b;
+  --color-brand-400: #c47d5e;
+  --color-brand-500: #ae5f41;
+  --color-brand-600: #93482f;
+  --color-brand-700: #763b28;
+  --color-brand-800: #5f3224;
+  --color-brand-900: #4e2b22;
+  --color-brand-950: #2d1a15;
+
+  --color-paper: #f5f2ec;
+  --color-paper-card: #fffdfa;
+  --color-night: #171815;
+  --color-night-card: #20211e;
+
+  --color-accent: var(--color-brand-500);
+  --color-accent-dark: var(--color-brand-600);
+  --color-accent-light: var(--color-brand-400);
 
   /* Legacy bridge — map onto the zinc system */
   --color-primary: var(--color-zinc-800);
@@ -33,10 +35,10 @@
   --color-surface-dark: #000000;
   --color-surface-card-dark: var(--color-zinc-900);
 
-  --font-sans: Inter, system-ui, -apple-system, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-sans: "Geist", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
 
-  /* Spotlight text scale */
   --text-xs: 0.8125rem;
   --text-xs--line-height: 1.5rem;
   --text-sm: 0.875rem;
@@ -59,10 +61,45 @@
   --text-6xl--line-height: 1;
 }
 
-/* ---------------------------------------------------------------------------
-   Spotlight prose theming. typography.ts is replaced by setting the same CSS
-   variables directly (Tailwind v4). Links are violet instead of teal.
---------------------------------------------------------------------------- */
+@font-face {
+  font-family: "Geist";
+  src: url("../content/cv/fonts/Geist-Regular.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Geist";
+  src: url("../content/cv/fonts/Geist-Medium.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Geist";
+  src: url("../content/cv/fonts/Geist-SemiBold.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Geist";
+  src: url("../content/cv/fonts/Geist-Bold.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Geist Mono";
+  src: url("../content/cv/fonts/GeistMono-Regular.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
 
 @layer base {
   html {
@@ -70,18 +107,18 @@
   }
 
   body {
-    @apply bg-zinc-50 text-zinc-600 antialiased;
+    @apply bg-paper text-zinc-700 antialiased;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
   .dark body {
-    @apply bg-black text-zinc-400;
+    @apply bg-night text-zinc-300;
   }
 
   .prose {
     --tw-prose-body: var(--color-zinc-600);
     --tw-prose-headings: var(--color-zinc-900);
-    --tw-prose-links: var(--color-violet-600);
+    --tw-prose-links: var(--color-brand-700);
     --tw-prose-bold: var(--color-zinc-900);
     --tw-prose-counters: var(--color-zinc-900);
     --tw-prose-bullets: var(--color-zinc-900);
@@ -99,7 +136,7 @@
   .dark .prose {
     --tw-prose-body: var(--color-zinc-400);
     --tw-prose-headings: var(--color-zinc-200);
-    --tw-prose-links: var(--color-violet-400);
+    --tw-prose-links: var(--color-brand-300);
     --tw-prose-bold: var(--color-zinc-200);
     --tw-prose-counters: var(--color-zinc-200);
     --tw-prose-bullets: var(--color-zinc-200);
@@ -131,7 +168,7 @@
     @apply bg-zinc-600;
   }
   .prose code.inline-copy:focus-visible {
-    @apply outline-2 outline-offset-2 outline-violet-500;
+    @apply outline-2 outline-offset-2 outline-brand-500;
   }
 }
 

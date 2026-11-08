@@ -14,9 +14,7 @@ interface Props {
 }
 
 function loadFont(filename: string): Buffer {
-  return fs.readFileSync(
-    path.resolve("node_modules/@fontsource/inter/files", filename)
-  );
+  return fs.readFileSync(path.resolve("src/content/cv/fonts", filename));
 }
 
 export async function getStaticPaths() {
@@ -57,7 +55,7 @@ export async function getStaticPaths() {
     params: { slug: "home" },
     props: {
       title: "Will Pike, MD",
-      description: "Physician and Clinical AI Informaticist at Suki AI. Research, software, and real-world evidence.",
+      description: "Physician and clinical AI informaticist at Suki AI. Clinical informatics, research, and software.",
       label: "pikemd.com",
     },
   });
@@ -77,8 +75,8 @@ export async function getStaticPaths() {
 export async function GET({ props }: { props: Props }) {
   const { title, description, label } = props;
 
-  const font = loadFont("inter-latin-400-normal.woff");
-  const boldFont = loadFont("inter-latin-700-normal.woff");
+  const font = loadFont("Geist-Regular.ttf");
+  const boldFont = loadFont("Geist-Bold.ttf");
 
   const svg = await satori(
     {
@@ -87,19 +85,19 @@ export async function GET({ props }: { props: Props }) {
         style: {
           width: "1200px",
           height: "630px",
-          background: "#0f1729",
+          background: "#f5f2ec",
           display: "flex",
           flexDirection: "column",
           padding: "60px",
-          fontFamily: "Inter",
+          fontFamily: "Geist",
         },
         children: [
           {
             type: "div",
             props: {
               style: {
-                background: "#1e3a5f",
-                color: "#60a5fa",
+                background: "#f4e6dc",
+                color: "#763b28",
                 fontSize: "18px",
                 fontWeight: "700",
                 padding: "8px 18px",
@@ -114,7 +112,7 @@ export async function GET({ props }: { props: Props }) {
             type: "div",
             props: {
               style: {
-                color: "#f1f5f9",
+                color: "#292621",
                 fontSize: "64px",
                 fontWeight: "700",
                 lineHeight: "1.15",
@@ -130,7 +128,7 @@ export async function GET({ props }: { props: Props }) {
             type: "div",
             props: {
               style: {
-                color: "#94a3b8",
+                color: "#69655e",
                 fontSize: "28px",
                 lineHeight: "1.4",
                 marginBottom: "40px",
@@ -145,7 +143,7 @@ export async function GET({ props }: { props: Props }) {
             type: "div",
             props: {
               style: {
-                color: "#60a5fa",
+                color: "#93482f",
                 fontSize: "22px",
                 fontWeight: "700",
               },
@@ -159,8 +157,8 @@ export async function GET({ props }: { props: Props }) {
       width: 1200,
       height: 630,
       fonts: [
-        { name: "Inter", data: font, weight: 400, style: "normal" },
-        { name: "Inter", data: boldFont, weight: 700, style: "normal" },
+        { name: "Geist", data: font, weight: 400, style: "normal" },
+        { name: "Geist", data: boldFont, weight: 700, style: "normal" },
       ],
     }
   );

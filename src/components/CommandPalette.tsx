@@ -7,10 +7,10 @@ interface Props {
 }
 
 const TYPE_BADGE: Record<SearchDocType, string> = {
-  Note: "bg-violet-500/10 text-violet-600 dark:bg-violet-400/20 dark:text-violet-300",
+  Note: "bg-brand-500/10 text-brand-600 dark:bg-brand-400/20 dark:text-brand-300",
   Project: "bg-zinc-500/10 text-zinc-600 dark:bg-white/10 dark:text-zinc-200",
   Publication:
-    "bg-violet-100/70 text-violet-700 dark:bg-violet-500/10 dark:text-violet-300",
+    "bg-brand-100/70 text-brand-700 dark:bg-brand-500/10 dark:text-brand-300",
   Print:
     "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-400/20 dark:text-emerald-300",
 };

@@ -28,11 +28,10 @@ import { join } from "node:path";
 
 const DIST_DIR = "dist";
 
-// Out-of-document origins, single-sourced so analytics/font changes stay in
-// sync across both target files. Reference these in CSP_DIRECTIVES below.
+// Out-of-document origins, single-sourced so analytics changes stay in sync
+// across both target files. Reference these in CSP_DIRECTIVES below.
 const SHARED_ORIGINS = {
   matomo: "https://matomo.khanpikehome.com", // Matomo analytics (script + API)
-  fonts: "https://rsms.me", // Inter web font (stylesheet + font files)
   turnstile: "https://challenges.cloudflare.com", // Turnstile (contact form): api.js + iframe + siteverify
   // Algolia DocSearch (⌘K palette): search-API + crawler-fed index endpoints.
   // connect-src only — the DocSearch JS is bundled from npm, not a CDN.
@@ -46,9 +45,9 @@ const CSP_DIRECTIVES = [
   ["default-src", ["'self'"]],
   ["script-src", ["'self'", "__HASHES__", SHARED_ORIGINS.matomo, SHARED_ORIGINS.turnstile]],
   ["connect-src", ["'self'", SHARED_ORIGINS.matomo, SHARED_ORIGINS.turnstile, SHARED_ORIGINS.algolia]],
-  ["style-src", ["'self'", "'unsafe-inline'", SHARED_ORIGINS.fonts]],
+  ["style-src", ["'self'", "'unsafe-inline'"]],
   ["img-src", ["'self'", "data:"]],
-  ["font-src", ["'self'", SHARED_ORIGINS.fonts]],
+  ["font-src", ["'self'"]],
   ["frame-src", ["'self'", SHARED_ORIGINS.turnstile]],
   ["frame-ancestors", ["'self'"]],
 ];
